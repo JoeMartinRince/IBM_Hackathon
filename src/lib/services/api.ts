@@ -1,4 +1,4 @@
-// Unified API Client for VERIFEX AI Frontend
+// Unified API Client for VERIFAI Frontend
 
 export async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = endpoint.startsWith("/") ? endpoint : `/api/${endpoint}`;

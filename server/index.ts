@@ -27,7 +27,7 @@ app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 app.get("/api/health", (_req, res) => {
   res.json({
     status: "healthy",
-    service: "VERIFEX AI Backend Engine",
+    service: "VERIFAI Backend Engine",
     timestamp: new Date().toISOString(),
     mode: process.env.DATABASE_URL ? "LIVE" : "DEMO",
   });
@@ -44,7 +44,7 @@ app.use("/api", publicVerifyRouter);
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`[VERIFEX AI Engine] running at http://localhost:${PORT}`);
+  console.log(`[VERIFAI Engine] running at http://localhost:${PORT}`);
   console.log(`[Mode] ${process.env.DATABASE_URL ? "LIVE (PostgreSQL)" : "DEMO (In-Memory / Local Cache)"}`);
 });
 

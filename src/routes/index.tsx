@@ -8,9 +8,9 @@ import hero from "@/assets/hero-docs.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "VERIFEX AI — Verify Every Export Before It Ships" },
+      { title: "VERIFAI — Verify Every Export Before It Ships" },
       { name: "description", content: "AI-powered export document intelligence that finds inconsistencies, predicts customs queries and tells you when a shipment is ready." },
-      { property: "og:title", content: "VERIFEX AI — Verify Every Export Before It Ships" },
+      { property: "og:title", content: "VERIFAI — Verify Every Export Before It Ships" },
       { property: "og:description", content: "Don't just detect errors. Prevent export delays." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

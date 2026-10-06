@@ -58,13 +58,13 @@ function ReportPage() {
           <div>
             <div className="flex items-center gap-2 text-primary font-bold text-lg tracking-tight">
               <ShieldCheck className="size-6" />
-              VERIFEX<span className="text-foreground"> AI</span>
+              VERIF<span className="text-foreground">AI</span>
             </div>
             <div className="text-xs text-muted-foreground mt-1">
               Kerala Export Verification & Trade Compliance Authority · KeralAI 2026
             </div>
             <div className="mt-3 font-mono text-sm text-foreground">
-              CERTIFICATE REF: <span className="font-bold">VERIFEX-CERT-{activeShipment.id}-2026</span>
+              CERTIFICATE REF: <span className="font-bold">VERIFAI-CERT-{activeShipment.id}-2026</span>
             </div>
           </div>
 
@@ -159,7 +159,7 @@ function ReportPage() {
 
           <div className="text-center sm:text-right">
             <div className="font-bold text-sm uppercase tracking-wider text-foreground">
-              VERIFEX AI EXPORT INSPECTION SEAL
+              VERIFAI EXPORT INSPECTION SEAL
             </div>
             <div className="text-muted-foreground mt-0.5">Government of Kerala Trade Protocol v2.4</div>
             <div className="font-mono text-[11px] text-primary font-bold mt-1">STATUS: COMPLIANCE CLEARED</div>

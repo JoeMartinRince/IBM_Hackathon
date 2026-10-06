@@ -1,14 +1,14 @@
-# VERIFEX AI — System Architecture Document
+# VERIFAI — System Architecture Document
 
 **Challenge 3**: Export Document Verification System  
 **Hackathon**: IBM x Government of Kerala — KeralAI Hackathon 2026  
-**Platform**: VERIFEX AI (AI-Powered Export Document Verification & Readiness Platform)
+**Platform**: VERIFAI (AI-Powered Export Document Verification & Readiness Platform)
 
 ---
 
 ## 1. High-Level Architecture Overview
 
-VERIFEX AI is an end-to-end export documentation verification platform designed to eliminate customs clearance delays, discrepancies, and compliance penalties across Kerala's primary maritime gateways (**Cochin Sea Port - INCOK** and **Vizhinjam International Transshipment Deepwater Terminal - INVIZ**).
+VERIFAI is an end-to-end export documentation verification platform designed to eliminate customs clearance delays, discrepancies, and compliance penalties across Kerala's primary maritime gateways (**Cochin Sea Port - INCOK** and **Vizhinjam International Transshipment Deepwater Terminal - INVIZ**).
 
 ```
 +---------------------------------------------------------------------------------------+

@@ -1,7 +1,7 @@
 # Development Guidelines
 
-## Project: VERIFEX AI
-VERIFEX AI is an intelligent export document verification platform designed for trade compliance, inconsistency detection, and customs risk prediction.
+## Project: VERIFAI
+VERIFAI is an intelligent export document verification platform designed for trade compliance, inconsistency detection, and customs risk prediction.
 
 ### Principles
 - **Clean Architecture**: Keep UI components modular within `src/components` and business logic within `src/lib`.

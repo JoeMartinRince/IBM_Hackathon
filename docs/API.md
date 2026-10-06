@@ -1,4 +1,4 @@
-# VERIFEX AI — REST API Documentation
+# VERIFAI — REST API Documentation
 
 Base URL: `http://localhost:3001/api` (or proxied via Vite at `http://localhost:8080/api`)
 
@@ -9,13 +9,13 @@ All requests and responses use `application/json` content-type unless otherwise 
 ## 1. System Health
 
 ### `GET /api/health`
-Returns the operational health and execution mode of the VERIFEX engine.
+Returns the operational health and execution mode of the VERIFAI engine.
 
 **Response `200 OK`**:
 ```json
 {
   "status": "healthy",
-  "service": "VERIFEX AI Backend Engine",
+  "service": "VERIFAI Backend Engine",
   "timestamp": "2026-10-06T12:20:29.987Z",
   "mode": "DEMO"
 }

@@ -1,4 +1,4 @@
--- VERIFEX AI - PostgreSQL Database Schema
+-- VERIFAI - PostgreSQL Database Schema
 -- IBM x Government of Kerala - KeralAI Hackathon 2026
 -- Challenge 3: Export Document Verification System
 

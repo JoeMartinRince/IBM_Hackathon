@@ -30,7 +30,7 @@ function PublicVerifyStatusPage() {
               <ShieldCheck className="size-5 text-primary" />
             </div>
             <span className="font-semibold tracking-tight text-lg">
-              VERIFEX<span className="text-primary"> AI</span>
+              VERIF<span className="text-primary">AI</span>
             </span>
           </Link>
 
@@ -45,7 +45,7 @@ function PublicVerifyStatusPage() {
             <div className="eyebrow text-primary">Official Trade Verification</div>
             <h1 className="text-2xl font-bold tracking-tight">Export Clearance Authenticity</h1>
             <p className="text-xs text-muted-foreground">
-              Verified by VERIFEX AI Engine · Kerala Maritime Trade Authority
+              Verified by VERIFAI Engine · Kerala Maritime Trade Authority
             </p>
           </div>
 
@@ -102,7 +102,7 @@ function PublicVerifyStatusPage() {
               to="/dashboard"
               className="press inline-flex items-center gap-2 rounded-full border bg-card px-5 py-2.5 text-xs font-semibold text-foreground hover:bg-muted"
             >
-              <ArrowLeft className="size-3.5" /> Return to VERIFEX Platform
+              <ArrowLeft className="size-3.5" /> Return to VERIFAI Platform
             </Link>
           </div>
         </div>

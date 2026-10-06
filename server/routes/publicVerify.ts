@@ -31,7 +31,7 @@ publicVerifyRouter.get("/verify-status/:token", (req: Request, res: Response) =>
       verified_at: tokenRecord.verified_at,
       expires_at: tokenRecord.expires_at,
       documents_verified_count: docsCount,
-      integrity_seal: "VERIFEX-AUTHENTICATED-EXPORT-RECORD",
+      integrity_seal: "VERIFAI-AUTHENTICATED-EXPORT-RECORD",
       security_notice: "Commercial contract values and financial records are redacted for public verification.",
     },
   });

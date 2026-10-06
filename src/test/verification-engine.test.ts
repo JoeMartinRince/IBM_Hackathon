@@ -10,7 +10,7 @@ import {
 import { simulateCustomsQueries } from "../../server/engine/customsRisk";
 import { DiscrepancyRecord } from "../../server/types";
 
-describe("VERIFEX AI Verification Engine", () => {
+describe("VERIFAI Verification Engine", () => {
   describe("Unit Normalization", () => {
     it("converts Metric Tons (MT) to Kilograms (KG)", () => {
       expect(normalizeWeightToKg(12, "MT")).toBe(12000);

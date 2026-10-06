@@ -659,7 +659,7 @@ class DataStore {
       {
         id: "audit-03",
         shipment_id: "EXP-KL-2026-1042",
-        user_name: "VERIFEX AI Engine",
+        user_name: "VERIFAI Engine",
         user_role: "Automated System",
         action: "Verification Executed",
         details: "Analyzed 18 cross-document attributes. Flagged 1 Critical (qty), 1 Major (HS), 1 Warning (cert expiry).",

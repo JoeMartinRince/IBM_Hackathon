@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/login")({
-  head: () => seo("Login", "Sign in to VERIFEX AI export document verification system."),
+  head: () => seo("Login", "Sign in to VERIFAI export document verification system."),
   component: LoginPage,
 });
 
@@ -34,7 +34,7 @@ function LoginPage() {
             <ShieldCheck className="size-6 text-primary" />
           </div>
           <span className="text-2xl font-bold tracking-tight">
-            VERIFEX<span className="text-primary"> AI</span>
+            VERIF<span className="text-primary">AI</span>
           </span>
         </Link>
         <h2 className="text-xl font-bold tracking-tight text-foreground">Sign in to your export workspace</h2>

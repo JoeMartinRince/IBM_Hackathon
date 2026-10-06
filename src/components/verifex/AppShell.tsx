@@ -30,7 +30,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
       <div className="flex size-9 items-center justify-center rounded-xl bg-ink text-ink-foreground">
         <ShieldCheck className="size-5 text-primary" />
       </div>
-      {!compact && <span className="font-semibold tracking-tight">VERIFEX<span className="text-primary"> AI</span></span>}
+      {!compact && <span className="font-semibold tracking-tight">VERIF<span className="text-primary">AI</span></span>}
     </Link>
   );
 }

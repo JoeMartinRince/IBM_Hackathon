@@ -1,6 +1,6 @@
-# VERIFEX AI — Database Architecture & Schema
+# VERIFAI — Database Architecture & Schema
 
-**Platform**: VERIFEX AI (AI-Powered Export Document Verification & Readiness Platform)  
+**Platform**: VERIFAI (AI-Powered Export Document Verification & Readiness Platform)  
 **Hackathon**: IBM x Government of Kerala — KeralAI Hackathon 2026
 
 ---
@@ -136,7 +136,7 @@ Immutable compliance audit log for customs traceability.
 
 ## 3. Dual-Mode Storage Architecture
 
-VERIFEX AI incorporates a dual-mode persistence pattern:
+VERIFAI incorporates a dual-mode persistence pattern:
 
 1. **Production / Live Mode (PostgreSQL)**:
    - When `DATABASE_URL` is configured in `.env`, the system establishes a connection pool with PostgreSQL.

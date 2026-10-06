@@ -1,4 +1,4 @@
-# ⚓ VERIFEX AI — Verify Every Export Before It Ships
+# ⚓ VERIFAI — Verify Every Export Before It Ships
 
 <div align="center">
 
@@ -26,7 +26,7 @@
 ## 📑 Table of Contents
 
 1. [Executive Summary & The Kerala Export Challenge](#-executive-summary--the-kerala-export-challenge)
-2. [Why VERIFEX AI? (The Problem vs The Solution)](#-why-verifex-ai-the-problem-vs-the-solution)
+2. [Why VERIFAI? (The Problem vs The Solution)](#-why-verifai-the-problem-vs-the-solution)
 3. [Key Innovations & Platform Capabilities](#-key-innovations--platform-capabilities)
 4. [System Architecture](#-system-architecture)
 5. [Deterministic Verification Engine Rules](#-deterministic-verification-engine-rules)
@@ -64,11 +64,11 @@ Even minute discrepancies result in catastrophic supply chain penalties:
 - **Foreign Port Rejections**: Total cargo rejection at destination ports (Jebel Ali, Rotterdam, Newark) due to mismatching HS codes or expired health certificates.
 - **Manual Overhead**: Logistics officers spend 3 to 5 hours per consignment manually cross-checking hundreds of numbers across PDF scans and paper prints.
 
-**VERIFEX AI** solves this critical bottleneck by providing an **automated, deterministic cross-document verification engine** that eliminates errors before cargo departs the factory gate.
+**VERIFAI** solves this critical bottleneck by providing an **automated, deterministic cross-document verification engine** that eliminates errors before cargo departs the factory gate.
 
 ---
 
-## ⚖️ Why VERIFEX AI? (The Problem vs The Solution)
+## ⚖️ Why VERIFAI? (The Problem vs The Solution)
 
 ```
 TRADITIONAL MANUAL PROCESS
@@ -87,13 +87,13 @@ TRADITIONAL MANUAL PROCESS
 
 ─────────────────────────────────────────────────────────────────────────────
 
-VERIFEX AI PLATFORM
+VERIFAI PLATFORM
   Exporter CI        Packing List       Shipping Bill      Health Cert
       │                   │                   │                 │
       └─────────┬─────────┴─────────┬─────────┴─────────────────┘
                 │
                 ▼
-       [VERIFEX AI Ingestion & Verification Engine: < 3 Seconds]
+       [VERIFAI Ingestion & Verification Engine: < 3 Seconds]
        ✓ Deterministic cross-document field alignment
        ✓ ISO 6346 Container checksum validation
        ✓ Consensus Golden Record synthesized
@@ -240,7 +240,7 @@ Validates 6-to-8 digit Harmonized System classification consistency across all t
 
 ## 🏛️ Consensus Golden Record Model
 
-When different trade documents contain conflicting data, VERIFEX AI builds an authoritative **Golden Record** using a weighted authority hierarchy:
+When different trade documents contain conflicting data, VERIFAI builds an authoritative **Golden Record** using a weighted authority hierarchy:
 
 | Document Type | Authority Weight | Statutory Rationale |
 | :--- | :---: | :--- |
@@ -270,7 +270,7 @@ Predicted Customs Query:
   "Discrepancy in declared HS Code between Shipping Bill (030616) and Commercial
    Invoice (030617). Explain tariff variation and produce valid MPEDA certificate."
 
-VERIFEX AI PRE-DRAFTED REBUTTAL:
+VERIFAI PRE-DRAFTED REBUTTAL:
   "To: The Assistant Commissioner of Customs (Export), Cochin Customs House (INCOK)
    Subject: Clarification on HS Code Classification for Shipment EXP-KL-2026-1042
    
@@ -306,7 +306,7 @@ Switch languages instantly using the globe icon in the navigation bar.
 
 ## 📊 Comparison Matrix
 
-| Capability | Manual Verification | Generic OCR / Document AI | VERIFEX AI |
+| Capability | Manual Verification | Generic OCR / Document AI | VERIFAI |
 | :--- | :---: | :---: | :---: |
 | **Verification Speed** | 3 – 5 hours / shipment | 10 – 15 minutes | **< 3 seconds** |
 | **Multi-Document Cross Check** | Manual side-by-side | Single doc extraction only | **Automatic 7-way matrix** |
@@ -360,7 +360,7 @@ npm install
 cp .env.example .env
 ```
 
-*(Note: VERIFEX AI operates out of the box in **Resilient Demo Mode** with zero external database or API key requirements).*
+*(Note: VERIFAI operates out of the box in **Resilient Demo Mode** with zero external database or API key requirements).*
 
 ### 3. Launch Development Servers
 
@@ -391,7 +391,7 @@ http://localhost:8080
 
 ## 🔄 Dual-Mode Architecture
 
-VERIFEX AI provides seamless dual-mode execution to ensure **100% offline reliability for hackathon evaluation** alongside enterprise production scalability:
+VERIFAI provides seamless dual-mode execution to ensure **100% offline reliability for hackathon evaluation** alongside enterprise production scalability:
 
 | Feature | DEMO MODE (Default) | LIVE MODE (Production) |
 | :--- | :--- | :--- |
@@ -407,7 +407,7 @@ VERIFEX AI provides seamless dual-mode execution to ensure **100% offline reliab
 
 ## 🧪 Automated Test Suite
 
-VERIFEX AI includes comprehensive automated test coverage for all core verification mathematics and routing:
+VERIFAI includes comprehensive automated test coverage for all core verification mathematics and routing:
 
 ```bash
 npm test
@@ -509,7 +509,7 @@ IBM-Hackathon/
 ├── src/                                 # Full-Stack Frontend Application
 │   ├── components/                      # Modular UI Components
 │   │   ├── ui/                          # Radix UI design primitives
-│   │   └── verifex/                     # VERIFEX design system components
+│   │   └── verifex/                     # VERIFAI design system components
 │   │       ├── AppShell.tsx             # Master layout with sidebar & mobile dock
 │   │       ├── primitives.tsx           # ReadinessRing, StatusBadge, StatTile, Reveal
 │   │       └── QRCode.tsx               # Verified QR code renderer

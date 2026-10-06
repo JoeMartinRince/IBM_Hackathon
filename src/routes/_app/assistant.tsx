@@ -32,7 +32,7 @@ function AssistantPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `Hello! I am your VERIFEX AI export intelligence assistant. I am grounded in verified data for **${activeShipment.id}** (${activeShipment.commodity}). Ask me anything about declared quantities, tariff codes, discrepancies, or customs clearance steps.`,
+      content: `Hello! I am your VERIFAI export intelligence assistant. I am grounded in verified data for **${activeShipment.id}** (${activeShipment.commodity}). Ask me anything about declared quantities, tariff codes, discrepancies, or customs clearance steps.`,
       citations: ["Verified Consignment Dossier", "Consensus Golden Record"],
     },
   ]);
