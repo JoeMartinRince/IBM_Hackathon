@@ -138,6 +138,10 @@ VERIFAI PLATFORM
 ### 8. Native Multilingual Support
 - Instant one-click interface switching between **English**, **Malayalam (മലയാളം)**, and **Hindi (हिन्दी)**.
 
+### 9. Real-Time Optical Camera Scanner (ക്യാമറ സ്കാനർ)
+- Live camera stream integration for on-site warehouse and port gate paper document inspection.
+- Holographic viewfinder overlay with animated laser scanning beam, document corner framing brackets, torch toggle, and synthetic camera shutter feedback.
+
 ---
 
 ## 🏗️ System Architecture

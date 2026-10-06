@@ -13,10 +13,13 @@ import {
   ShieldCheck,
   RefreshCw,
   Trash2,
+  Camera,
+  ScanLine,
 } from "lucide-react";
 import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
 import { PageHeader, Reveal } from "@/components/verifex/primitives";
+import { CameraScanner } from "@/components/verifex/CameraScanner";
 import { shipments, type DocType, type ShipmentDocument } from "@/lib/data";
 
 export const Route = createFileRoute("/_app/verify")({
@@ -29,6 +32,7 @@ function VerifyPage() {
   const { activeShipmentId, setActiveShipmentId, docs, setDocs, addDocs, t } = useDemo();
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [processStep, setProcessStep] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -97,7 +101,7 @@ function VerifyPage() {
       <PageHeader
         eyebrow="Multi-Document Ingestion"
         title="Verify Export Documents"
-        sub="Upload your export dossier (Commercial Invoice, Packing List, Shipping Bill, PO, Quality Certificate). VERIFEX AI will automatically extract, classify, and cross-verify."
+        sub="Upload your export dossier (Commercial Invoice, Packing List, Shipping Bill, PO, Quality Certificate). VERIFAI will automatically extract, classify, and cross-verify."
         right={
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Active:</span>
@@ -146,7 +150,7 @@ function VerifyPage() {
         </div>
       </Reveal>
 
-      {/* Drag & Drop Upload Zone */}
+      {/* Drag & Drop Upload Zone + Camera Scanner */}
       <Reveal delay={0.08}>
         <div
           onDragOver={(e) => {
@@ -160,7 +164,7 @@ function VerifyPage() {
             handleFiles(e.dataTransfer.files);
           }}
           onClick={() => fileInputRef.current?.click()}
-          className={`surface press group relative flex cursor-pointer flex-col items-center justify-center border-2 border-dashed p-10 text-center transition-all ${
+          className={`surface press group relative flex cursor-pointer flex-col items-center justify-center border-2 border-dashed p-8 sm:p-10 text-center transition-all ${
             isDragging ? "border-primary bg-primary/5 scale-[0.99]" : "border-border hover:border-primary/50"
           }`}
         >
@@ -175,11 +179,40 @@ function VerifyPage() {
           <div className="flex size-16 items-center justify-center rounded-3xl bg-primary-soft text-primary group-hover:scale-110 transition-transform">
             <Upload className="size-8" />
           </div>
-          <h3 className="mt-5 text-lg font-semibold">Drop trade documents here or click to browse</h3>
+          <h3 className="mt-5 text-lg font-semibold">Drop trade documents here or choose an ingestion mode</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Supports PDF, Scanned Images (PNG, JPG), Excel (.xlsx), and Word (.docx) up to 25 MB each
           </p>
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
+
+          {/* Action Buttons: Browse Files & Open Camera Scanner */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
+              className="press inline-flex items-center gap-2 rounded-full border bg-card px-5 py-2.5 text-xs font-semibold hover:border-primary/50"
+            >
+              <Upload className="size-3.5 text-primary" /> Browse Local Files
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsCameraOpen(true);
+              }}
+              className="press inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-glow)] hover:brightness-105"
+            >
+              <Camera className="size-3.5" /> Open Camera Scanner
+              <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                Live Scan
+              </span>
+            </button>
+          </div>
+
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
             {["Commercial Invoice", "Packing List", "Shipping Bill", "Purchase Order", "Quality Cert", "Origin Cert"].map(
               (badge) => (
                 <span key={badge} className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
@@ -287,6 +320,14 @@ function VerifyPage() {
           </div>
         )}
       </Reveal>
+
+      {/* Real-time Document Camera Scanner Modal */}
+      <CameraScanner
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onCapture={(doc) => addDocs([doc])}
+        shipmentId={activeShipment.id}
+      />
     </div>
   );
 }
