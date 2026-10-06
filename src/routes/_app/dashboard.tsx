@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_app/dashboard")({
 });
 
 function Dashboard() {
-  const { readiness, openIssues } = useDemo();
+  const { readiness, openIssues, activeShipment } = useDemo();
   return (
     <div>
       <Reveal className="mb-6">
@@ -24,9 +24,9 @@ function Dashboard() {
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">Active Shipment</div>
-              <div className="mt-1 font-mono text-xl md:text-2xl">EXP-KL-2026-1042</div>
-              <div className="mt-4 text-2xl font-semibold">Frozen Shrimp</div>
-              <div className="text-ink-muted">Cochin → Dubai</div>
+              <div className="mt-1 font-mono text-xl md:text-2xl">{activeShipment.id}</div>
+              <div className="mt-4 text-2xl font-semibold">{activeShipment.commodity}</div>
+              <div className="text-ink-muted">{activeShipment.from} → {activeShipment.to}</div>
               <div className="mt-5 flex items-center gap-3">
                 <StatusBadge status={readiness >= 100 ? "ready" : "review"} />
                 <span className="text-sm text-ink-muted">{openIssues} open issues</span>

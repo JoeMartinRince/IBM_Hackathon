@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppAssistantRouteImport } from './routes/_app/assistant'
 import { Route as AppCustomsRouteImport } from './routes/_app/customs'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -24,6 +25,7 @@ import { Route as AppResultsRouteImport } from './routes/_app/results'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppShipmentsRouteImport } from './routes/_app/shipments'
 import { Route as AppVerifyRouteImport } from './routes/_app/verify'
+import { Route as VerifyStatusTokenRouteImport } from './routes/verify-status.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -32,6 +34,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppAssistantRoute = AppAssistantRouteImport.update({
@@ -99,9 +106,15 @@ const AppVerifyRoute = AppVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => AppRoute,
 } as any)
+const VerifyStatusTokenRoute = VerifyStatusTokenRouteImport.update({
+  id: '/verify-status/$token',
+  path: '/verify-status/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/assistant': typeof AppAssistantRoute
   '/customs': typeof AppCustomsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -115,9 +128,11 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/shipments': typeof AppShipmentsRoute
   '/verify': typeof AppVerifyRoute
+  '/verify-status/$token': typeof VerifyStatusTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/assistant': typeof AppAssistantRoute
   '/customs': typeof AppCustomsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -131,11 +146,13 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/shipments': typeof AppShipmentsRoute
   '/verify': typeof AppVerifyRoute
+  '/verify-status/$token': typeof VerifyStatusTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/_app/assistant': typeof AppAssistantRoute
   '/_app/customs': typeof AppCustomsRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -149,11 +166,13 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/shipments': typeof AppShipmentsRoute
   '/_app/verify': typeof AppVerifyRoute
+  '/verify-status/$token': typeof VerifyStatusTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
     | '/assistant'
     | '/customs'
     | '/dashboard'
@@ -167,9 +186,11 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shipments'
     | '/verify'
+    | '/verify-status/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
     | '/assistant'
     | '/customs'
     | '/dashboard'
@@ -183,10 +204,12 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shipments'
     | '/verify'
+    | '/verify-status/$token'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/login'
     | '/_app/assistant'
     | '/_app/customs'
     | '/_app/dashboard'
@@ -200,11 +223,14 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/shipments'
     | '/_app/verify'
+    | '/verify-status/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  VerifyStatusTokenRoute: typeof VerifyStatusTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -221,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/assistant': {
@@ -314,6 +347,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVerifyRouteImport
       parentRoute: typeof AppRoute
     }
+    '/verify-status/$token': {
+      id: '/verify-status/$token'
+      path: '/verify-status/$token'
+      fullPath: '/verify-status/$token'
+      preLoaderRoute: typeof VerifyStatusTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -354,6 +394,8 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  VerifyStatusTokenRoute: VerifyStatusTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
