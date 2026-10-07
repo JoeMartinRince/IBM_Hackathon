@@ -6,8 +6,8 @@
 **IBM x Government of Kerala — KeralAI Hackathon 2026**  
 **Challenge 3**: Export Document Verification System
 
-[![Hackathon](https://img.shields.io/badge/IBM%20x%20Govt%20of%20Kerala-KeralAI%20Hackathon%202026-0043CE?style=for-the-badge&logo=ibm&logoColor=white)](https://github.com/alwinjosegeorge/IBM-Hackathon)
-[![Challenge](https://img.shields.io/badge/Challenge%203-Export%20Document%20Verification-059669?style=for-the-badge)](https://github.com/alwinjosegeorge/IBM-Hackathon)
+[![Hackathon](https://img.shields.io/badge/IBM%20x%20Govt%20of%20Kerala-KeralAI%20Hackathon%202026-0043CE?style=for-the-badge&logo=ibm&logoColor=white)](https://github.com/alwinjosegeorge/027_03)
+[![Challenge](https://img.shields.io/badge/Challenge%203-Export%20Document%20Verification-059669?style=for-the-badge)](https://github.com/alwinjosegeorge/027_03)
 
 <br/>
 
@@ -353,8 +353,8 @@ Switch languages instantly using the globe icon in the navigation bar.
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/alwinjosegeorge/IBM-Hackathon.git
-cd "IBM-Hackathon"
+git clone https://github.com/alwinjosegeorge/027_03.git
+cd "027_03"
 npm install
 ```
 
@@ -482,7 +482,7 @@ Follow this step-by-step workflow to experience the complete platform flow:
 ## 📂 Repository Structure
 
 ```
-IBM-Hackathon/
+027_03/
 ├── docs/                                # Technical Architecture Specifications
 │   ├── ARCHITECTURE.md                  # Detailed system design & modulus algorithms
 │   ├── API.md                           # REST API endpoint documentation
@@ -556,7 +556,7 @@ IBM-Hackathon/
 - **Challenge**: Challenge 3 — Export Document Verification System
 - **Focus Area**: AI-Powered Maritime Trade Compliance for Cochin Sea Port (INCOK) & Vizhinjam Deepwater Terminal (INVIZ)
 - **Primary Developer**: Alwin Joseph George ([@alwinjosegeorge](https://github.com/alwinjosegeorge))
-- **Repository**: [https://github.com/alwinjosegeorge/IBM-Hackathon](https://github.com/alwinjosegeorge/IBM-Hackathon)
+- **Repository**: [https://github.com/alwinjosegeorge/027_03](https://github.com/alwinjosegeorge/027_03)
 
 <div align="center">
   <sub>Built with pride for Kerala's global exporters. ⚓ Made for KeralAI Hackathon 2026.</sub>
