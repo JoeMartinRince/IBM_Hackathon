@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -28,6 +28,7 @@ import {
   Send,
   RefreshCw,
   Plus,
+  Camera,
 } from "lucide-react";
 import { toast } from "sonner";
 import { seo } from "@/lib/seo";
@@ -35,6 +36,7 @@ import { shipments, type DocumentSlot, type DocumentVersion } from "@/lib/data";
 import { useDemo } from "@/lib/demo-store";
 import { Reveal, ReadinessRing, ShipmentCard, StatTile, StatusBadge, ProgressBar } from "@/components/verifex/primitives";
 import { NewConsignmentModal } from "@/components/verifex/NewConsignmentModal";
+import { CameraScanner } from "@/components/verifex/CameraScanner";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => seo("Overview", "Current state of your export documentation and multi-user workflow."),
@@ -76,6 +78,9 @@ function Dashboard() {
   const [uploadTitle, setUploadTitle] = useState("");
   const [inspectVersionsSlot, setInspectVersionsSlot] = useState<DocumentSlot | null>(null);
   const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [scannedViaCamera, setScannedViaCamera] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Analysis progress animation state
   const [analysisStepIndex, setAnalysisStepIndex] = useState(0);
@@ -676,32 +681,63 @@ function Dashboard() {
                       </div>
 
                       {isCorrReq ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedSlotForUpload(slot);
-                            setIsCorrecting(true);
-                            setUploadFileName(`Packing_List_Reconciled_V2.pdf`);
-                            setUploadTitle(`Corrected ${slot.type} — Case ${slot.shipmentId}`);
-                          }}
-                          className="press rounded-full bg-critical px-5 py-2.5 text-xs font-bold text-white shadow-md hover:brightness-110 flex items-center gap-1.5"
-                        >
-                          <RotateCcw className="size-3.5" />
-                          Upload Corrected Version (V2)
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSlotForUpload(slot);
+                              setIsCorrecting(true);
+                              setUploadFileName(`Packing_List_Reconciled_V2.pdf`);
+                              setUploadTitle(`Corrected ${slot.type} — Case ${slot.shipmentId}`);
+                              setIsCameraOpen(true);
+                            }}
+                            className="press rounded-full bg-critical/10 border border-critical/30 px-3.5 py-2.5 text-xs font-bold text-critical hover:bg-critical/20 flex items-center gap-1.5"
+                          >
+                            <Camera className="size-3.5" />
+                            Scan V2
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSlotForUpload(slot);
+                              setIsCorrecting(true);
+                              setUploadFileName(`Packing_List_Reconciled_V2.pdf`);
+                              setUploadTitle(`Corrected ${slot.type} — Case ${slot.shipmentId}`);
+                            }}
+                            className="press rounded-full bg-critical px-4 py-2.5 text-xs font-bold text-white shadow-md hover:brightness-110 flex items-center gap-1.5"
+                          >
+                            <RotateCcw className="size-3.5" />
+                            Upload V2
+                          </button>
+                        </div>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedSlotForUpload(slot);
-                            setIsCorrecting(false);
-                            setUploadTitle(`${slot.type} — Case ${slot.shipmentId}`);
-                          }}
-                          className="press rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-glow)] hover:brightness-105 flex items-center gap-1.5"
-                        >
-                          <Upload className="size-3.5" />
-                          {isReady ? "Upload New Version" : "Upload Document"}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSlotForUpload(slot);
+                              setIsCorrecting(false);
+                              setUploadTitle(`${slot.type} — Case ${slot.shipmentId}`);
+                              setIsCameraOpen(true);
+                            }}
+                            className="press rounded-full bg-primary/10 border border-primary/30 px-3.5 py-2.5 text-xs font-bold text-primary hover:bg-primary/20 flex items-center gap-1.5"
+                          >
+                            <Camera className="size-3.5" />
+                            Scan
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSlotForUpload(slot);
+                              setIsCorrecting(false);
+                              setUploadTitle(`${slot.type} — Case ${slot.shipmentId}`);
+                            }}
+                            className="press rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-glow)] hover:brightness-105 flex items-center gap-1.5"
+                          >
+                            <Upload className="size-3.5" />
+                            {isReady ? "New Version" : "Upload"}
+                          </button>
+                        </div>
                       )}
                     </div>
                   </Reveal>
@@ -825,19 +861,73 @@ function Dashboard() {
                   />
                 </div>
 
-                {/* Simulated Drag & Drop Zone */}
-                <div className="rounded-2xl border-2 border-dashed border-primary/30 p-6 text-center space-y-2 bg-primary/5">
-                  <div className="flex size-10 mx-auto items-center justify-center rounded-full bg-primary/10 text-primary">
+                {/* File Input & Drag & Drop Zone with Camera Scanner */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.xlsx,.xls,.docx"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setUploadFileName(file.name);
+                      setUploadFileSize(`${(file.size / 1024).toFixed(0)} KB`);
+                      setScannedViaCamera(false);
+                      toast.success(`Selected file: ${file.name}`);
+                    }
+                  }}
+                />
+
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-2xl border-2 border-dashed border-primary/30 p-6 text-center space-y-3 bg-primary/5 cursor-pointer hover:border-primary/60 transition-all"
+                >
+                  <div className="flex size-11 mx-auto items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Upload className="size-5" />
                   </div>
-                  <div className="font-semibold text-foreground">
-                    Drag and drop file here, or click to browse
+                  <div>
+                    <div className="font-semibold text-foreground text-sm">
+                      Drag and drop file here, or click to browse
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      Supported: PDF, JPG, PNG, XLSX, DOCX (Max 25MB)
+                    </div>
                   </div>
-                  <div className="text-[11px] text-muted-foreground">
-                    Supported: PDF, JPG, PNG, XLSX, DOCX (Max 25MB)
+
+                  {/* Dual Ingestion Options: Browse Files OR Live Camera Scanner */}
+                  <div
+                    className="flex flex-wrap items-center justify-center gap-2 pt-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="press inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground hover:border-primary/50"
+                    >
+                      <Upload className="size-3.5 text-primary" /> Browse File
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsCameraOpen(true)}
+                      className="press inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground shadow-[var(--shadow-glow)] hover:brightness-105"
+                    >
+                      <Camera className="size-3.5" /> Open Camera Scanner
+                      <span className="rounded-full bg-white/25 px-1.5 py-0.2 text-[9px] uppercase font-bold tracking-wider">
+                        Live
+                      </span>
+                    </button>
                   </div>
-                  <div className="text-[10px] font-mono text-primary font-bold">
-                    File selected: {uploadFileName || "default_export_document.pdf"} ({uploadFileSize})
+
+                  <div className="pt-1">
+                    <div className="text-[11px] font-mono text-primary font-bold">
+                      File selected: {uploadFileName || "default_export_document.pdf"} ({uploadFileSize})
+                    </div>
+                    {scannedViaCamera && (
+                      <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        <CheckCircle2 className="size-3" /> Captured from Camera Scanner (OCR 97%)
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -952,6 +1042,22 @@ function Dashboard() {
         isOpen={showNewConsignmentModal}
         onClose={() => setShowNewConsignmentModal(false)}
       />
+
+      {/* Real-time Document Camera Scanner Modal */}
+      {selectedSlotForUpload && (
+        <CameraScanner
+          isOpen={isCameraOpen}
+          onClose={() => setIsCameraOpen(false)}
+          onCapture={(doc) => {
+            setUploadFileName(doc.filename);
+            setUploadFileSize(doc.size);
+            setScannedViaCamera(true);
+            setIsCameraOpen(false);
+            toast.success(`Scanned document captured: ${doc.filename} (${doc.size})`);
+          }}
+          shipmentId={selectedSlotForUpload.shipmentId}
+        />
+      )}
     </div>
   );
 }

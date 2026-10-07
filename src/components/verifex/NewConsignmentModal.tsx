@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Ship, CheckSquare, Square, CheckCircle2, Clock, Sparkles } from "lucide-react";
+import { X, Ship, CheckSquare, Square, CheckCircle2, Clock, Sparkles, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useDemo } from "@/lib/demo-store";
 import type { DocType } from "@/lib/data";
+import { CameraScanner } from "./CameraScanner";
 
 interface NewConsignmentModalProps {
   isOpen: boolean;
@@ -57,6 +58,8 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
   const [exporter, setExporter] = useState("ABC Seafood");
   const [destination, setDestination] = useState("Dubai");
   const [product, setProduct] = useState("Frozen Shrimp");
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [activeScanType, setActiveScanType] = useState<DocType | null>(null);
 
   const [selectedDocs, setSelectedDocs] = useState<Record<DocType, boolean>>({
     "Commercial Invoice": true,
@@ -227,7 +230,19 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                         </div>
                       </div>
 
-                      <div className="shrink-0">
+                      <div className="shrink-0 flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveScanType(doc.type);
+                            setIsCameraOpen(true);
+                          }}
+                          className="p-1 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                          title={`Scan ${doc.type} using device camera`}
+                        >
+                          <Camera className="size-3.5" />
+                        </button>
                         {isChecked ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                             <CheckCircle2 className="size-3" /> Uploaded
@@ -241,6 +256,20 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                     </div>
                   );
                 })}
+              </div>
+
+              <div className="flex justify-end pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const firstUnchecked = DOCUMENT_OPTIONS.find((d) => !selectedDocs[d.type])?.type || "Shipping Bill";
+                    setActiveScanType(firstUnchecked);
+                    setIsCameraOpen(true);
+                  }}
+                  className="press inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-1.5 text-[11px] font-semibold text-primary hover:border-primary/50 shadow-2xs"
+                >
+                  <Camera className="size-3.5" /> Open Camera Scanner
+                </button>
               </div>
             </div>
 
@@ -277,6 +306,26 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
           </form>
         </motion.div>
       </div>
+
+      {/* Real-time Document Camera Scanner Modal */}
+      <CameraScanner
+        isOpen={isCameraOpen}
+        onClose={() => {
+          setIsCameraOpen(false);
+          setActiveScanType(null);
+        }}
+        onCapture={(scanned) => {
+          const target = activeScanType || scanned.type;
+          setSelectedDocs((prev) => ({
+            ...prev,
+            [target]: true,
+          }));
+          setIsCameraOpen(false);
+          setActiveScanType(null);
+          toast.success(`Scanned and attached ${target} (${scanned.filename}) via camera!`);
+        }}
+        shipmentId="EXP-ABC-2026-001"
+      />
     </AnimatePresence>
   );
 }
