@@ -15,10 +15,14 @@ import {
   Trash2,
   Camera,
   ScanLine,
+  Lock,
+  Clock,
+  UserCheck,
 } from "lucide-react";
+import { toast } from "sonner";
 import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
-import { PageHeader, Reveal } from "@/components/verifex/primitives";
+import { PageHeader, Reveal, StatusBadge } from "@/components/verifex/primitives";
 import { CameraScanner } from "@/components/verifex/CameraScanner";
 import { shipments, type DocType, type ShipmentDocument } from "@/lib/data";
 
@@ -29,14 +33,28 @@ export const Route = createFileRoute("/_app/verify")({
 
 function VerifyPage() {
   const navigate = useNavigate();
-  const { activeShipmentId, setActiveShipmentId, docs, setDocs, addDocs, t } = useDemo();
+  const {
+    activeShipmentId,
+    setActiveShipmentId,
+    docs,
+    setDocs,
+    addDocs,
+    currentUser,
+    getActiveSlots,
+    uploadSlotDocument,
+    canStartAnalysis,
+    startAiAnalysis,
+  } = useDemo();
+
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [processStep, setProcessStep] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const activeShipment = shipments.find((s) => s.id === activeShipmentId) || shipments[0];
+  const activeShipment = shipments.find((s) => s.id === activeShipmentId) ?? shipments[0]!;
+  const slots = getActiveSlots(activeShipment.id);
+  const check = canStartAnalysis(activeShipment.id);
 
   const handleFiles = (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
@@ -44,13 +62,27 @@ function VerifyPage() {
     const newUploaded: ShipmentDocument[] = [];
     for (let i = 0; i < fileList.length; i++) {
       const f = fileList[i];
+      if (!f) continue;
       let type: DocType = "Other";
       const name = f.name.toLowerCase();
-      if (name.includes("invoice") || name.includes("ci")) type = "Commercial Invoice";
-      else if (name.includes("packing") || name.includes("pl")) type = "Packing List";
-      else if (name.includes("shipping") || name.includes("sb")) type = "Shipping Bill";
-      else if (name.includes("order") || name.includes("po")) type = "Purchase Order";
-      else if (name.includes("cert") || name.includes("mpeda")) type = "Quality Certificate";
+      let targetSlotId = "";
+
+      if (name.includes("invoice") || name.includes("ci")) {
+        type = "Commercial Invoice";
+        targetSlotId = "slot-ci";
+      } else if (name.includes("packing") || name.includes("pl")) {
+        type = "Packing List";
+        targetSlotId = "slot-pl";
+      } else if (name.includes("shipping") || name.includes("sb")) {
+        type = "Shipping Bill";
+        targetSlotId = "slot-sb";
+      } else if (name.includes("order") || name.includes("po")) {
+        type = "Purchase Order";
+        targetSlotId = "slot-po";
+      } else if (name.includes("cert") || name.includes("mpeda") || name.includes("quality")) {
+        type = "Quality Certificate";
+        targetSlotId = "slot-qc";
+      }
 
       newUploaded.push({
         id: `doc-${Date.now()}-${i}`,
@@ -59,17 +91,31 @@ function VerifyPage() {
         confidence: Math.floor(91 + Math.random() * 8),
         size: `${(f.size / 1024).toFixed(0)} KB`,
       });
+
+      // Synchronize with multi-user document slots
+      if (targetSlotId) {
+        uploadSlotDocument(activeShipment.id, targetSlotId, {
+          name: f.name,
+          size: `${(f.size / 1024).toFixed(0)} KB`,
+        });
+      }
     }
 
     addDocs(newUploaded);
+    toast.success(`Attached ${newUploaded.length} document(s) to collection workspace.`);
   };
 
-  const handleStartVerification = () => {
+  const handleStartVerification = async () => {
+    if (!check.canStart && currentUser.role === "ADMIN") {
+      toast.error(`Cannot start AI verification: waiting for ${check.missing.join(", ")} (${check.received}/${check.total} received).`);
+      return;
+    }
+
     setIsProcessing(true);
-    setProcessStep("Extracting OCR & text streams…");
+    setProcessStep("Extracting OCR & semantic entity vectors…");
 
     setTimeout(() => {
-      setProcessStep("Classifying document semantics…");
+      setProcessStep("Classifying customs declarations & tariff lines…");
     }, 800);
 
     setTimeout(() => {
@@ -96,12 +142,30 @@ function VerifyPage() {
     return FileText;
   };
 
+  // Quick 1-click slot upload helper for assigned users
+  const handleQuickUploadAssigned = (slotId: string, docType: string, filename: string) => {
+    uploadSlotDocument(activeShipment.id, slotId, {
+      name: filename,
+      size: "284 KB",
+    });
+    addDocs([
+      {
+        id: `doc-${Date.now()}`,
+        filename,
+        type: docType as DocType,
+        confidence: 96,
+        size: "284 KB",
+      },
+    ]);
+    toast.success(`Uploaded ${docType} (${filename}) to ${activeShipment.id}`);
+  };
+
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow="Multi-Document Ingestion"
         title="Verify Export Documents"
-        sub="Upload your export dossier (Commercial Invoice, Packing List, Shipping Bill, PO, Quality Certificate). VERIFAI will automatically extract, classify, and cross-verify."
+        sub="Multi-user export dossier collection (Commercial Invoice, Packing List, Shipping Bill, PO, Quality Certificate). VERIFAI cross-verifies when all required slots are present."
         right={
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Active:</span>
@@ -119,6 +183,47 @@ function VerifyPage() {
           </div>
         }
       />
+
+      {/* Role Banner for Department Uploaders */}
+      {currentUser.assignedDocType && (
+        <Reveal className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold">
+                {currentUser.avatar}
+              </div>
+              <div>
+                <div className="font-semibold text-foreground">
+                  Logged in as {currentUser.name} ({currentUser.roleLabel})
+                </div>
+                <div className="text-muted-foreground">
+                  Assigned Task: Upload official <span className="font-semibold text-primary">{currentUser.assignedDocType}</span> for {activeShipment.id}.
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                if (!currentUser.assignedDocType) return;
+                const assignedType = currentUser.assignedDocType;
+                const targetSlot = slots.find((s) => s.type === assignedType);
+                if (targetSlot) {
+                  const defaultFilename =
+                    assignedType === "Shipping Bill"
+                      ? "Shipping_Bill_SB4471_CochinCustoms.pdf"
+                      : assignedType === "Quality Certificate"
+                      ? "MPEDA_Health_Certificate_QC992.pdf"
+                      : "Document_Upload.pdf";
+                  handleQuickUploadAssigned(targetSlot.id, assignedType, defaultFilename);
+                }
+              }}
+              className="press inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:brightness-110"
+            >
+              <Upload className="size-3.5" />
+              Upload {currentUser.assignedDocType}
+            </button>
+          </div>
+        </Reveal>
+      )}
 
       {/* Shipment Header Banner */}
       <Reveal className="surface-ink p-6 md:p-7">
@@ -143,10 +248,98 @@ function VerifyPage() {
             </div>
             <div className="h-8 w-px bg-white/10" />
             <div>
-              <div className="text-xs text-ink-muted">Declared Value</div>
-              <div className="font-mono font-semibold">{activeShipment.value}</div>
+              <div className="text-xs text-ink-muted">Dossier Collection</div>
+              <div className="font-mono font-bold text-primary">
+                {check.received} / {check.total} Received
+              </div>
             </div>
           </div>
+        </div>
+      </Reveal>
+
+      {/* 5-Slot Document Collection Progress Grid */}
+      <Reveal delay={0.05} className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-semibold">Document Collection Status (5 Required Slots)</h3>
+            <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+              check.canStart ? "bg-success-soft text-success" : "bg-warning-soft text-warning"
+            }`}>
+              {check.canStart ? "5/5 Complete" : `${check.received}/${check.total} Uploaded`}
+            </span>
+          </div>
+          <Link to="/dashboard" className="text-xs text-muted-foreground hover:text-foreground">
+            View Workspace →
+          </Link>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {slots.map((slot) => {
+            const isUploaded = slot.status === "READY" || slot.status === "CORRECTION_SUBMITTED";
+            const isWaiting = slot.status === "WAITING";
+            const isCorrection = slot.status === "CORRECTION_REQUESTED";
+
+            return (
+              <div
+                key={slot.id}
+                className={`surface p-3.5 flex flex-col justify-between transition-all ${
+                  isUploaded
+                    ? "border-success/30 bg-success/5"
+                    : isCorrection
+                    ? "border-warning/40 bg-warning/5"
+                    : "border-border/60 bg-card"
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                      {slot.assignedToUser.team.split(" ")[0]}
+                    </span>
+                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
+                      isUploaded
+                        ? "bg-success-soft text-success"
+                        : isCorrection
+                        ? "bg-warning-soft text-warning"
+                        : "bg-muted text-muted-foreground"
+                    }`}>
+                      {slot.status.replace("_", " ")}
+                    </span>
+                  </div>
+
+                  <h4 className="mt-2 text-xs font-bold text-foreground line-clamp-1">{slot.type}</h4>
+                  <div className="mt-1 text-[11px] text-muted-foreground flex items-center gap-1">
+                    <UserCheck className="size-3" />
+                    <span className="truncate">{slot.assignedToUser.name}</span>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-2 border-t text-[11px] flex items-center justify-between">
+                  {isUploaded && slot.currentVersion ? (
+                    <span className="font-mono text-[10px] text-muted-foreground truncate">
+                      v{slot.currentVersion.version} · {slot.currentVersion.fileSize}
+                    </span>
+                  ) : isWaiting ? (
+                    <button
+                      onClick={() => {
+                        const defaultFilename =
+                          slot.type === "Shipping Bill"
+                            ? "Shipping_Bill_SB4471_CochinCustoms.pdf"
+                            : slot.type === "Quality Certificate"
+                            ? "MPEDA_Health_Certificate_QC992.pdf"
+                            : `${slot.type.replace(/\s+/g, "_")}.pdf`;
+                        handleQuickUploadAssigned(slot.id, slot.type, defaultFilename);
+                      }}
+                      className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1"
+                    >
+                      <Upload className="size-3" /> Upload Slot
+                    </button>
+                  ) : (
+                    <span className="text-warning text-[10px] font-medium">Correction Pending</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Reveal>
 
@@ -307,15 +500,34 @@ function VerifyPage() {
           <div className="flex flex-col items-center gap-3">
             <button
               onClick={handleStartVerification}
-              disabled={docs.length === 0}
-              className="press inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:brightness-105 disabled:opacity-50"
+              disabled={docs.length === 0 || (!check.canStart && currentUser.role === "ADMIN")}
+              className={`press inline-flex items-center gap-3 rounded-full px-8 py-4 font-semibold shadow-[var(--shadow-glow)] transition-all ${
+                check.canStart
+                  ? "bg-primary text-primary-foreground hover:brightness-105"
+                  : "bg-muted text-muted-foreground border cursor-not-allowed opacity-80"
+              }`}
             >
-              <Sparkles className="size-5" />
-              Run Cross-Document Verification ({docs.length} docs)
-              <ArrowRight className="size-5" />
+              {!check.canStart && currentUser.role === "ADMIN" ? (
+                <>
+                  <Lock className="size-5 text-muted-foreground" />
+                  Waiting for {check.missing.length} Document(s) ({check.received}/{check.total})
+                </>
+              ) : (
+                <>
+                  <Sparkles className="size-5" />
+                  Run Cross-Document Verification ({docs.length} docs)
+                  <ArrowRight className="size-5" />
+                </>
+              )}
             </button>
             <p className="text-xs text-muted-foreground">
-              Cross-checks tariff codes, quantities, weights, container checksum, and regulatory validity.
+              {!check.canStart && currentUser.role === "ADMIN" ? (
+                <span className="text-warning">
+                  Gated Workflow: Upload {check.missing.join(", ")} before starting AI analysis.
+                </span>
+              ) : (
+                "Cross-checks tariff codes, quantities, weights, container checksum, and regulatory validity."
+              )}
             </p>
           </div>
         )}
@@ -325,7 +537,17 @@ function VerifyPage() {
       <CameraScanner
         isOpen={isCameraOpen}
         onClose={() => setIsCameraOpen(false)}
-        onCapture={(doc) => addDocs([doc])}
+        onCapture={(doc) => {
+          addDocs([doc]);
+          // Also link to slot if matches doc type
+          const targetSlot = slots.find((s) => s.type === doc.type);
+          if (targetSlot) {
+            uploadSlotDocument(activeShipment.id, targetSlot.id, {
+              name: doc.filename,
+              size: doc.size,
+            });
+          }
+        }}
         shipmentId={activeShipment.id}
       />
     </div>

@@ -105,3 +105,167 @@ shipmentsRouter.patch("/:id", (req: Request, res: Response) => {
   db.shipments.set(req.params.id, updated);
   res.json({ success: true, shipment: updated });
 });
+
+// GET /api/shipments/:id/slots - Document collection slots & completion status
+shipmentsRouter.get("/:id/slots", (req: Request, res: Response) => {
+  const shipment = db.shipments.get(req.params.id);
+  if (!shipment) {
+    return res.status(404).json({ success: false, error: "Shipment not found" });
+  }
+
+  const slots = db.getSlots(req.params.id);
+  const check = db.canStartAnalysis(req.params.id);
+
+  res.json({
+    success: true,
+    shipment_id: req.params.id,
+    slots,
+    received: check.received,
+    total: check.total,
+    missing: check.missing,
+    can_start: check.canStart,
+  });
+});
+
+// POST /api/shipments/:id/slots/:slotId/upload - Upload a document version to slot
+shipmentsRouter.post("/:id/slots/:slotId/upload", (req: Request, res: Response) => {
+  const { filename, file_size, uploader, role, notes } = req.body;
+  const updatedSlot = db.uploadSlotVersion(
+    req.params.id,
+    req.params.slotId,
+    filename || "uploaded_document.pdf",
+    file_size || "240 KB",
+    uploader || "Document User",
+    role || "User",
+    notes
+  );
+
+  if (!updatedSlot) {
+    return res.status(404).json({ success: false, error: "Slot not found" });
+  }
+
+  const check = db.canStartAnalysis(req.params.id);
+  res.json({
+    success: true,
+    slot: updatedSlot,
+    received: check.received,
+    total: check.total,
+    missing: check.missing,
+    can_start: check.canStart,
+  });
+});
+
+// POST /api/shipments/:id/slots/:slotId/request-correction - Admin requests correction
+shipmentsRouter.post("/:id/slots/:slotId/request-correction", (req: Request, res: Response) => {
+  const { reason, requested_by } = req.body;
+  if (!reason) {
+    return res.status(400).json({ success: false, error: "Reason for correction is required" });
+  }
+
+  const updatedSlot = db.requestCorrection(
+    req.params.id,
+    req.params.slotId,
+    reason,
+    requested_by || "Admin"
+  );
+
+  if (!updatedSlot) {
+    return res.status(404).json({ success: false, error: "Slot not found" });
+  }
+
+  res.json({ success: true, slot: updatedSlot });
+});
+
+// POST /api/shipments/:id/slots/:slotId/submit-correction - User submits corrected version
+shipmentsRouter.post("/:id/slots/:slotId/submit-correction", (req: Request, res: Response) => {
+  const { filename, file_size, uploader, role } = req.body;
+  const updatedSlot = db.submitCorrection(
+    req.params.id,
+    req.params.slotId,
+    filename || "corrected_document.pdf",
+    file_size || "220 KB",
+    uploader || "Warehouse Team",
+    role || "WAREHOUSE"
+  );
+
+  if (!updatedSlot) {
+    return res.status(404).json({ success: false, error: "Slot not found" });
+  }
+
+  res.json({ success: true, slot: updatedSlot });
+});
+
+// POST /api/shipments/:id/slots/:slotId/approve-correction - Admin approves correction
+shipmentsRouter.post("/:id/slots/:slotId/approve-correction", (req: Request, res: Response) => {
+  const { approved_by } = req.body;
+  const updatedSlot = db.approveCorrection(
+    req.params.id,
+    req.params.slotId,
+    approved_by || "Alwin Joseph"
+  );
+
+  if (!updatedSlot) {
+    return res.status(404).json({ success: false, error: "Slot not found" });
+  }
+
+  // Also auto-resolve the discrepancy in demo store if packing list was corrected to 1200
+  const qtyDisc = db.discrepancies.get("qty");
+  if (qtyDisc) {
+    qtyDisc.status = "RESOLVED";
+    qtyDisc.resolved_by = approved_by || "Alwin Joseph";
+    qtyDisc.resolved_at = new Date().toISOString();
+  }
+
+  const shipment = db.shipments.get(req.params.id);
+  if (shipment) {
+    shipment.readiness_score = 100;
+    shipment.issues_count = 0;
+    shipment.status = "READY";
+  }
+
+  res.json({ success: true, slot: updatedSlot, readiness: 100 });
+});
+
+// POST /api/shipments/:id/start-analysis - Admin triggers AI analysis (Gated by 5/5 check)
+shipmentsRouter.post("/:id/start-analysis", (req: Request, res: Response) => {
+  const check = db.canStartAnalysis(req.params.id);
+  if (!check.canStart) {
+    return res.status(400).json({
+      success: false,
+      error: `Cannot start AI verification while required documents are missing. Waiting for ${check.missing.join(", ")} (${check.received}/${check.total} received).`,
+      missing: check.missing,
+      received: check.received,
+      total: check.total,
+    });
+  }
+
+  const shipment = db.shipments.get(req.params.id);
+  if (shipment) {
+    shipment.status = "UNDER_REVIEW";
+    shipment.updated_at = new Date().toISOString();
+  }
+
+  db.auditLogs.unshift({
+    id: `audit-${Date.now()}`,
+    shipment_id: req.params.id,
+    user_name: req.body.admin_name || "Alwin Joseph",
+    user_role: "Admin",
+    action: "AI Analysis Started",
+    details: `Admin triggered complete AI verification pipeline across all ${check.total} received documents.`,
+    created_at: new Date().toISOString(),
+  });
+
+  res.json({
+    success: true,
+    message: "AI analysis initiated across complete document collection.",
+    shipment_id: req.params.id,
+    readiness: shipment?.readiness_score || 84,
+  });
+});
+
+// GET /api/shipments/:id/audit-trail - Audit log entries for shipment
+shipmentsRouter.get("/:id/audit-trail", (req: Request, res: Response) => {
+  const logs = db.auditLogs.filter((l) => l.shipment_id === req.params.id);
+  res.json({ success: true, shipment_id: req.params.id, logs });
+});
+

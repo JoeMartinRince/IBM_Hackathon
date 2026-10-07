@@ -38,7 +38,7 @@ function SettingsPage() {
   const [tempKey, setTempKey] = useState(geminiApiKey);
   const [showKey, setShowKey] = useState(false);
   const [testingKey, setTestingKey] = useState(false);
-  const [keyTestResult, setKeyTestResult] = useState<{ valid: boolean; message: string; model?: string } | null>(null);
+  const [keyTestResult, setKeyTestResult] = useState<{ valid: boolean; message: string; model?: string | undefined } | null>(null);
 
   const roles = [
     "Exporter",

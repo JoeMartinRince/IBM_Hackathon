@@ -36,11 +36,75 @@ export type UserRole =
   | "Documentation Team"
   | "Government/Admin";
 
+export type AppRole =
+  | "ADMIN"
+  | "FINANCE"
+  | "WAREHOUSE"
+  | "CUSTOMS_BROKER"
+  | "BUYER"
+  | "QUALITY";
+
+export type SlotStatus =
+  | "WAITING"
+  | "READY"
+  | "CORRECTION_REQUESTED"
+  | "CORRECTION_SUBMITTED";
+
+export interface DocumentVersionRecord {
+  version: number;
+  filename: string;
+  file_size: string;
+  uploaded_by: string;
+  uploaded_by_role: string;
+  uploaded_at: string;
+  status: "UPLOADED" | "APPROVED" | "REPLACED";
+  file_url?: string | undefined;
+  notes?: string | undefined;
+  provenance: {
+    source: string;
+    version: number;
+    team: string;
+    uploader: string;
+    timestamp: string;
+    page?: number;
+  };
+}
+
+export interface CorrectionRequestRecord {
+  id: string;
+  slot_id: string;
+  discrepancy_title: string;
+  reason: string;
+  requested_by: string;
+  requested_at: string;
+  assigned_to: string;
+  assigned_role: AppRole;
+  status: "PENDING" | "SUBMITTED" | "APPROVED";
+  submitted_version?: number;
+  submitted_at?: string;
+}
+
+export interface DocumentSlotRecord {
+  id: string;
+  shipment_id: string;
+  document_type: DocumentType;
+  required: boolean;
+  assigned_user_id: string;
+  assigned_user_name: string;
+  assigned_user_role: AppRole;
+  status: SlotStatus;
+  versions: DocumentVersionRecord[];
+  current_version?: DocumentVersionRecord;
+  correction_request?: CorrectionRequestRecord;
+  updated_at: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
   name: string;
   role: UserRole;
+  app_role?: AppRole;
   organization: string;
   created_at: string;
 }

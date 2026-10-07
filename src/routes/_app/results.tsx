@@ -14,7 +14,15 @@ import {
   Check,
   X,
   Database,
+  Send,
+  Upload,
+  Clock,
+  UserCheck,
+  ShieldCheck,
+  History,
+  QrCode,
 } from "lucide-react";
+import { toast } from "sonner";
 import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
 import { PageHeader, Reveal, ReadinessRing, StatusBadge, Chip } from "@/components/verifex/primitives";
@@ -26,21 +34,71 @@ export const Route = createFileRoute("/_app/results")({
 });
 
 function ResultsPage() {
-  const { readiness, openIssues, resolve, isResolved, activeShipment, reverify } = useDemo();
+  const {
+    readiness,
+    openIssues,
+    resolve,
+    isResolved,
+    activeShipment,
+    reverify,
+    currentUser,
+    getActiveSlots,
+    requestCorrection,
+    submitCorrection,
+    approveCorrection,
+  } = useDemo();
+
   const [inspectModal, setInspectModal] = useState<Discrepancy | null>(null);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
   const [reverifying, setReverifying] = useState(false);
 
+  // Correction workflow modal state
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const [correctionReason, setCorrectionReason] = useState(
+    "Commercial Invoice declares 1,200 cartons, but Packing List specifies 1,180 cartons. Please recount the Willingdon Island warehouse lot and upload a revised Packing List (1,200 cartons)."
+  );
+  const [uploadV2ModalOpen, setUploadV2ModalOpen] = useState(false);
+  const [v2Filename, setV2Filename] = useState("Packing_List_V2_Corrected_1200ctns.pdf");
+
+  const slots = getActiveSlots(activeShipment.id);
+  const plSlot = slots.find((s) => s.id.includes("pl") || s.type.toLowerCase().includes("packing"));
+
   const handleApplyFix = async (id: string) => {
     setResolvingId(id);
     await resolve(id);
+    toast.success("Discrepancy resolved successfully.");
     setTimeout(() => setResolvingId(null), 500);
   };
 
   const handleReverify = async () => {
     setReverifying(true);
     await reverify();
+    toast.success("Cross-document verification re-evaluated.");
     setTimeout(() => setReverifying(false), 900);
+  };
+
+  const handleSendCorrectionRequest = async () => {
+    if (!plSlot) return;
+    await requestCorrection(activeShipment.id, plSlot.id, correctionReason);
+    setRequestModalOpen(false);
+    toast.info("Correction request sent to Warehouse team (Akhil Varma).");
+  };
+
+  const handleSubmitV2 = async () => {
+    if (!plSlot) return;
+    await submitCorrection(activeShipment.id, plSlot.id, {
+      name: v2Filename,
+      size: "194 KB",
+    });
+    setUploadV2ModalOpen(false);
+    toast.success("Packing List V2 (1,200 cartons) submitted. Awaiting Admin approval.");
+  };
+
+  const handleApproveCorrection = async () => {
+    if (!plSlot) return;
+    await approveCorrection(activeShipment.id, plSlot.id);
+    await reverify();
+    toast.success("Correction approved! Quantity aligned to 1,200 cartons. Readiness is now 100% READY.");
   };
 
   return (
@@ -85,12 +143,14 @@ function ResultsPage() {
               <span>{openIssues} unresolved discrepancies</span>
               <span>·</span>
               <span>12 cross-checked data points</span>
+              <span>·</span>
+              <span className="text-primary font-medium">5/5 Documents Audited</span>
             </div>
           </div>
           <div className="flex flex-col items-center gap-2">
             <ReadinessRing value={readiness} size={150} dark label="Readiness" />
             <span className="text-[11px] text-ink-muted font-medium">
-              {readiness >= 100 ? "Ready for Port Gate" : "Action Required"}
+              {readiness >= 100 ? "100% Ready for Port Gate" : "Action Required"}
             </span>
           </div>
         </div>
@@ -101,8 +161,10 @@ function ResultsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-semibold">Detected Discrepancies & Suggested Fixes</h2>
-            <span className="rounded-full bg-critical-soft px-2.5 py-0.5 text-xs font-bold text-critical">
-              {openIssues} Open
+            <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+              openIssues > 0 ? "bg-critical-soft text-critical" : "bg-success-soft text-success"
+            }`}>
+              {openIssues > 0 ? `${openIssues} Open` : "All Resolved"}
             </span>
           </div>
           <Link to="/issues" className="text-xs text-muted-foreground hover:text-foreground">
@@ -113,6 +175,8 @@ function ResultsPage() {
         <div className="grid gap-4">
           {discrepancies.map((d) => {
             const resolved = isResolved(d.id);
+            const isQtyIssue = d.id === "qty";
+
             return (
               <motion.div
                 key={d.id}
@@ -122,7 +186,7 @@ function ResultsPage() {
                 }`}
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div className="space-y-2 max-w-2xl">
+                  <div className="space-y-3 max-w-2xl">
                     <div className="flex items-center gap-2">
                       <Chip tone={resolved ? "verified" : d.severity}>{resolved ? "Resolved" : d.severity}</Chip>
                       <h3 className="text-base font-semibold">{d.title}</h3>
@@ -131,21 +195,116 @@ function ResultsPage() {
 
                     <p className="text-sm text-muted-foreground">{d.explanation}</p>
 
-                    <div className="grid grid-cols-2 gap-3 pt-2 sm:max-w-md">
-                      <div className="rounded-xl border bg-card p-2.5 text-xs">
-                        <div className="text-[10px] text-muted-foreground font-medium">{d.left.doc}</div>
-                        <div className="font-semibold">{d.left.value}</div>
+                    {/* 3-Way Cross Check Comparison for Quantity */}
+                    {isQtyIssue ? (
+                      <div className="space-y-2 pt-1">
+                        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          3-Way Cross-Document Provenance
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                          {/* Commercial Invoice */}
+                          <div className="rounded-xl border bg-card p-3 text-xs">
+                            <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
+                              <span>Commercial Invoice</span>
+                              <span className="font-mono">v1</span>
+                            </div>
+                            <div className="mt-1 font-mono text-sm font-bold text-foreground">1,200 cartons</div>
+                            <div className="mt-1 text-[10px] text-muted-foreground truncate">
+                              Finance Team (Rahul Nair)
+                            </div>
+                          </div>
+
+                          {/* Packing List */}
+                          <div className={`rounded-xl border p-3 text-xs ${
+                            resolved
+                              ? "border-success/40 bg-success/5"
+                              : plSlot?.status === "CORRECTION_SUBMITTED"
+                              ? "border-primary/40 bg-primary/5"
+                              : "border-critical/30 bg-card"
+                          }`}>
+                            <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
+                              <span>Packing List</span>
+                              <span className="font-mono">{plSlot && plSlot.versions.length > 1 ? `v${plSlot.versions.length}` : "v1"}</span>
+                            </div>
+                            <div className={`mt-1 font-mono text-sm font-bold ${
+                              resolved ? "text-success" : plSlot?.status === "CORRECTION_SUBMITTED" ? "text-primary" : "text-critical"
+                            }`}>
+                              {resolved || plSlot?.status === "CORRECTION_SUBMITTED" ? "1,200 cartons" : "1,180 cartons"}
+                            </div>
+                            <div className="mt-1 text-[10px] text-muted-foreground truncate">
+                              Warehouse (Akhil Varma)
+                            </div>
+                          </div>
+
+                          {/* Shipping Bill */}
+                          <div className="rounded-xl border bg-card p-3 text-xs">
+                            <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
+                              <span>Shipping Bill</span>
+                              <span className="font-mono">v1</span>
+                            </div>
+                            <div className="mt-1 font-mono text-sm font-bold text-foreground">1,200 cartons</div>
+                            <div className="mt-1 text-[10px] text-muted-foreground truncate">
+                              Customs Broker (Kavitha)
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive Workflow Banner for Packing List correction */}
+                        {!resolved && plSlot?.status === "CORRECTION_REQUESTED" && (
+                          <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning-foreground">
+                            <div className="flex items-start gap-2">
+                              <AlertTriangle className="size-4 shrink-0 text-warning mt-0.5" />
+                              <div>
+                                <span className="font-bold">Correction Requested by Admin:</span>{" "}
+                                <span className="text-muted-foreground">{plSlot.correctionRequest?.reason}</span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => setUploadV2ModalOpen(true)}
+                              className="press shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm"
+                            >
+                              <Upload className="size-3.5" /> Upload V2 (Warehouse)
+                            </button>
+                          </div>
+                        )}
+
+                        {!resolved && plSlot?.status === "CORRECTION_SUBMITTED" && (
+                          <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-primary/40 bg-primary/10 p-3 text-xs">
+                            <div className="flex items-start gap-2">
+                              <Sparkles className="size-4 shrink-0 text-primary mt-0.5" />
+                              <div>
+                                <span className="font-bold text-foreground">Corrected Packing List V2 Uploaded:</span>{" "}
+                                <span className="text-muted-foreground">
+                                  Warehouse reconciled lot to 1,200 cartons. Pending Admin verification approval.
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={handleApproveCorrection}
+                              className="press shrink-0 inline-flex items-center gap-1.5 rounded-full bg-success px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-110"
+                            >
+                              <CheckCircle2 className="size-3.5" /> Approve & Re-Verify
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <div className="rounded-xl border bg-card p-2.5 text-xs">
-                        <div className="text-[10px] text-muted-foreground font-medium">{d.right.doc}</div>
-                        <div className={`font-semibold ${resolved ? "text-success" : "text-critical"}`}>
-                          {resolved ? d.left.value : d.right.value}
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3 pt-2 sm:max-w-md">
+                        <div className="rounded-xl border bg-card p-2.5 text-xs">
+                          <div className="text-[10px] text-muted-foreground font-medium">{d.left.doc}</div>
+                          <div className="font-semibold">{d.left.value}</div>
+                        </div>
+                        <div className="rounded-xl border bg-card p-2.5 text-xs">
+                          <div className="text-[10px] text-muted-foreground font-medium">{d.right.doc}</div>
+                          <div className={`font-semibold ${resolved ? "text-success" : "text-critical"}`}>
+                            {resolved ? d.left.value : d.right.value}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
-                  <div className="flex flex-row md:flex-col items-center md:items-end gap-2 pt-2 md:pt-0">
+                  <div className="flex flex-row md:flex-col items-center md:items-end gap-2 pt-2 md:pt-0 shrink-0">
                     <button
                       onClick={() => setInspectModal(d)}
                       className="press inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-2 text-xs font-medium hover:bg-muted"
@@ -156,8 +315,42 @@ function ResultsPage() {
 
                     {resolved ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-3 py-1.5 text-xs font-semibold text-success">
-                        <Check className="size-3.5" /> Applied
+                        <Check className="size-3.5" /> Resolved
                       </span>
+                    ) : isQtyIssue && plSlot?.status === "CORRECTION_SUBMITTED" ? (
+                      <button
+                        onClick={handleApproveCorrection}
+                        className="press inline-flex items-center gap-1.5 rounded-full bg-success px-4 py-2 text-xs font-semibold text-white shadow-sm hover:brightness-110"
+                      >
+                        <CheckCircle2 className="size-3.5" />
+                        Approve V2
+                      </button>
+                    ) : isQtyIssue && plSlot?.status !== "CORRECTION_REQUESTED" ? (
+                      <div className="flex flex-col gap-2 items-end">
+                        <button
+                          onClick={() => setRequestModalOpen(true)}
+                          className="press inline-flex items-center gap-1.5 rounded-full bg-warning-soft text-warning border border-warning/30 px-3.5 py-2 text-xs font-semibold hover:bg-warning/20"
+                        >
+                          <Send className="size-3.5" />
+                          Request Correction
+                        </button>
+                        <button
+                          onClick={() => handleApplyFix(d.id)}
+                          disabled={resolvingId === d.id}
+                          className="press inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold text-ink-foreground shadow-sm hover:brightness-125"
+                        >
+                          <Wand2 className="size-3 text-primary" />
+                          1-Click Auto-Fix
+                        </button>
+                      </div>
+                    ) : isQtyIssue && plSlot?.status === "CORRECTION_REQUESTED" ? (
+                      <button
+                        onClick={() => setUploadV2ModalOpen(true)}
+                        className="press inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:brightness-110"
+                      >
+                        <Upload className="size-3.5" />
+                        Upload V2
+                      </button>
                     ) : (
                       <button
                         onClick={() => handleApplyFix(d.id)}
@@ -182,7 +375,7 @@ function ResultsPage() {
           <div>
             <h2 className="text-xl font-semibold">Document Cross-Reference Matrix</h2>
             <p className="text-xs text-muted-foreground">
-              Compares commercial invoice (CI), packing list (PL), shipping bill (SB), and purchase order (PO).
+              Compares Commercial Invoice (CI), Packing List (PL), Shipping Bill (SB), and Purchase Order (PO).
             </p>
           </div>
           <Link to="/golden-record" className="text-xs text-muted-foreground hover:text-foreground">
@@ -196,10 +389,10 @@ function ResultsPage() {
               <thead className="border-b bg-muted/50 text-[11px] uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="p-4 font-semibold">Attribute</th>
-                  <th className="p-4 font-semibold">Commercial Invoice</th>
-                  <th className="p-4 font-semibold">Packing List</th>
-                  <th className="p-4 font-semibold">Shipping Bill</th>
-                  <th className="p-4 font-semibold">Purchase Order</th>
+                  <th className="p-4 font-semibold">Commercial Invoice (Finance)</th>
+                  <th className="p-4 font-semibold">Packing List (Warehouse)</th>
+                  <th className="p-4 font-semibold">Shipping Bill (Broker)</th>
+                  <th className="p-4 font-semibold">Purchase Order (Buyer)</th>
                   <th className="p-4 font-semibold text-right">Status</th>
                 </tr>
               </thead>
@@ -233,6 +426,121 @@ function ResultsPage() {
         </div>
       </Reveal>
 
+      {/* Admin Request Correction Modal */}
+      <AnimatePresence>
+        {requestModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="surface max-w-lg w-full p-6 shadow-2xl space-y-4"
+            >
+              <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex items-center gap-2">
+                  <Send className="size-5 text-warning" />
+                  <h3 className="font-semibold text-lg">Request Document Correction</h3>
+                </div>
+                <button onClick={() => setRequestModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="rounded-xl bg-muted/40 p-3 text-xs space-y-1">
+                  <div className="font-semibold text-foreground">Target Document Slot:</div>
+                  <div className="text-muted-foreground">Packing List (Assigned to Akhil Varma — Warehouse Team)</div>
+                  <div className="text-muted-foreground">Shipment: <span className="font-mono font-medium">{activeShipment.id}</span></div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    Reason / Instructions for Warehouse:
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={correctionReason}
+                    onChange={(e) => setCorrectionReason(e.target.value)}
+                    className="w-full rounded-xl border bg-card p-3 text-xs outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t">
+                <button
+                  onClick={() => setRequestModalOpen(false)}
+                  className="rounded-full border bg-card px-4 py-2 text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendCorrectionRequest}
+                  className="press rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
+                >
+                  Send Correction Request
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Warehouse Upload V2 Modal */}
+      <AnimatePresence>
+        {uploadV2ModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="surface max-w-lg w-full p-6 shadow-2xl space-y-4"
+            >
+              <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex items-center gap-2">
+                  <Upload className="size-5 text-primary" />
+                  <h3 className="font-semibold text-lg">Upload Corrected Packing List V2</h3>
+                </div>
+                <button onClick={() => setUploadV2ModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="rounded-xl bg-success-soft p-3 text-xs text-success space-y-1">
+                  <div className="font-semibold">Reconciliation Note:</div>
+                  <div>Warehouse lot recounted. Quantity adjusted to match Commercial Invoice (1,200 cartons).</div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-foreground block mb-1">File Name:</label>
+                  <input
+                    type="text"
+                    value={v2Filename}
+                    onChange={(e) => setV2Filename(e.target.value)}
+                    className="w-full rounded-xl border bg-card p-3 font-mono text-xs outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t">
+                <button
+                  onClick={() => setUploadV2ModalOpen(false)}
+                  className="rounded-full border bg-card px-4 py-2 text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitV2}
+                  className="press rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
+                >
+                  Submit Version 2 for Approval
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Evidence Viewer Modal */}
       <AnimatePresence>
         {inspectModal && (
@@ -246,7 +554,7 @@ function ResultsPage() {
               <div className="flex items-center justify-between border-b pb-3">
                 <div className="flex items-center gap-2">
                   <FileText className="size-5 text-primary" />
-                  <h3 className="font-semibold text-lg">Source Evidence Viewer</h3>
+                  <h3 className="font-semibold text-lg">Source Evidence & Provenance</h3>
                 </div>
                 <button onClick={() => setInspectModal(null)} className="text-muted-foreground hover:text-foreground">
                   <X className="size-5" />
@@ -267,8 +575,33 @@ function ResultsPage() {
                   </p>
                 </div>
 
+                {/* Provenance Audit Details */}
+                <div className="rounded-2xl border bg-card p-3 space-y-2 text-xs">
+                  <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1.5">
+                    <ShieldCheck className="size-3.5 text-primary" /> Tamper-Evident Provenance Trail
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div>
+                      <span className="text-muted-foreground">Assigned Team:</span>{" "}
+                      <span className="font-medium text-foreground">
+                        {inspectModal.id === "qty" ? "Warehouse Logistics" : inspectModal.id === "hs" ? "Customs Broker (CHA)" : "MPEDA Inspection"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Sign-off Officer:</span>{" "}
+                      <span className="font-medium text-foreground">
+                        {inspectModal.id === "qty" ? "Akhil Varma" : inspectModal.id === "hs" ? "Kavitha Menon" : "Dr. Ananya Pillai"}
+                      </span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-muted-foreground">Audit Record:</span>{" "}
+                      <span className="font-mono text-[10px] text-muted-foreground">SHA256:7f9b8c...a449 (Immutable)</span>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
-                  <span>Confidence: {inspectModal.evidence.confidence}%</span>
+                  <span>OCR Confidence: {inspectModal.evidence.confidence}%</span>
                   <span>Rule Severity: {inspectModal.severity.toUpperCase()}</span>
                 </div>
               </div>

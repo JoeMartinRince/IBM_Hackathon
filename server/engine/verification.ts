@@ -51,14 +51,14 @@ export function validateContainerNumber(containerNo: string): { valid: boolean; 
 
   let sum = 0;
   for (let i = 0; i < 10; i++) {
-    const char = clean[i];
-    const val = char >= "0" && char <= "9" ? parseInt(char, 10) : charValues[char] || 0;
+    const char = clean[i] ?? "";
+    const val = char >= "0" && char <= "9" ? parseInt(char, 10) : (charValues[char] ?? 0);
     sum += val * Math.pow(2, i);
   }
 
   const remainder = sum % 11;
   const expectedCheckDigit = remainder === 10 ? 0 : remainder;
-  const actualCheckDigit = parseInt(clean[10], 10);
+  const actualCheckDigit = parseInt(clean[10] ?? "-1", 10);
 
   return { valid: expectedCheckDigit === actualCheckDigit, calculatedCheckDigit: expectedCheckDigit };
 }

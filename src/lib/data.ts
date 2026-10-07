@@ -10,6 +10,77 @@ export type DocType =
   | "Quality Certificate"
   | "Other";
 
+export type AppRole =
+  | "ADMIN"
+  | "FINANCE"
+  | "WAREHOUSE"
+  | "CUSTOMS_BROKER"
+  | "BUYER"
+  | "QUALITY";
+
+export type SlotStatus =
+  | "WAITING"
+  | "READY"
+  | "CORRECTION_REQUESTED"
+  | "CORRECTION_SUBMITTED";
+
+export interface DemoUser {
+  id: string;
+  name: string;
+  role: AppRole;
+  roleLabel: string;
+  team: string;
+  avatar: string;
+  email: string;
+  assignedDocType?: DocType | undefined;
+}
+
+export interface DocumentVersion {
+  version: number;
+  filename: string;
+  fileSize: string;
+  uploadedBy: string;
+  uploadedByRole: string;
+  uploadedAt: string;
+  status: "UPLOADED" | "APPROVED" | "REPLACED";
+  fileUrl?: string | undefined;
+  notes?: string | undefined;
+  provenance: {
+    source: string;
+    version: number;
+    team: string;
+    uploader: string;
+    timestamp: string;
+    pageCount?: number | undefined;
+  };
+}
+
+export interface CorrectionRequest {
+  id: string;
+  slotId: string;
+  discrepancyTitle: string;
+  reason: string;
+  requestedBy: string;
+  requestedAt: string;
+  assignedTo: string;
+  assignedRole: AppRole;
+  status: "PENDING" | "SUBMITTED" | "APPROVED";
+  submittedVersion?: number | undefined;
+  submittedAt?: string | undefined;
+}
+
+export interface DocumentSlot {
+  id: string;
+  shipmentId: string;
+  type: DocType;
+  required: boolean;
+  assignedToUser: DemoUser;
+  status: SlotStatus;
+  versions: DocumentVersion[];
+  currentVersion?: DocumentVersion | undefined;
+  correctionRequest?: CorrectionRequest | undefined;
+}
+
 export interface Shipment {
   id: string;
   commodity: string;
@@ -73,7 +144,233 @@ export interface RiskQuestion {
   issueId?: string;
 }
 
+export const demoUsers: DemoUser[] = [
+  {
+    id: "usr-admin",
+    name: "Alwin Joseph",
+    role: "ADMIN",
+    roleLabel: "Admin / Compliance Lead",
+    team: "Export Compliance Oversight",
+    avatar: "AJ",
+    email: "admin@verifai.io",
+  },
+  {
+    id: "usr-fin",
+    name: "Rahul Nair",
+    role: "FINANCE",
+    roleLabel: "Finance Specialist",
+    team: "Finance & Commercial Billing",
+    avatar: "RN",
+    email: "finance@malabarfoods.com",
+    assignedDocType: "Commercial Invoice",
+  },
+  {
+    id: "usr-wh",
+    name: "Akhil Varma",
+    role: "WAREHOUSE",
+    roleLabel: "Warehouse Supervisor",
+    team: "Willingdon Island Terminal Logistics",
+    avatar: "AV",
+    email: "warehouse@malabarfoods.com",
+    assignedDocType: "Packing List",
+  },
+  {
+    id: "usr-cha",
+    name: "Kavitha Menon",
+    role: "CUSTOMS_BROKER",
+    roleLabel: "Licensed Customs Broker (CHA)",
+    team: "Cochin Marine Clearing Agents",
+    avatar: "KM",
+    email: "customs@cochincha.in",
+    assignedDocType: "Shipping Bill",
+  },
+  {
+    id: "usr-buyer",
+    name: "Tariq Al-Mansoor",
+    role: "BUYER",
+    roleLabel: "Overseas Buyer / Procurement",
+    team: "Gulf Fresh Trading LLC, Dubai",
+    avatar: "TM",
+    email: "procurement@gulffresh.ae",
+    assignedDocType: "Purchase Order",
+  },
+  {
+    id: "usr-quality",
+    name: "Dr. Ananya Pillai",
+    role: "QUALITY",
+    roleLabel: "Statutory Inspection Officer",
+    team: "MPEDA Seafood Inspection Agency",
+    avatar: "AP",
+    email: "inspection@mpeda.gov.in",
+    assignedDocType: "Quality Certificate",
+  },
+];
+
+export const initialDocumentSlots: Record<string, DocumentSlot[]> = {
+  "VFX-2026-001": [
+    {
+      id: "slot-ci",
+      shipmentId: "VFX-2026-001",
+      type: "Commercial Invoice",
+      required: true,
+      assignedToUser: demoUsers[1]!, // Rahul (Finance)
+      status: "READY",
+      versions: [
+        {
+          version: 1,
+          filename: "Commercial_Invoice_INV20261048.pdf",
+          fileSize: "248 KB",
+          uploadedBy: "Rahul Nair",
+          uploadedByRole: "Finance Specialist",
+          uploadedAt: "07 Oct 2026, 10:20 AM",
+          status: "APPROVED",
+          provenance: {
+            source: "Commercial Invoice",
+            version: 1,
+            team: "Finance Team",
+            uploader: "Rahul Nair",
+            timestamp: "07 Oct 2026, 10:20 AM",
+            pageCount: 2,
+          },
+        },
+      ],
+      currentVersion: {
+        version: 1,
+        filename: "Commercial_Invoice_INV20261048.pdf",
+        fileSize: "248 KB",
+        uploadedBy: "Rahul Nair",
+        uploadedByRole: "Finance Specialist",
+        uploadedAt: "07 Oct 2026, 10:20 AM",
+        status: "APPROVED",
+        provenance: {
+          source: "Commercial Invoice",
+          version: 1,
+          team: "Finance Team",
+          uploader: "Rahul Nair",
+          timestamp: "07 Oct 2026, 10:20 AM",
+          pageCount: 2,
+        },
+      },
+    },
+    {
+      id: "slot-pl",
+      shipmentId: "VFX-2026-001",
+      type: "Packing List",
+      required: true,
+      assignedToUser: demoUsers[2]!, // Akhil (Warehouse)
+      status: "READY",
+      versions: [
+        {
+          version: 1,
+          filename: "Packing_List_W102.pdf",
+          fileSize: "186 KB",
+          uploadedBy: "Akhil Varma",
+          uploadedByRole: "Warehouse Supervisor",
+          uploadedAt: "07 Oct 2026, 10:35 AM",
+          status: "APPROVED",
+          notes: "Initial warehouse packaging tally: 1,180 cartons",
+          provenance: {
+            source: "Packing List",
+            version: 1,
+            team: "Warehouse Team",
+            uploader: "Akhil Varma",
+            timestamp: "07 Oct 2026, 10:35 AM",
+            pageCount: 1,
+          },
+        },
+      ],
+      currentVersion: {
+        version: 1,
+        filename: "Packing_List_W102.pdf",
+        fileSize: "186 KB",
+        uploadedBy: "Akhil Varma",
+        uploadedByRole: "Warehouse Supervisor",
+        uploadedAt: "07 Oct 2026, 10:35 AM",
+        status: "APPROVED",
+        notes: "Initial warehouse packaging tally: 1,180 cartons",
+        provenance: {
+          source: "Packing List",
+          version: 1,
+          team: "Warehouse Team",
+          uploader: "Akhil Varma",
+          timestamp: "07 Oct 2026, 10:35 AM",
+          pageCount: 1,
+        },
+      },
+    },
+    {
+      id: "slot-sb",
+      shipmentId: "VFX-2026-001",
+      type: "Shipping Bill",
+      required: true,
+      assignedToUser: demoUsers[3]!, // Kavitha (Customs Broker)
+      status: "WAITING",
+      versions: [],
+    },
+    {
+      id: "slot-po",
+      shipmentId: "VFX-2026-001",
+      type: "Purchase Order",
+      required: true,
+      assignedToUser: demoUsers[4]!, // Tariq (Buyer)
+      status: "READY",
+      versions: [
+        {
+          version: 1,
+          filename: "PO_GFT_2291.xlsx",
+          fileSize: "64 KB",
+          uploadedBy: "Tariq Al-Mansoor",
+          uploadedByRole: "Overseas Buyer",
+          uploadedAt: "07 Oct 2026, 09:40 AM",
+          status: "APPROVED",
+          provenance: {
+            source: "Purchase Order",
+            version: 1,
+            team: "Buyer Procurement",
+            uploader: "Tariq Al-Mansoor",
+            timestamp: "07 Oct 2026, 09:40 AM",
+            pageCount: 1,
+          },
+        },
+      ],
+      currentVersion: {
+        version: 1,
+        filename: "PO_GFT_2291.xlsx",
+        fileSize: "64 KB",
+        uploadedBy: "Tariq Al-Mansoor",
+        uploadedByRole: "Overseas Buyer",
+        uploadedAt: "07 Oct 2026, 09:40 AM",
+        status: "APPROVED",
+        provenance: {
+          source: "Purchase Order",
+          version: 1,
+          team: "Buyer Procurement",
+          uploader: "Tariq Al-Mansoor",
+          timestamp: "07 Oct 2026, 09:40 AM",
+          pageCount: 1,
+        },
+      },
+    },
+    {
+      id: "slot-qc",
+      shipmentId: "VFX-2026-001",
+      type: "Quality Certificate",
+      required: true,
+      assignedToUser: demoUsers[5]!, // Dr. Ananya (Quality)
+      status: "WAITING",
+      versions: [],
+    },
+  ],
+};
+
+// Mirror for EXP-KL-2026-1042 so both identifiers work interchangeably
+initialDocumentSlots["EXP-KL-2026-1042"] = initialDocumentSlots["VFX-2026-001"]!.map(s => ({
+  ...s,
+  shipmentId: "EXP-KL-2026-1042",
+}));
+
 export const shipments: Shipment[] = [
+  { id: "VFX-2026-001", commodity: "Frozen Seafood Export", category: "Seafood", from: "Cochin Port (INCOK)", to: "Jebel Ali, Dubai", readiness: 84, status: "review", issues: 3, updated: "Just now", exporter: "Malabar Ocean Foods Pvt Ltd", consignee: "Gulf Fresh Trading LLC", value: "USD 186,400" },
   { id: "EXP-KL-2026-1042", commodity: "Frozen Shrimp", category: "Seafood", from: "Cochin", to: "Dubai", readiness: 84, status: "review", issues: 3, updated: "12 min ago", exporter: "Malabar Ocean Foods Pvt Ltd", consignee: "Gulf Fresh Trading LLC", value: "USD 186,400" },
   { id: "EXP-KL-2026-1041", commodity: "Black Pepper", category: "Spices", from: "Cochin", to: "Hamburg", readiness: 100, status: "ready", issues: 0, updated: "2 h ago", exporter: "Wayanad Spice Collective", consignee: "Nordgewürz GmbH", value: "EUR 92,750" },
   { id: "EXP-KL-2026-1039", commodity: "Natural Rubber", category: "Rubber", from: "Kochi", to: "Singapore", readiness: 61, status: "critical", issues: 6, updated: "Yesterday", exporter: "Kottayam Latex Industries", consignee: "Straits Polymer Pte Ltd", value: "USD 241,000" },

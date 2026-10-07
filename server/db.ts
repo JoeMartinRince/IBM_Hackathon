@@ -7,13 +7,18 @@ import {
   AuditLogRecord,
   VerificationTokenRecord,
   UserProfile,
+  DocumentSlotRecord,
+  DocumentVersionRecord,
+  CorrectionRequestRecord,
+  AppRole,
 } from "./types";
 
 // In-Memory & File-backed Store for DEMO MODE / Instant Offline Execution
-class DataStore {
+export class DataStore {
   public profiles: Map<string, UserProfile> = new Map();
   public shipments: Map<string, ShipmentRecord> = new Map();
   public documents: Map<string, DocumentRecord> = new Map();
+  public documentSlots: Map<string, DocumentSlotRecord[]> = new Map();
   public extractedFields: Map<string, ExtractedFieldRecord> = new Map();
   public goldenRecords: Map<string, GoldenRecordField[]> = new Map();
   public discrepancies: Map<string, DiscrepancyRecord> = new Map();
@@ -38,6 +43,34 @@ class DataStore {
 
     // Initial Realistic Kerala Shipments
     const seedShipments: ShipmentRecord[] = [
+      {
+        id: "VFX-2026-001",
+        exporter: "Malabar Ocean Foods Pvt Ltd",
+        consignee: "Gulf Fresh Trading LLC",
+        commodity: "Frozen Seafood Export",
+        category: "Seafood",
+        origin_port: "Cochin Port (INCOK)",
+        destination_port: "Jebel Ali, Dubai (AEJEA)",
+        destination_country: "UAE",
+        container_number: "MSKU 482915-3",
+        seal_number: "ML-2209184",
+        incoterm: "CIF Jebel Ali",
+        currency: "USD",
+        total_value: 186400,
+        quantity: 1200,
+        unit: "cartons",
+        net_weight: 12000,
+        gross_weight: 13450,
+        cbm: 58.2,
+        shipment_date: "2026-10-16",
+        status: "UNDER_REVIEW",
+        readiness_score: 84,
+        risk_score: 36,
+        issues_count: 3,
+        created_by: defaultProfile.id,
+        created_at: new Date(Date.now() - 3600000).toISOString(),
+        updated_at: new Date().toISOString(),
+      },
       {
         id: "EXP-KL-2026-1042",
         exporter: "Malabar Ocean Foods Pvt Ltd",
@@ -679,7 +712,376 @@ class DataStore {
       verified_at: new Date().toISOString(),
       expires_at: new Date(Date.now() + 2592000000).toISOString(),
     };
-    this.verificationTokens.set(initialToken.token, initialToken);
+    // Seed Multi-User Document Collection Slots for VFX-2026-001 and EXP-KL-2026-1042
+    const createInitialSlots = (shipmentId: string): DocumentSlotRecord[] => [
+      {
+        id: `slot-ci-${shipmentId}`,
+        shipment_id: shipmentId,
+        document_type: "Commercial Invoice",
+        required: true,
+        assigned_user_id: "usr-fin",
+        assigned_user_name: "Rahul Nair",
+        assigned_user_role: "FINANCE",
+        status: "READY",
+        versions: [
+          {
+            version: 1,
+            filename: "Commercial_Invoice_INV20261048.pdf",
+            file_size: "248 KB",
+            uploaded_by: "Rahul Nair",
+            uploaded_by_role: "Finance Team",
+            uploaded_at: new Date(Date.now() - 7200000).toISOString(),
+            status: "APPROVED",
+            provenance: {
+              source: "Commercial Invoice",
+              version: 1,
+              team: "Finance Team",
+              uploader: "Rahul Nair",
+              timestamp: new Date(Date.now() - 7200000).toISOString(),
+              page: 1,
+            },
+          },
+        ],
+        current_version: {
+          version: 1,
+          filename: "Commercial_Invoice_INV20261048.pdf",
+          file_size: "248 KB",
+          uploaded_by: "Rahul Nair",
+          uploaded_by_role: "Finance Team",
+          uploaded_at: new Date(Date.now() - 7200000).toISOString(),
+          status: "APPROVED",
+          provenance: {
+            source: "Commercial Invoice",
+            version: 1,
+            team: "Finance Team",
+            uploader: "Rahul Nair",
+            timestamp: new Date(Date.now() - 7200000).toISOString(),
+            page: 1,
+          },
+        },
+        updated_at: new Date(Date.now() - 7200000).toISOString(),
+      },
+      {
+        id: `slot-pl-${shipmentId}`,
+        shipment_id: shipmentId,
+        document_type: "Packing List",
+        required: true,
+        assigned_user_id: "usr-wh",
+        assigned_user_name: "Akhil Varma",
+        assigned_user_role: "WAREHOUSE",
+        status: "READY",
+        versions: [
+          {
+            version: 1,
+            filename: "Packing_List_W102.pdf",
+            file_size: "186 KB",
+            uploaded_by: "Akhil Varma",
+            uploaded_by_role: "Warehouse Team",
+            uploaded_at: new Date(Date.now() - 5400000).toISOString(),
+            status: "APPROVED",
+            provenance: {
+              source: "Packing List",
+              version: 1,
+              team: "Warehouse Team",
+              uploader: "Akhil Varma",
+              timestamp: new Date(Date.now() - 5400000).toISOString(),
+              page: 1,
+            },
+          },
+        ],
+        current_version: {
+          version: 1,
+          filename: "Packing_List_W102.pdf",
+          file_size: "186 KB",
+          uploaded_by: "Akhil Varma",
+          uploaded_by_role: "Warehouse Team",
+          uploaded_at: new Date(Date.now() - 5400000).toISOString(),
+          status: "APPROVED",
+          provenance: {
+            source: "Packing List",
+            version: 1,
+            team: "Warehouse Team",
+            uploader: "Akhil Varma",
+            timestamp: new Date(Date.now() - 5400000).toISOString(),
+            page: 1,
+          },
+        },
+        updated_at: new Date(Date.now() - 5400000).toISOString(),
+      },
+      {
+        id: `slot-sb-${shipmentId}`,
+        shipment_id: shipmentId,
+        document_type: "Shipping Bill",
+        required: true,
+        assigned_user_id: "usr-cha",
+        assigned_user_name: "Kavitha Menon",
+        assigned_user_role: "CUSTOMS_BROKER",
+        status: "WAITING",
+        versions: [],
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: `slot-po-${shipmentId}`,
+        shipment_id: shipmentId,
+        document_type: "Purchase Order",
+        required: true,
+        assigned_user_id: "usr-buyer",
+        assigned_user_name: "Tariq Al-Mansoor",
+        assigned_user_role: "BUYER",
+        status: "READY",
+        versions: [
+          {
+            version: 1,
+            filename: "PO_GFT_2291.xlsx",
+            file_size: "64 KB",
+            uploaded_by: "Tariq Al-Mansoor",
+            uploaded_by_role: "Buyer Team",
+            uploaded_at: new Date(Date.now() - 9000000).toISOString(),
+            status: "APPROVED",
+            provenance: {
+              source: "Purchase Order",
+              version: 1,
+              team: "Buyer Procurement",
+              uploader: "Tariq Al-Mansoor",
+              timestamp: new Date(Date.now() - 9000000).toISOString(),
+              page: 1,
+            },
+          },
+        ],
+        current_version: {
+          version: 1,
+          filename: "PO_GFT_2291.xlsx",
+          file_size: "64 KB",
+          uploaded_by: "Tariq Al-Mansoor",
+          uploaded_by_role: "Buyer Team",
+          uploaded_at: new Date(Date.now() - 9000000).toISOString(),
+          status: "APPROVED",
+          provenance: {
+            source: "Purchase Order",
+            version: 1,
+            team: "Buyer Procurement",
+            uploader: "Tariq Al-Mansoor",
+            timestamp: new Date(Date.now() - 9000000).toISOString(),
+            page: 1,
+          },
+        },
+        updated_at: new Date(Date.now() - 9000000).toISOString(),
+      },
+      {
+        id: `slot-qc-${shipmentId}`,
+        shipment_id: shipmentId,
+        document_type: "Quality Certificate",
+        required: true,
+        assigned_user_id: "usr-quality",
+        assigned_user_name: "Dr. Ananya Pillai",
+        assigned_user_role: "QUALITY",
+        status: "WAITING",
+        versions: [],
+        updated_at: new Date().toISOString(),
+      },
+    ];
+
+    this.documentSlots.set("VFX-2026-001", createInitialSlots("VFX-2026-001"));
+    this.documentSlots.set("EXP-KL-2026-1042", createInitialSlots("EXP-KL-2026-1042"));
+  }
+
+  public getSlots(shipmentId: string): DocumentSlotRecord[] {
+    if (!this.documentSlots.has(shipmentId)) {
+      const slots: DocumentSlotRecord[] = [
+        { id: `slot-ci-${shipmentId}`, shipment_id: shipmentId, document_type: "Commercial Invoice", required: true, assigned_user_id: "usr-fin", assigned_user_name: "Rahul Nair", assigned_user_role: "FINANCE", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
+        { id: `slot-pl-${shipmentId}`, shipment_id: shipmentId, document_type: "Packing List", required: true, assigned_user_id: "usr-wh", assigned_user_name: "Akhil Varma", assigned_user_role: "WAREHOUSE", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
+        { id: `slot-sb-${shipmentId}`, shipment_id: shipmentId, document_type: "Shipping Bill", required: true, assigned_user_id: "usr-cha", assigned_user_name: "Kavitha Menon", assigned_user_role: "CUSTOMS_BROKER", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
+        { id: `slot-po-${shipmentId}`, shipment_id: shipmentId, document_type: "Purchase Order", required: true, assigned_user_id: "usr-buyer", assigned_user_name: "Tariq Al-Mansoor", assigned_user_role: "BUYER", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
+        { id: `slot-qc-${shipmentId}`, shipment_id: shipmentId, document_type: "Quality Certificate", required: true, assigned_user_id: "usr-quality", assigned_user_name: "Dr. Ananya Pillai", assigned_user_role: "QUALITY", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
+      ];
+      this.documentSlots.set(shipmentId, slots);
+    }
+    return this.documentSlots.get(shipmentId) || [];
+  }
+
+  public uploadSlotVersion(shipmentId: string, slotId: string, filename: string, size: string, uploader: string, role: string, notes?: string): DocumentSlotRecord | null {
+    const slots = this.getSlots(shipmentId);
+    const slot = slots.find(
+      (s) =>
+        s.id === slotId ||
+        s.id.startsWith(slotId) ||
+        s.document_type.toLowerCase() === slotId.toLowerCase()
+    );
+    if (!slot) return null;
+
+    const nextVer = (slot.versions?.length || 0) + 1;
+    const newVersion: DocumentVersionRecord = {
+      version: nextVer,
+      filename,
+      file_size: size || "250 KB",
+      uploaded_by: uploader,
+      uploaded_by_role: role,
+      uploaded_at: new Date().toISOString(),
+      status: "APPROVED",
+      notes,
+      provenance: {
+        source: slot.document_type,
+        version: nextVer,
+        team: role,
+        uploader,
+        timestamp: new Date().toISOString(),
+        page: 1,
+      },
+    };
+
+    slot.versions = [...(slot.versions || []), newVersion];
+    slot.current_version = newVersion;
+    slot.status = "READY";
+    slot.updated_at = new Date().toISOString();
+
+    this.auditLogs.unshift({
+      id: `audit-${Date.now()}`,
+      shipment_id: shipmentId,
+      user_name: uploader,
+      user_role: role,
+      action: "Document Uploaded",
+      details: `${uploader} uploaded ${slot.document_type} (Version ${nextVer}: ${filename}).`,
+      created_at: new Date().toISOString(),
+    });
+
+    return slot;
+  }
+
+  public requestCorrection(shipmentId: string, slotId: string, reason: string, requestedBy: string): DocumentSlotRecord | null {
+    const slots = this.getSlots(shipmentId);
+    const slot = slots.find(
+      (s) =>
+        s.id === slotId ||
+        s.id.startsWith(slotId) ||
+        s.document_type.toLowerCase() === slotId.toLowerCase()
+    );
+    if (!slot) return null;
+
+    const req: CorrectionRequestRecord = {
+      id: `corr-${Date.now()}`,
+      slot_id: slot.id,
+      discrepancy_title: "Discrepancy Correction",
+      reason,
+      requested_by: requestedBy,
+      requested_at: new Date().toISOString(),
+      assigned_to: slot.assigned_user_name,
+      assigned_role: slot.assigned_user_role,
+      status: "PENDING",
+    };
+
+    slot.correction_request = req;
+    slot.status = "CORRECTION_REQUESTED";
+    slot.updated_at = new Date().toISOString();
+
+    this.auditLogs.unshift({
+      id: `audit-${Date.now()}`,
+      shipment_id: shipmentId,
+      user_name: requestedBy,
+      user_role: "Admin",
+      action: "Correction Requested",
+      details: `Admin requested correction on ${slot.document_type} from ${slot.assigned_user_name}: "${reason}"`,
+      created_at: new Date().toISOString(),
+    });
+
+    return slot;
+  }
+
+  public submitCorrection(shipmentId: string, slotId: string, filename: string, size: string, uploader: string, role: string): DocumentSlotRecord | null {
+    const slots = this.getSlots(shipmentId);
+    const slot = slots.find(
+      (s) =>
+        s.id === slotId ||
+        s.id.startsWith(slotId) ||
+        s.document_type.toLowerCase() === slotId.toLowerCase()
+    );
+    if (!slot) return null;
+
+    const nextVer = (slot.versions?.length || 0) + 1;
+    const newVersion: DocumentVersionRecord = {
+      version: nextVer,
+      filename,
+      file_size: size || "220 KB",
+      uploaded_by: uploader,
+      uploaded_by_role: role,
+      uploaded_at: new Date().toISOString(),
+      status: "UPLOADED",
+      notes: "Submitted in response to correction request",
+      provenance: {
+        source: slot.document_type,
+        version: nextVer,
+        team: role,
+        uploader,
+        timestamp: new Date().toISOString(),
+        page: 1,
+      },
+    };
+
+    slot.versions = [...(slot.versions || []), newVersion];
+    slot.current_version = newVersion;
+    slot.status = "CORRECTION_SUBMITTED";
+    if (slot.correction_request) {
+      slot.correction_request.status = "SUBMITTED";
+      slot.correction_request.submitted_version = nextVer;
+      slot.correction_request.submitted_at = new Date().toISOString();
+    }
+    slot.updated_at = new Date().toISOString();
+
+    this.auditLogs.unshift({
+      id: `audit-${Date.now()}`,
+      shipment_id: shipmentId,
+      user_name: uploader,
+      user_role: role,
+      action: "Correction Submitted",
+      details: `${uploader} submitted corrected version ${nextVer} of ${slot.document_type} (${filename}).`,
+      created_at: new Date().toISOString(),
+    });
+
+    return slot;
+  }
+
+  public approveCorrection(shipmentId: string, slotId: string, approvedBy: string): DocumentSlotRecord | null {
+    const slots = this.getSlots(shipmentId);
+    const slot = slots.find(
+      (s) =>
+        s.id === slotId ||
+        s.id.startsWith(slotId) ||
+        s.document_type.toLowerCase() === slotId.toLowerCase()
+    );
+    if (!slot) return null;
+
+    slot.status = "READY";
+    if (slot.current_version) {
+      slot.current_version.status = "APPROVED";
+    }
+    if (slot.correction_request) {
+      slot.correction_request.status = "APPROVED";
+    }
+    slot.updated_at = new Date().toISOString();
+
+    this.auditLogs.unshift({
+      id: `audit-${Date.now()}`,
+      shipment_id: shipmentId,
+      user_name: approvedBy,
+      user_role: "Admin",
+      action: "Correction Approved",
+      details: `${approvedBy} approved corrected version of ${slot.document_type}. Ready for re-verification.`,
+      created_at: new Date().toISOString(),
+    });
+
+    return slot;
+  }
+
+  public canStartAnalysis(shipmentId: string): { canStart: boolean; received: number; total: number; missing: string[] } {
+    const slots = this.getSlots(shipmentId);
+    const requiredSlots = slots.filter((s) => s.required);
+    const missing = requiredSlots.filter((s) => s.status === "WAITING").map((s) => s.document_type);
+    const received = requiredSlots.length - missing.length;
+    return {
+      canStart: missing.length === 0,
+      received,
+      total: requiredSlots.length,
+      missing,
+    };
   }
 }
 

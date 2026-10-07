@@ -24,8 +24,8 @@ export const Route = createFileRoute("/_app/assistant")({
 interface Message {
   role: "user" | "assistant";
   content: string;
-  citations?: string[];
-  model?: string;
+  citations?: string[] | undefined;
+  model?: string | undefined;
 }
 
 function AssistantPage() {
