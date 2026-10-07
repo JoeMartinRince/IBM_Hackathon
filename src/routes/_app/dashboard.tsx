@@ -59,6 +59,7 @@ function Dashboard() {
     allUsers,
     setCurrentUser,
     reverify,
+    reassignSlot,
   } = useDemo();
 
   const navigate = useNavigate();
@@ -297,11 +298,24 @@ function Dashboard() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <h4 className="font-bold text-sm text-foreground">{slot.type}</h4>
-                          <div className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
                             <span>Assigned:</span>
-                            <span className="font-semibold text-foreground">
-                              {slot.assignedToUser.name}
-                            </span>
+                            <select
+                              value={slot.assignedToUser.id}
+                              onChange={(e) => {
+                                reassignSlot(activeShipmentId, slot.id, e.target.value);
+                                const u = allUsers.find((x) => x.id === e.target.value);
+                                toast.success(`Reassigned ${slot.type} to ${u?.name || "specialist"}`);
+                              }}
+                              className="font-semibold text-foreground bg-transparent border-b border-border/40 pb-0.5 outline-none hover:border-primary text-[11px] cursor-pointer"
+                              title="Click to reassign document responsibility"
+                            >
+                              {allUsers.filter((u) => u.role !== "ADMIN").map((u) => (
+                                <option key={u.id} value={u.id} className="bg-card text-foreground">
+                                  {u.name} ({u.roleLabel})
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         </div>
 

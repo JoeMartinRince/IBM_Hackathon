@@ -37,10 +37,13 @@ function IssuesPage() {
     submitCorrection,
     approveCorrection,
     reverify,
+    ignoreDiscrepancy,
   } = useDemo();
 
   const [filterSev, setFilterSev] = useState<string>("all");
   const [inspectModal, setInspectModal] = useState<Discrepancy | null>(null);
+  const [ignoreModal, setIgnoreModal] = useState<Discrepancy | null>(null);
+  const [ignoreReason, setIgnoreReason] = useState("");
 
   // Correction workflow states
   const [requestModalOpen, setRequestModalOpen] = useState(false);
@@ -260,12 +263,23 @@ function IssuesPage() {
                       >
                         <Send className="size-3.5" /> Request Correction
                       </button>
-                      <button
-                        onClick={() => resolve(d.id)}
-                        className="press inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold text-ink-foreground shadow-sm hover:brightness-125"
-                      >
-                        <Wand2 className="size-3 text-primary" /> Auto-Fix
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setIgnoreModal(d);
+                            setIgnoreReason("Customer waiver granted for container shipment variance.");
+                          }}
+                          className="text-[10px] text-muted-foreground hover:text-foreground font-medium underline"
+                        >
+                          Ignore with Reason
+                        </button>
+                        <button
+                          onClick={() => resolve(d.id)}
+                          className="press inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold text-ink-foreground shadow-sm hover:brightness-125"
+                        >
+                          <Wand2 className="size-3 text-primary" /> Auto-Fix
+                        </button>
+                      </div>
                     </div>
                   ) : isQtyIssue && plSlot?.status === "CORRECTION_REQUESTED" ? (
                     <button
@@ -275,12 +289,23 @@ function IssuesPage() {
                       <Upload className="size-3.5" /> Upload V2
                     </button>
                   ) : (
-                    <button
-                      onClick={() => resolve(d.id)}
-                      className="press inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
-                    >
-                      <Wand2 className="size-3.5" /> {d.fixLabel}
-                    </button>
+                    <div className="flex flex-col gap-1 items-end">
+                      <button
+                        onClick={() => resolve(d.id)}
+                        className="press inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
+                      >
+                        <Wand2 className="size-3.5" /> {d.fixLabel}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIgnoreModal(d);
+                          setIgnoreReason("Clerical variation within permissible statutory boundary.");
+                        }}
+                        className="text-[10px] text-muted-foreground hover:text-foreground font-medium underline"
+                      >
+                        Ignore with Reason
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -482,6 +507,68 @@ function IssuesPage() {
                     Resolve Discrepancy
                   </button>
                 )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Ignore Discrepancy Modal */}
+      <AnimatePresence>
+        {ignoreModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="surface max-w-md w-full p-6 shadow-2xl space-y-4"
+            >
+              <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="size-5 text-warning" />
+                  <h3 className="font-semibold text-lg">Ignore Discrepancy with Justification</h3>
+                </div>
+                <button onClick={() => setIgnoreModal(null)} className="text-muted-foreground hover:text-foreground">
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="rounded-xl bg-muted/40 p-3 text-xs">
+                  <span className="font-semibold">{ignoreModal.title}</span> ({ignoreModal.difference})
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    Regulatory Waiver / Justification Note (Audited):
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={ignoreReason}
+                    onChange={(e) => setIgnoreReason(e.target.value)}
+                    className="w-full rounded-xl border bg-card p-3 text-xs outline-none focus:ring-2 focus:ring-ring"
+                    placeholder="Enter compliance justification..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t">
+                <button
+                  onClick={() => setIgnoreModal(null)}
+                  className="rounded-full border bg-card px-4 py-2 text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await ignoreDiscrepancy(ignoreModal.id, ignoreReason);
+                    toast.info(`Discrepancy "${ignoreModal.title}" ignored with logged audit justification.`);
+                    setIgnoreModal(null);
+                  }}
+                  className="press rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
+                >
+                  Confirm Waiver & Audit
+                </button>
               </div>
             </motion.div>
           </div>

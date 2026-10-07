@@ -53,6 +53,10 @@ interface DemoState {
   isAnalyzing: boolean;
   setIsAnalyzing: (v: boolean) => void;
   analysisCompleted: Record<string, boolean>;
+  reassignSlot: (shipmentId: string, slotId: string, userId: string) => void;
+  goldenOverrides: Record<string, string>;
+  setGoldenOverride: (fieldLabel: string, value: string, reason?: string) => void;
+  ignoreDiscrepancy: (id: string, reason: string) => Promise<void>;
 }
 
 const Ctx = createContext<DemoState | null>(null);
@@ -390,10 +394,40 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     return true;
   };
 
+  const [goldenOverrides, setGoldenOverrides] = useState<Record<string, string>>({});
+
+  const setGoldenOverride = (fieldLabel: string, value: string, _reason?: string) => {
+    setGoldenOverrides((prev) => ({ ...prev, [fieldLabel]: value }));
+  };
+
+  const reassignSlot = (shipmentId: string, slotId: string, userId: string) => {
+    const targetUser = demoUsers.find((u) => u.id === userId);
+    if (!targetUser) return;
+
+    setDocumentSlots((prev) => {
+      const currentList = prev[shipmentId] ?? initialDocumentSlots[shipmentId] ?? initialDocumentSlots["VFX-2026-001"] ?? [];
+      const updatedList = currentList.map((slot) => {
+        if (slot.id === slotId || slot.type.toLowerCase() === slotId.toLowerCase()) {
+          return {
+            ...slot,
+            assignedToUser: targetUser,
+          };
+        }
+        return slot;
+      });
+      return { ...prev, [shipmentId]: updatedList };
+    });
+  };
+
+  const ignoreDiscrepancy = async (id: string, _reason: string) => {
+    setResolved((r) => (r.includes(id) ? r : [...r, id]));
+  };
+
   const reset = () => {
     setResolved([]);
     setDocs(demoDocuments);
     setDocumentSlots(initialDocumentSlots);
+    setGoldenOverrides({});
     setAnalysisCompleted({ "VFX-2026-001": false, "EXP-KL-2026-1042": false });
     if (typeof window !== "undefined") {
       localStorage.removeItem("verifai_document_slots");
@@ -437,6 +471,10 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     isAnalyzing,
     setIsAnalyzing,
     analysisCompleted,
+    reassignSlot,
+    goldenOverrides,
+    setGoldenOverride,
+    ignoreDiscrepancy,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
