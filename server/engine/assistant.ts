@@ -6,28 +6,64 @@ export interface AssistantResult {
   model?: string;
 }
 
+/**
+ * Resolves all configured Gemini API keys into an ordered fallback pool.
+ * Precedence:
+ * 1. User/Client provided API key(s)
+ * 2. Primary GEMINI_API_KEY from environment
+ * 3. Comma/newline-delimited GEMINI_BACKUP_KEYS
+ * 4. Specific numbered GEMINI_API_KEY_BACKUP1, BACKUP2, BACKUP3
+ * 5. Fallback AI_API_KEY
+ */
+export function getAvailableGeminiKeys(clientApiKey?: string): string[] {
+  const keys: string[] = [];
+
+  const addKeys = (raw?: string) => {
+    if (!raw) return;
+    const candidates = raw
+      .split(/[,;\n\r]+/)
+      .map((k) => k.trim())
+      .filter((k) => k.length > 10);
+    for (const c of candidates) {
+      if (!keys.includes(c)) {
+        keys.push(c);
+      }
+    }
+  };
+
+  addKeys(clientApiKey);
+  addKeys(process.env.GEMINI_API_KEY);
+  addKeys(process.env.GEMINI_BACKUP_KEYS);
+  addKeys(process.env.GEMINI_API_KEY_BACKUP1);
+  addKeys(process.env.GEMINI_API_KEY_BACKUP2);
+  addKeys(process.env.GEMINI_API_KEY_BACKUP3);
+  addKeys(process.env.AI_API_KEY);
+
+  return keys;
+}
+
 export async function answerShipmentQuery(
   shipmentId: string,
   question: string,
   clientApiKey?: string,
 ): Promise<AssistantResult> {
-  const apiKey = (
-    clientApiKey ||
-    process.env.GEMINI_API_KEY ||
-    process.env.AI_API_KEY ||
-    ""
-  ).trim();
   const shipment = db.shipments.get(shipmentId);
   const golden = db.goldenRecords.get(shipmentId) || [];
   const openDiscrepancies = Array.from(db.discrepancies.values()).filter(
     (d) => d.shipment_id === shipmentId && d.status === "OPEN",
   );
 
-  // If a Gemini API key is provided, attempt live generation via Google Generative Language API
-  if (apiKey) {
+  const availableKeys = getAvailableGeminiKeys(clientApiKey);
+
+  // Iterate through available primary and backup keys
+  for (let i = 0; i < availableKeys.length; i++) {
+    const key = availableKeys[i];
+    const keyLabel = i === 0 ? "Primary Key" : `Backup Key #${i}`;
+    const keySnippet = `${key.slice(0, 14)}...`;
+
     try {
       const geminiResult = await callGeminiApi(
-        apiKey,
+        key,
         shipmentId,
         question,
         shipment,
@@ -35,11 +71,14 @@ export async function answerShipmentQuery(
         openDiscrepancies,
       );
       if (geminiResult) {
+        if (i > 0) {
+          console.log(`[Gemini Multi-Key] Fulfilled via ${keyLabel} (${keySnippet})`);
+        }
         return geminiResult;
       }
     } catch (err) {
       console.warn(
-        "[Gemini API] Error calling Gemini, falling back to deterministic trade engine:",
+        `[Gemini Multi-Key] ${keyLabel} (${keySnippet}) failed or rate-limited. Rotating to next backup key...`,
         err,
       );
     }
@@ -141,6 +180,7 @@ CITATIONS: [Document 1, Document 2, ...]`;
             maxOutputTokens: 800,
           },
         }),
+        signal: AbortSignal.timeout(9000),
       });
 
       if (!res.ok) {
