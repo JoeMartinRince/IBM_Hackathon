@@ -102,20 +102,24 @@ app.use("/api", assistantRouter);
 app.use("/api/insights", insightsRouter);
 app.use("/api", publicVerifyRouter);
 
-// 8. Start Server and synchronize with Neon PostgreSQL
-app.listen(PORT, async () => {
-  console.log(`[VERIFAI Engine] running at http://localhost:${PORT}`);
-  if (process.env.DATABASE_URL) {
-    try {
-      await db.initPostgres();
-      console.log(`[Mode] LIVE (Connected & Synchronized with Neon PostgreSQL)`);
-    } catch (e) {
-      console.warn(`[Mode] PostgreSQL initialization warning:`, e);
-      console.log(`[Mode] DEMO (In-Memory Fallback)`);
+// 8. Start Server and synchronize with Neon PostgreSQL (when not running as a Vercel serverless function)
+if (!process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    console.log(`[VERIFAI Engine] running at http://localhost:${PORT}`);
+    if (process.env.DATABASE_URL) {
+      try {
+        await db.initPostgres();
+        console.log(`[Mode] LIVE (Connected & Synchronized with Neon PostgreSQL)`);
+      } catch (e) {
+        console.warn(`[Mode] PostgreSQL initialization warning:`, e);
+        console.log(`[Mode] DEMO (In-Memory Fallback)`);
+      }
+    } else {
+      console.log(`[Mode] DEMO (In-Memory / Local Cache)`);
     }
-  } else {
-    console.log(`[Mode] DEMO (In-Memory / Local Cache)`);
-  }
-});
+  });
+} else if (process.env.DATABASE_URL) {
+  db.initPostgres().catch((e) => console.warn("[PostgreSQL] Init warning:", e));
+}
 
 export default app;
