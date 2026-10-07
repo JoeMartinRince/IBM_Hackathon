@@ -37,38 +37,46 @@ assistantRouter.post("/assistant/test-key", async (req: Request, res: Response) 
     return res.status(400).json({ success: false, error: "No API key provided" });
   }
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: "Respond with the word PONG if you receive this." }] }],
-      }),
-    });
+  const testModels = ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-pro-latest"];
+  let lastError = "Failed to connect to Google API";
 
-    if (!response.ok) {
-      const errJson = await response.json().catch(() => ({}));
-      return res.status(400).json({
-        success: false,
-        error: errJson.error?.message || `Google API returned status ${response.status}`,
+  for (const model of testModels) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: "Respond with the word PONG if you receive this." }] }],
+        }),
       });
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        lastError = errJson.error?.message || `Google API returned status ${response.status}`;
+        continue;
+      }
+
+      const data = (await response.json()) as any;
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "PONG";
+
+      return res.json({
+        success: true,
+        valid: true,
+        model,
+        message: `Gemini API key is active and responding via ${model}!`,
+        reply,
+      });
+    } catch (err: any) {
+      lastError = err.message || "Network error connecting to Google Generative Language API";
     }
-
-    const data = (await response.json()) as any;
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-
-    res.json({
-      success: true,
-      valid: true,
-      model: "gemini-1.5-flash",
-      message: "Gemini API key is active and responding successfully!",
-      reply,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      error: err.message || "Network error connecting to Google Generative Language API",
-    });
   }
+
+  res.status(400).json({
+    success: false,
+    error: lastError,
+  });
 });

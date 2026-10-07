@@ -97,14 +97,17 @@ INSTRUCTIONS:
 - At the very end of your response, on a new line, write:
 CITATIONS: [Document 1, Document 2, ...]`;
 
-  const models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-pro"];
+  const models = ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-pro-latest"];
 
   for (const model of models) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
       const res = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
         body: JSON.stringify({
           contents: [
             {
@@ -126,7 +129,9 @@ CITATIONS: [Document 1, Document 2, ...]`;
       }
 
       const data = (await res.json()) as any;
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      const textParts = parts.filter((p: any) => typeof p.text === "string" && p.text.trim());
+      const rawText = textParts.map((p: any) => p.text).join("\n").trim();
       if (!rawText) continue;
 
       // Extract citations if present
