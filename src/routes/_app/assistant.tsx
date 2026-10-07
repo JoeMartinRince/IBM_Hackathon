@@ -25,15 +25,17 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   citations?: string[];
+  model?: string;
 }
 
 function AssistantPage() {
-  const { activeShipmentId, activeShipment } = useDemo();
+  const { activeShipmentId, activeShipment, geminiApiKey } = useDemo();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
       content: `Hello! I am your VERIFAI export intelligence assistant. I am grounded in verified data for **${activeShipment.id}** (${activeShipment.commodity}). Ask me anything about declared quantities, tariff codes, discrepancies, or customs clearance steps.`,
-      citations: ["Verified Consignment Dossier", "Consensus Golden Record"],
+      citations: ["Commercial Invoice (Finance)", "Packing List (Warehouse)", "Shipping Bill (Customs Broker)"],
+      model: geminiApiKey ? "gemini-1.5-flash (Google AI)" : "Deterministic Trade Engine",
     },
   ]);
   const [input, setInput] = useState("");
@@ -42,9 +44,10 @@ function AssistantPage() {
   const chips = [
     "How many cartons are in this shipment?",
     "Which documents contain mismatches?",
+    "Who generates the invoice, packing list, and shipping bill?",
+    "What is the consequence of the HS code conflict?",
     "What should I fix first?",
     "Why is this shipment not ready?",
-    "What is the highest-risk issue?",
   ];
 
   const handleSend = async (textToSend?: string) => {
@@ -57,10 +60,10 @@ function AssistantPage() {
     setLoading(true);
 
     try {
-      const res = await assistantService.askQuestion(activeShipmentId, q);
+      const res = await assistantService.askQuestion(activeShipmentId, q, geminiApiKey);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: res.answer, citations: res.citations },
+        { role: "assistant", content: res.answer, citations: res.citations, model: res.model },
       ]);
     } catch {
       // Local fallback
@@ -71,6 +74,7 @@ function AssistantPage() {
           role: "assistant",
           content: foundAnswer,
           citations: ["Commercial Invoice", "Packing List", "Shipping Bill"],
+          model: "Local Trade Engine",
         },
       ]);
     } finally {
@@ -84,6 +88,14 @@ function AssistantPage() {
         eyebrow="Grounded Export Intelligence"
         title="Ask Your Shipment"
         sub="Inquire directly about quantities, weights, tariff lines, and customs query predictions. Answers are strictly grounded in your uploaded trade documents."
+        right={
+          <div className="flex items-center gap-2 rounded-full border bg-card px-3.5 py-1.5 text-xs">
+            <span className={`size-2 rounded-full ${geminiApiKey ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+            <span className="font-semibold text-foreground">
+              {geminiApiKey ? "Gemini 1.5 Flash Connected" : "Deterministic Mode"}
+            </span>
+          </div>
+        }
       />
 
       {/* Suggested Prompt Chips */}
@@ -124,16 +136,25 @@ function AssistantPage() {
               >
                 <div dangerouslySetInnerHTML={{ __html: m.content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
 
-                {m.citations && m.citations.length > 0 && (
-                  <div className="pt-2 border-t border-border/50 text-[11px] text-muted-foreground flex flex-wrap items-center gap-1.5">
-                    <span className="font-semibold text-foreground">Verified Sources:</span>
-                    {m.citations.map((c, i) => (
-                      <span key={i} className="rounded-md bg-card px-2 py-0.5 border font-mono">
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/50 text-[11px] text-muted-foreground">
+                  {m.citations && m.citations.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="font-semibold text-foreground">Sources:</span>
+                      {m.citations.map((c, i) => (
+                        <span key={i} className="rounded-md bg-card px-2 py-0.5 border font-mono">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {m.model && (
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      {m.model.includes("gemini") ? "✨ " : "⚡ "}
+                      {m.model}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {m.role === "user" && (

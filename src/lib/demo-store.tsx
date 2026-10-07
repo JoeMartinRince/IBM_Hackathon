@@ -22,6 +22,8 @@ interface DemoState {
   setLang: (l: Language) => void;
   mode: "DEMO" | "LIVE";
   setMode: (m: "DEMO" | "LIVE") => void;
+  geminiApiKey: string;
+  setGeminiApiKey: (k: string) => void;
   t: (key: string) => string;
   reset: () => void;
 }
@@ -36,6 +38,19 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [lang, setLang] = useState<Language>("EN");
   const [mode, setMode] = useState<"DEMO" | "LIVE">("DEMO");
+  const [geminiApiKey, setGeminiApiKeyState] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("verifai_gemini_key") || "";
+    }
+    return "";
+  });
+
+  const setGeminiApiKey = (key: string) => {
+    setGeminiApiKeyState(key);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("verifai_gemini_key", key);
+    }
+  };
 
   const activeShipment = useMemo(() => {
     return shipments.find((s) => s.id === activeShipmentId) || shipments[0];
@@ -97,6 +112,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setLang,
     mode,
     setMode,
+    geminiApiKey,
+    setGeminiApiKey,
     t,
     reset,
   };

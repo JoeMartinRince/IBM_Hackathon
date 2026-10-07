@@ -109,10 +109,16 @@ export const verificationService = {
 
 // 4. Assistant Service
 export const assistantService = {
-  async askQuestion(shipmentId: string, question: string) {
-    return fetchApi<{ success: boolean; answer: string; citations: string[] }>(`/api/shipments/${shipmentId}/assistant`, {
+  async askQuestion(shipmentId: string, question: string, apiKey?: string) {
+    return fetchApi<{ success: boolean; answer: string; citations: string[]; model?: string }>(`/api/shipments/${shipmentId}/assistant`, {
       method: "POST",
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, api_key: apiKey }),
+    });
+  },
+  async testGeminiKey(apiKey: string) {
+    return fetchApi<{ success: boolean; valid: boolean; message: string; model?: string; reply?: string }>(`/api/assistant/test-key`, {
+      method: "POST",
+      body: JSON.stringify({ api_key: apiKey }),
     });
   },
 };
