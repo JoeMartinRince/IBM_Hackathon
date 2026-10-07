@@ -64,7 +64,9 @@ The data architecture is designed for transactional consistency, document versio
 ## 2. Table Specifications
 
 ### 2.1 `shipments`
+
 Stores the master export shipment header and status.
+
 - `id` (VARCHAR 64, PK): Unique shipment reference (e.g., `EXP-KL-2026-1042`).
 - `exporter` (VARCHAR 255): Legal trade name of the Kerala exporter.
 - `consignee` (VARCHAR 255): Overseas buyer entity.
@@ -79,7 +81,9 @@ Stores the master export shipment header and status.
 - `status` (VARCHAR 32): Lifecycle stage (`DRAFT`, `UNDER_REVIEW`, `READY`, `SHIPPED`).
 
 ### 2.2 `documents`
+
 Stores metadata and parsed contents for uploaded trade documents.
+
 - `id` (VARCHAR 64, PK): Document UUID.
 - `shipment_id` (VARCHAR 64, FK -> shipments.id): Owning shipment.
 - `file_name` (VARCHAR 255): Original filename.
@@ -89,7 +93,9 @@ Stores metadata and parsed contents for uploaded trade documents.
 - `file_path` (VARCHAR 512): Disk location in `uploads/`.
 
 ### 2.3 `extracted_fields`
+
 Granular structured key-value pairs parsed from individual trade documents.
+
 - `id` (VARCHAR 64, PK): Field extraction ID.
 - `document_id` (VARCHAR 64, FK -> documents.id): Source document.
 - `field_name` (VARCHAR 64): Normalized semantic key (e.g., `total_weight_kg`, `hs_code`).
@@ -99,7 +105,9 @@ Granular structured key-value pairs parsed from individual trade documents.
 - `bounding_box` (JSONB): Visual coordinates on the document surface.
 
 ### 2.4 `discrepancies`
+
 Tracks cross-document conflicts detected by the verification engine.
+
 - `id` (VARCHAR 64, PK): Discrepancy UUID.
 - `shipment_id` (VARCHAR 64, FK -> shipments.id).
 - `field_name` (VARCHAR 64): Target trade attribute.
@@ -111,7 +119,9 @@ Tracks cross-document conflicts detected by the verification engine.
 - `resolved_by` (VARCHAR 100): User who confirmed 1-click resolution.
 
 ### 2.5 `golden_record_entries`
+
 Consensus single source of truth across all submitted documents.
+
 - `id` (VARCHAR 64, PK).
 - `shipment_id` (VARCHAR 64, FK -> shipments.id).
 - `field_name` (VARCHAR 64): Normalized attribute key.
@@ -123,7 +133,9 @@ Consensus single source of truth across all submitted documents.
 - `has_conflict` (BOOLEAN): Flag indicating unresolved discrepancy.
 
 ### 2.6 `audit_logs`
+
 Immutable compliance audit log for customs traceability.
+
 - `id` (VARCHAR 64, PK).
 - `shipment_id` (VARCHAR 64, FK -> shipments.id).
 - `user_name` (VARCHAR 100): Acting officer name.

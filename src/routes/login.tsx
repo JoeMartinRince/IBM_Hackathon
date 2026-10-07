@@ -37,7 +37,9 @@ function LoginPage() {
             VERIF<span className="text-primary">AI</span>
           </span>
         </Link>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">Sign in to your export workspace</h2>
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
+          Sign in to your export workspace
+        </h2>
         <p className="text-xs text-muted-foreground">
           KeralAI Hackathon 2026 · Challenge 3: Export Document Verification System
         </p>

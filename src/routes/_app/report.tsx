@@ -16,7 +16,8 @@ import { PageHeader, Reveal } from "@/components/verifex/primitives";
 import { MockQR } from "@/components/verifex/QRCode";
 
 export const Route = createFileRoute("/_app/report")({
-  head: () => seo("Verification Report", "Official export document verification report and certificate."),
+  head: () =>
+    seo("Verification Report", "Official export document verification report and certificate."),
   component: ReportPage,
 });
 
@@ -64,7 +65,8 @@ function ReportPage() {
               Kerala Export Verification & Trade Compliance Authority · KeralAI 2026
             </div>
             <div className="mt-3 font-mono text-sm text-foreground">
-              CERTIFICATE REF: <span className="font-bold">VERIFAI-CERT-{activeShipment.id}-2026</span>
+              CERTIFICATE REF:{" "}
+              <span className="font-bold">VERIFAI-CERT-{activeShipment.id}-2026</span>
             </div>
           </div>
 
@@ -82,19 +84,27 @@ function ReportPage() {
         {/* Consignment Particulars */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
           <div className="rounded-2xl border p-3.5 bg-muted/20">
-            <div className="text-muted-foreground uppercase font-semibold text-[10px]">Shipment ID</div>
+            <div className="text-muted-foreground uppercase font-semibold text-[10px]">
+              Shipment ID
+            </div>
             <div className="font-mono font-bold text-sm mt-0.5">{activeShipment.id}</div>
           </div>
           <div className="rounded-2xl border p-3.5 bg-muted/20">
-            <div className="text-muted-foreground uppercase font-semibold text-[10px]">Commodity</div>
+            <div className="text-muted-foreground uppercase font-semibold text-[10px]">
+              Commodity
+            </div>
             <div className="font-bold text-sm mt-0.5">{activeShipment.commodity}</div>
           </div>
           <div className="rounded-2xl border p-3.5 bg-muted/20">
-            <div className="text-muted-foreground uppercase font-semibold text-[10px]">Port of Loading</div>
+            <div className="text-muted-foreground uppercase font-semibold text-[10px]">
+              Port of Loading
+            </div>
             <div className="font-bold text-sm mt-0.5">{activeShipment.from} (INCOK)</div>
           </div>
           <div className="rounded-2xl border p-3.5 bg-muted/20">
-            <div className="text-muted-foreground uppercase font-semibold text-[10px]">Destination Port</div>
+            <div className="text-muted-foreground uppercase font-semibold text-[10px]">
+              Destination Port
+            </div>
             <div className="font-bold text-sm mt-0.5">{activeShipment.to}</div>
           </div>
         </div>
@@ -102,14 +112,22 @@ function ReportPage() {
         {/* Parties */}
         <div className="grid sm:grid-cols-2 gap-4 text-xs">
           <div className="rounded-2xl border p-4 bg-card">
-            <div className="text-[10px] uppercase font-semibold text-muted-foreground">Registered Exporter</div>
+            <div className="text-[10px] uppercase font-semibold text-muted-foreground">
+              Registered Exporter
+            </div>
             <div className="font-bold text-sm text-foreground mt-1">{activeShipment.exporter}</div>
-            <div className="text-muted-foreground mt-0.5">IEC: 1004819201 · Cochin Port, Kerala, India</div>
+            <div className="text-muted-foreground mt-0.5">
+              IEC: 1004819201 · Cochin Port, Kerala, India
+            </div>
           </div>
           <div className="rounded-2xl border p-4 bg-card">
-            <div className="text-[10px] uppercase font-semibold text-muted-foreground">Buyer / Consignee</div>
+            <div className="text-[10px] uppercase font-semibold text-muted-foreground">
+              Buyer / Consignee
+            </div>
             <div className="font-bold text-sm text-foreground mt-1">{activeShipment.consignee}</div>
-            <div className="text-muted-foreground mt-0.5">Al Ras, Deira, Dubai, United Arab Emirates</div>
+            <div className="text-muted-foreground mt-0.5">
+              Al Ras, Deira, Dubai, United Arab Emirates
+            </div>
           </div>
         </div>
 
@@ -150,7 +168,9 @@ function ReportPage() {
             </div>
             <div>
               <div className="font-semibold text-sm">Authenticity QR Code</div>
-              <div className="text-muted-foreground mt-0.5">Scan to verify Let Export Order readiness online.</div>
+              <div className="text-muted-foreground mt-0.5">
+                Scan to verify Let Export Order readiness online.
+              </div>
               <div className="font-mono text-[10px] text-muted-foreground mt-1">
                 TIMESTAMP: {new Date().toISOString()}
               </div>
@@ -161,8 +181,12 @@ function ReportPage() {
             <div className="font-bold text-sm uppercase tracking-wider text-foreground">
               VERIFAI EXPORT INSPECTION SEAL
             </div>
-            <div className="text-muted-foreground mt-0.5">Government of Kerala Trade Protocol v2.4</div>
-            <div className="font-mono text-[11px] text-primary font-bold mt-1">STATUS: COMPLIANCE CLEARED</div>
+            <div className="text-muted-foreground mt-0.5">
+              Government of Kerala Trade Protocol v2.4
+            </div>
+            <div className="font-mono text-[11px] text-primary font-bold mt-1">
+              STATUS: COMPLIANCE CLEARED
+            </div>
           </div>
         </div>
       </Reveal>

@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import {
-  Sparkles,
-  Send,
-  Bot,
-  User,
-  ShieldCheck,
-  FileText,
-  CornerDownLeft,
-} from "lucide-react";
+import { Sparkles, Send, Bot, User, ShieldCheck, FileText, CornerDownLeft } from "lucide-react";
 import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
 import { PageHeader, Reveal } from "@/components/verifex/primitives";
@@ -34,7 +26,11 @@ function AssistantPage() {
     {
       role: "assistant",
       content: `Hello! I am your VERIFAI export intelligence assistant. I am grounded in verified data for **${activeShipment.id}** (${activeShipment.commodity}). Ask me anything about declared quantities, tariff codes, discrepancies, or customs clearance steps.`,
-      citations: ["Commercial Invoice (Finance)", "Packing List (Warehouse)", "Shipping Bill (Customs Broker)"],
+      citations: [
+        "Commercial Invoice (Finance)",
+        "Packing List (Warehouse)",
+        "Shipping Bill (Customs Broker)",
+      ],
       model: geminiApiKey ? "gemini-1.5-flash (Google AI)" : "Deterministic Trade Engine",
     },
   ]);
@@ -67,7 +63,9 @@ function AssistantPage() {
       ]);
     } catch {
       // Local fallback
-      const foundAnswer = assistantAnswers[q] || `Based on the verified Golden Record for ${activeShipmentId}: The commodity is ${activeShipment.commodity} with a declared value of ${activeShipment.value}. Please review active discrepancies on the Results page.`;
+      const foundAnswer =
+        assistantAnswers[q] ||
+        `Based on the verified Golden Record for ${activeShipmentId}: The commodity is ${activeShipment.commodity} with a declared value of ${activeShipment.value}. Please review active discrepancies on the Results page.`;
       setMessages((prev) => [
         ...prev,
         {
@@ -90,7 +88,9 @@ function AssistantPage() {
         sub="Inquire directly about quantities, weights, tariff lines, and customs query predictions. Answers are strictly grounded in your uploaded trade documents."
         right={
           <div className="flex items-center gap-2 rounded-full border bg-card px-3.5 py-1.5 text-xs">
-            <span className={`size-2 rounded-full ${geminiApiKey ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+            <span
+              className={`size-2 rounded-full ${geminiApiKey ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`}
+            />
             <span className="font-semibold text-foreground">
               {geminiApiKey ? "Gemini 1.5 Flash Connected" : "Deterministic Mode"}
             </span>
@@ -134,7 +134,11 @@ function AssistantPage() {
                     : "bg-muted/40 border text-foreground rounded-tl-sm space-y-2.5"
                 }`}
               >
-                <div dangerouslySetInnerHTML={{ __html: m.content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: m.content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+                  }}
+                />
 
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/50 text-[11px] text-muted-foreground">
                   {m.citations && m.citations.length > 0 && (

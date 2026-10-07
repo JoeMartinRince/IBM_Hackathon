@@ -1,9 +1,6 @@
 import { Router, Request, Response } from "express";
 import { db } from "../db";
-import {
-  calculateReadinessScore,
-  generateReadinessChecklist,
-} from "../engine/verification";
+import { calculateReadinessScore, generateReadinessChecklist } from "../engine/verification";
 import { updateGoldenRecordField } from "../engine/goldenRecord";
 import { simulateCustomsQueries } from "../engine/customsRisk";
 import { VerificationTokenRecord } from "../types";
@@ -19,7 +16,7 @@ verificationRouter.get("/shipments/:id/results", (req: Request, res: Response) =
   }
 
   const allDiscrepancies = Array.from(db.discrepancies.values()).filter(
-    (d) => d.shipment_id === shipmentId
+    (d) => d.shipment_id === shipmentId,
   );
   const openDiscrepancies = allDiscrepancies.filter((d) => d.status === "OPEN");
   const readiness = calculateReadinessScore(allDiscrepancies);
@@ -187,7 +184,7 @@ verificationRouter.patch("/shipments/:id/golden-record/:fieldId", (req: Request,
     req.params.id,
     req.params.fieldId,
     value,
-    updated_by || "Alwin Joseph"
+    updated_by || "Alwin Joseph",
   );
 
   if (!updatedField) {
@@ -200,7 +197,7 @@ verificationRouter.patch("/shipments/:id/golden-record/:fieldId", (req: Request,
 // GET /api/shipments/:id/discrepancies
 verificationRouter.get("/shipments/:id/discrepancies", (req: Request, res: Response) => {
   const items = Array.from(db.discrepancies.values()).filter(
-    (d) => d.shipment_id === req.params.id
+    (d) => d.shipment_id === req.params.id,
   );
   res.json({ success: true, discrepancies: items });
 });
@@ -222,7 +219,7 @@ verificationRouter.post("/discrepancies/:id/resolve", (req: Request, res: Respon
   const shipment = db.shipments.get(disc.shipment_id);
   if (shipment) {
     const allForShipment = Array.from(db.discrepancies.values()).filter(
-      (d) => d.shipment_id === disc.shipment_id
+      (d) => d.shipment_id === disc.shipment_id,
     );
     const openCount = allForShipment.filter((d) => d.status === "OPEN").length;
     shipment.issues_count = openCount;
@@ -277,7 +274,7 @@ verificationRouter.post("/shipments/:id/reverify", (req: Request, res: Response)
   }
 
   const allDiscrepancies = Array.from(db.discrepancies.values()).filter(
-    (d) => d.shipment_id === shipmentId
+    (d) => d.shipment_id === shipmentId,
   );
   const openCount = allDiscrepancies.filter((d) => d.status === "OPEN").length;
   const newReadiness = calculateReadinessScore(allDiscrepancies);
@@ -316,7 +313,7 @@ verificationRouter.get("/shipments/:id/readiness", (req: Request, res: Response)
   }
 
   const allDiscrepancies = Array.from(db.discrepancies.values()).filter(
-    (d) => d.shipment_id === shipmentId
+    (d) => d.shipment_id === shipmentId,
   );
 
   res.json({
@@ -331,7 +328,7 @@ verificationRouter.get("/shipments/:id/readiness", (req: Request, res: Response)
 verificationRouter.post("/shipments/:id/customs-risk", (req: Request, res: Response) => {
   const shipmentId = req.params.id;
   const allDiscrepancies = Array.from(db.discrepancies.values()).filter(
-    (d) => d.shipment_id === shipmentId
+    (d) => d.shipment_id === shipmentId,
   );
   const result = simulateCustomsQueries(allDiscrepancies);
   res.json({ success: true, ...result });
@@ -377,7 +374,7 @@ verificationRouter.post("/shipments/:id/report", (req: Request, res: Response) =
   }
 
   const allDiscrepancies = Array.from(db.discrepancies.values()).filter(
-    (d) => d.shipment_id === shipmentId
+    (d) => d.shipment_id === shipmentId,
   );
   const goldenRecord = db.goldenRecords.get(shipmentId) || [];
   const checklist = generateReadinessChecklist(shipmentId, allDiscrepancies);

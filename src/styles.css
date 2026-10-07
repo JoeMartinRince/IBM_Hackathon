@@ -124,7 +124,9 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     letter-spacing: -0.025em;
   }
 }
@@ -154,7 +156,10 @@
   letter-spacing: -0.04em;
 }
 @utility press {
-  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
   &:active {
     transform: scale(0.97);
   }
@@ -183,7 +188,13 @@
 }
 
 @keyframes scan {
-  0%, 100% { transform: translateY(0); opacity: 0.2; }
-  50% { transform: translateY(160px); opacity: 1; }
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(160px);
+    opacity: 1;
+  }
 }
-

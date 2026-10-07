@@ -1,3 +1,4 @@
+import { Pool } from "pg";
 import {
   ShipmentRecord,
   DocumentRecord,
@@ -13,7 +14,7 @@ import {
   AppRole,
 } from "./types";
 
-// In-Memory & File-backed Store for DEMO MODE / Instant Offline Execution
+// In-Memory & File-backed Store for DEMO MODE / Instant Offline Execution with Live PostgreSQL Persistence
 export class DataStore {
   public profiles: Map<string, UserProfile> = new Map();
   public shipments: Map<string, ShipmentRecord> = new Map();
@@ -24,9 +25,21 @@ export class DataStore {
   public discrepancies: Map<string, DiscrepancyRecord> = new Map();
   public auditLogs: AuditLogRecord[] = [];
   public verificationTokens: Map<string, VerificationTokenRecord> = new Map();
+  public pool: Pool | null = null;
+  public isPostgresConnected: boolean = false;
 
   constructor() {
     this.seedInitialData();
+    if (process.env.DATABASE_URL) {
+      try {
+        this.pool = new Pool({
+          connectionString: process.env.DATABASE_URL,
+          ssl: { rejectUnauthorized: false },
+        });
+      } catch (e) {
+        console.warn("[PostgreSQL] Failed to initialize connection pool:", e);
+      }
+    }
   }
 
   private seedInitialData() {
@@ -690,7 +703,9 @@ export class DataStore {
         source_doc_ids: ["doc-ci-01", "doc-pl-02", "doc-sb-03"],
         sources_count: 3,
         status: "CONFLICT",
-        conflicting_values: [{ doc_name: "Quality Certificate", value: "Expires 18 Oct 2026 (2-day buffer)" }],
+        conflicting_values: [
+          { doc_name: "Quality Certificate", value: "Expires 18 Oct 2026 (2-day buffer)" },
+        ],
         updated_at: new Date().toISOString(),
       },
     ];
@@ -714,7 +729,8 @@ export class DataStore {
         user_name: "Alwin Joseph",
         user_role: "Documentation Lead",
         action: "Documents Ingested",
-        details: "Ingested 5 trade documents: Commercial Invoice, Packing List, Shipping Bill, PO, Quality Certificate.",
+        details:
+          "Ingested 5 trade documents: Commercial Invoice, Packing List, Shipping Bill, PO, Quality Certificate.",
         created_at: new Date(Date.now() - 1800000).toISOString(),
       },
       {
@@ -723,9 +739,10 @@ export class DataStore {
         user_name: "VERIFAI Engine",
         user_role: "Automated System",
         action: "Verification Executed",
-        details: "Analyzed 18 cross-document attributes. Flagged 1 Critical (qty), 1 Major (HS), 1 Warning (cert expiry).",
+        details:
+          "Analyzed 18 cross-document attributes. Flagged 1 Critical (qty), 1 Major (HS), 1 Warning (cert expiry).",
         created_at: new Date(Date.now() - 600000).toISOString(),
-      }
+      },
     );
 
     // Seed Verified Public Token
@@ -917,24 +934,87 @@ export class DataStore {
   public getSlots(shipmentId: string): DocumentSlotRecord[] {
     if (!this.documentSlots.has(shipmentId)) {
       const slots: DocumentSlotRecord[] = [
-        { id: `slot-ci-${shipmentId}`, shipment_id: shipmentId, document_type: "Commercial Invoice", required: true, assigned_user_id: "usr-fin", assigned_user_name: "Rahul Nair", assigned_user_role: "FINANCE", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
-        { id: `slot-pl-${shipmentId}`, shipment_id: shipmentId, document_type: "Packing List", required: true, assigned_user_id: "usr-wh", assigned_user_name: "Akhil Varma", assigned_user_role: "WAREHOUSE", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
-        { id: `slot-sb-${shipmentId}`, shipment_id: shipmentId, document_type: "Shipping Bill", required: true, assigned_user_id: "usr-cha", assigned_user_name: "Kavitha Menon", assigned_user_role: "CUSTOMS_BROKER", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
-        { id: `slot-po-${shipmentId}`, shipment_id: shipmentId, document_type: "Purchase Order", required: true, assigned_user_id: "usr-buyer", assigned_user_name: "Tariq Al-Mansoor", assigned_user_role: "BUYER", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
-        { id: `slot-qc-${shipmentId}`, shipment_id: shipmentId, document_type: "Quality Certificate", required: true, assigned_user_id: "usr-quality", assigned_user_name: "Dr. Ananya Pillai", assigned_user_role: "QUALITY", status: "WAITING", versions: [], updated_at: new Date().toISOString() },
+        {
+          id: `slot-ci-${shipmentId}`,
+          shipment_id: shipmentId,
+          document_type: "Commercial Invoice",
+          required: true,
+          assigned_user_id: "usr-fin",
+          assigned_user_name: "Rahul Nair",
+          assigned_user_role: "FINANCE",
+          status: "WAITING",
+          versions: [],
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: `slot-pl-${shipmentId}`,
+          shipment_id: shipmentId,
+          document_type: "Packing List",
+          required: true,
+          assigned_user_id: "usr-wh",
+          assigned_user_name: "Akhil Varma",
+          assigned_user_role: "WAREHOUSE",
+          status: "WAITING",
+          versions: [],
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: `slot-sb-${shipmentId}`,
+          shipment_id: shipmentId,
+          document_type: "Shipping Bill",
+          required: true,
+          assigned_user_id: "usr-cha",
+          assigned_user_name: "Kavitha Menon",
+          assigned_user_role: "CUSTOMS_BROKER",
+          status: "WAITING",
+          versions: [],
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: `slot-po-${shipmentId}`,
+          shipment_id: shipmentId,
+          document_type: "Purchase Order",
+          required: true,
+          assigned_user_id: "usr-buyer",
+          assigned_user_name: "Tariq Al-Mansoor",
+          assigned_user_role: "BUYER",
+          status: "WAITING",
+          versions: [],
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: `slot-qc-${shipmentId}`,
+          shipment_id: shipmentId,
+          document_type: "Quality Certificate",
+          required: true,
+          assigned_user_id: "usr-quality",
+          assigned_user_name: "Dr. Ananya Pillai",
+          assigned_user_role: "QUALITY",
+          status: "WAITING",
+          versions: [],
+          updated_at: new Date().toISOString(),
+        },
       ];
       this.documentSlots.set(shipmentId, slots);
     }
     return this.documentSlots.get(shipmentId) || [];
   }
 
-  public uploadSlotVersion(shipmentId: string, slotId: string, filename: string, size: string, uploader: string, role: string, notes?: string): DocumentSlotRecord | null {
+  public uploadSlotVersion(
+    shipmentId: string,
+    slotId: string,
+    filename: string,
+    size: string,
+    uploader: string,
+    role: string,
+    notes?: string,
+  ): DocumentSlotRecord | null {
     const slots = this.getSlots(shipmentId);
     const slot = slots.find(
       (s) =>
         s.id === slotId ||
         s.id.startsWith(slotId) ||
-        s.document_type.toLowerCase() === slotId.toLowerCase()
+        s.document_type.toLowerCase() === slotId.toLowerCase(),
     );
     if (!slot) return null;
 
@@ -976,13 +1056,18 @@ export class DataStore {
     return slot;
   }
 
-  public requestCorrection(shipmentId: string, slotId: string, reason: string, requestedBy: string): DocumentSlotRecord | null {
+  public requestCorrection(
+    shipmentId: string,
+    slotId: string,
+    reason: string,
+    requestedBy: string,
+  ): DocumentSlotRecord | null {
     const slots = this.getSlots(shipmentId);
     const slot = slots.find(
       (s) =>
         s.id === slotId ||
         s.id.startsWith(slotId) ||
-        s.document_type.toLowerCase() === slotId.toLowerCase()
+        s.document_type.toLowerCase() === slotId.toLowerCase(),
     );
     if (!slot) return null;
 
@@ -1015,13 +1100,20 @@ export class DataStore {
     return slot;
   }
 
-  public submitCorrection(shipmentId: string, slotId: string, filename: string, size: string, uploader: string, role: string): DocumentSlotRecord | null {
+  public submitCorrection(
+    shipmentId: string,
+    slotId: string,
+    filename: string,
+    size: string,
+    uploader: string,
+    role: string,
+  ): DocumentSlotRecord | null {
     const slots = this.getSlots(shipmentId);
     const slot = slots.find(
       (s) =>
         s.id === slotId ||
         s.id.startsWith(slotId) ||
-        s.document_type.toLowerCase() === slotId.toLowerCase()
+        s.document_type.toLowerCase() === slotId.toLowerCase(),
     );
     if (!slot) return null;
 
@@ -1068,13 +1160,17 @@ export class DataStore {
     return slot;
   }
 
-  public approveCorrection(shipmentId: string, slotId: string, approvedBy: string): DocumentSlotRecord | null {
+  public approveCorrection(
+    shipmentId: string,
+    slotId: string,
+    approvedBy: string,
+  ): DocumentSlotRecord | null {
     const slots = this.getSlots(shipmentId);
     const slot = slots.find(
       (s) =>
         s.id === slotId ||
         s.id.startsWith(slotId) ||
-        s.document_type.toLowerCase() === slotId.toLowerCase()
+        s.document_type.toLowerCase() === slotId.toLowerCase(),
     );
     if (!slot) return null;
 
@@ -1100,7 +1196,12 @@ export class DataStore {
     return slot;
   }
 
-  public canStartAnalysis(shipmentId: string): { canStart: boolean; received: number; total: number; missing: string[] } {
+  public canStartAnalysis(shipmentId: string): {
+    canStart: boolean;
+    received: number;
+    total: number;
+    missing: string[];
+  } {
     const slots = this.getSlots(shipmentId);
     const requiredSlots = slots.filter((s) => s.required);
     const missing = requiredSlots.filter((s) => s.status === "WAITING").map((s) => s.document_type);
@@ -1111,6 +1212,175 @@ export class DataStore {
       total: requiredSlots.length,
       missing,
     };
+  }
+
+  public async checkPgConnection(): Promise<boolean> {
+    if (!this.pool) return false;
+    try {
+      const res = await this.pool.query("SELECT 1;");
+      return (res.rowCount || 0) > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  public async initPostgres(): Promise<void> {
+    if (!this.pool) return;
+    try {
+      const client = await this.pool.connect();
+      try {
+        // Load shipments
+        const sRes = await client.query("SELECT * FROM shipments ORDER BY created_at DESC;");
+        for (const row of sRes.rows) {
+          this.shipments.set(row.id, {
+            id: row.id,
+            exporter: row.exporter,
+            consignee: row.consignee,
+            commodity: row.commodity,
+            category: row.category,
+            origin_port: row.origin_port,
+            destination_port: row.destination_port,
+            destination_country: row.destination_country,
+            container_number: row.container_number,
+            seal_number: row.seal_number,
+            incoterm: row.incoterm,
+            currency: row.currency,
+            total_value: Number(row.total_value),
+            quantity: Number(row.quantity),
+            unit: row.unit,
+            net_weight: Number(row.net_weight),
+            gross_weight: Number(row.gross_weight),
+            cbm: Number(row.cbm),
+            shipment_date: row.shipment_date
+              ? row.shipment_date instanceof Date
+                ? row.shipment_date.toISOString().split("T")[0]
+                : String(row.shipment_date)
+              : undefined,
+            status: row.status,
+            readiness_score: row.readiness_score,
+            risk_score: row.risk_score,
+            issues_count: row.issues_count,
+            created_by: row.created_by,
+            created_at: row.created_at
+              ? row.created_at instanceof Date
+                ? row.created_at.toISOString()
+                : String(row.created_at)
+              : new Date().toISOString(),
+            updated_at: row.updated_at
+              ? row.updated_at instanceof Date
+                ? row.updated_at.toISOString()
+                : String(row.updated_at)
+              : new Date().toISOString(),
+          });
+        }
+
+        // Load document slots and versions
+        const slotRes = await client.query("SELECT * FROM document_slots;");
+        const verRes = await client.query("SELECT * FROM document_versions ORDER BY version ASC;");
+        const corrRes = await client.query("SELECT * FROM correction_requests;");
+
+        const versionsBySlot = new Map<string, DocumentVersionRecord[]>();
+        for (const v of verRes.rows) {
+          const list = versionsBySlot.get(v.slot_id) || [];
+          list.push({
+            version: v.version,
+            filename: v.filename,
+            file_size: v.file_size,
+            uploaded_by: v.uploaded_by,
+            uploaded_by_role: v.uploaded_by_role,
+            uploaded_at: v.uploaded_at
+              ? v.uploaded_at instanceof Date
+                ? v.uploaded_at.toISOString()
+                : String(v.uploaded_at)
+              : new Date().toISOString(),
+            status: v.status,
+            notes: v.notes,
+            provenance: {
+              source: v.filename,
+              version: v.version,
+              team: v.uploaded_by_role,
+              uploader: v.uploaded_by,
+              timestamp: v.uploaded_at
+                ? v.uploaded_at instanceof Date
+                  ? v.uploaded_at.toISOString()
+                  : String(v.uploaded_at)
+                : new Date().toISOString(),
+              page: 1,
+            },
+          });
+          versionsBySlot.set(v.slot_id, list);
+        }
+
+        const corrBySlot = new Map<string, CorrectionRequestRecord>();
+        for (const c of corrRes.rows) {
+          corrBySlot.set(c.slot_id, {
+            id: c.id,
+            slot_id: c.slot_id,
+            discrepancy_title: c.discrepancy_title,
+            reason: c.reason,
+            requested_by: c.requested_by,
+            requested_at: c.requested_at
+              ? c.requested_at instanceof Date
+                ? c.requested_at.toISOString()
+                : String(c.requested_at)
+              : new Date().toISOString(),
+            assigned_to: "Assigned Team",
+            assigned_role: "WAREHOUSE",
+            status: c.status,
+            submitted_version: c.submitted_version,
+            submitted_at: c.submitted_at
+              ? c.submitted_at instanceof Date
+                ? c.submitted_at.toISOString()
+                : String(c.submitted_at)
+              : undefined,
+          });
+        }
+
+        const slotsByShipment = new Map<string, DocumentSlotRecord[]>();
+        for (const r of slotRes.rows) {
+          const vList = versionsBySlot.get(r.id) || [];
+          const slotRecord: DocumentSlotRecord = {
+            id: r.id,
+            shipment_id: r.shipment_id,
+            document_type: r.document_type,
+            required: r.required,
+            assigned_user_id: r.assigned_user_id,
+            assigned_user_name: r.assigned_user_name,
+            assigned_user_role: r.assigned_user_role,
+            status: r.status,
+            versions: vList,
+            current_version: vList[vList.length - 1],
+            correction_request: corrBySlot.get(r.id),
+            created_at: r.created_at
+              ? r.created_at instanceof Date
+                ? r.created_at.toISOString()
+                : String(r.created_at)
+              : new Date().toISOString(),
+            updated_at: r.updated_at
+              ? r.updated_at instanceof Date
+                ? r.updated_at.toISOString()
+                : String(r.updated_at)
+              : new Date().toISOString(),
+          };
+          const list = slotsByShipment.get(r.shipment_id) || [];
+          list.push(slotRecord);
+          slotsByShipment.set(r.shipment_id, list);
+        }
+
+        for (const [shipId, sList] of slotsByShipment.entries()) {
+          this.documentSlots.set(shipId, sList);
+        }
+
+        this.isPostgresConnected = true;
+        console.log(
+          `[Neon PostgreSQL] Initialized and synchronized ${this.shipments.size} shipments, ${slotRes.rows.length} document slots.`,
+        );
+      } finally {
+        client.release();
+      }
+    } catch (e) {
+      console.warn("[Neon PostgreSQL] Synchronization warning:", e);
+    }
   }
 }
 

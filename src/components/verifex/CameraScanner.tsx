@@ -30,15 +30,14 @@ const DOCUMENT_PRESETS: { type: DocType; label: string; malayalam: string }[] = 
   { type: "Packing List", label: "Packing List", malayalam: "പാക്കിംഗ് ലിസ്റ്റ്" },
   { type: "Shipping Bill", label: "Shipping Bill", malayalam: "ഷിപ്പിംഗ് ബിൽ" },
   { type: "Purchase Order", label: "Purchase Order", malayalam: "പർച്ചേസ് ഓർഡർ" },
-  { type: "Quality Certificate", label: "Health / Phyto Cert", malayalam: "ഹെൽത്ത് സർട്ടിഫിക്കറ്റ്" },
+  {
+    type: "Quality Certificate",
+    label: "Health / Phyto Cert",
+    malayalam: "ഹെൽത്ത് സർട്ടിഫിക്കറ്റ്",
+  },
 ];
 
-export function CameraScanner({
-  isOpen,
-  onClose,
-  onCapture,
-  shipmentId,
-}: CameraScannerProps) {
+export function CameraScanner({ isOpen, onClose, onCapture, shipmentId }: CameraScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -56,10 +55,12 @@ export function CameraScanner({
   // Play synthetic camera shutter sound using Web Audio API
   const playShutterSound = useCallback(() => {
     try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
-      
+
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = "sine";
@@ -96,7 +97,9 @@ export function CameraScanner({
     setCameraError(null);
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setCameraError("Camera API is not supported in this browser environment. Using high-resolution simulation mode.");
+      setCameraError(
+        "Camera API is not supported in this browser environment. Using high-resolution simulation mode.",
+      );
       setCameraActive(false);
       return;
     }
@@ -140,7 +143,9 @@ export function CameraScanner({
     if (track && hasTorch) {
       try {
         const newTorch = !torchOn;
-        await (track as unknown as { applyConstraints: (c: unknown) => Promise<void> }).applyConstraints({
+        await (
+          track as unknown as { applyConstraints: (c: unknown) => Promise<void> }
+        ).applyConstraints({
           advanced: [{ torch: newTorch }],
         });
         setTorchOn(newTorch);
@@ -235,7 +240,9 @@ export function CameraScanner({
                   <span className="text-[11px] font-normal text-zinc-400">· ക്യാമറ സ്കാനർ</span>
                 </h3>
                 <div className="text-[11px] text-zinc-400 flex items-center gap-1.5">
-                  <span className={`size-2 rounded-full ${cameraActive ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+                  <span
+                    className={`size-2 rounded-full ${cameraActive ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`}
+                  />
                   {cameraActive ? "Live Optical Stream" : "Simulation / Offline Sensor"}
                 </div>
               </div>
@@ -247,7 +254,9 @@ export function CameraScanner({
                   type="button"
                   onClick={toggleTorch}
                   className={`flex size-9 items-center justify-center rounded-full border border-white/10 transition-colors ${
-                    torchOn ? "bg-amber-400 text-black" : "bg-white/5 text-zinc-300 hover:bg-white/10"
+                    torchOn
+                      ? "bg-amber-400 text-black"
+                      : "bg-white/5 text-zinc-300 hover:bg-white/10"
                   }`}
                   title="Flashlight"
                 >

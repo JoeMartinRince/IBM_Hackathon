@@ -34,12 +34,20 @@ import { toast } from "sonner";
 import { seo } from "@/lib/seo";
 import { shipments, type DocumentSlot, type DocumentVersion } from "@/lib/data";
 import { useDemo } from "@/lib/demo-store";
-import { Reveal, ReadinessRing, ShipmentCard, StatTile, StatusBadge, ProgressBar } from "@/components/verifex/primitives";
+import {
+  Reveal,
+  ReadinessRing,
+  ShipmentCard,
+  StatTile,
+  StatusBadge,
+  ProgressBar,
+} from "@/components/verifex/primitives";
 import { NewConsignmentModal } from "@/components/verifex/NewConsignmentModal";
 import { CameraScanner } from "@/components/verifex/CameraScanner";
 
 export const Route = createFileRoute("/_app/dashboard")({
-  head: () => seo("Overview", "Current state of your export documentation and multi-user workflow."),
+  head: () =>
+    seo("Overview", "Current state of your export documentation and multi-user workflow."),
   component: Dashboard,
 });
 
@@ -122,7 +130,9 @@ function Dashboard() {
     e.preventDefault();
     if (!selectedSlotForUpload) return;
 
-    const fname = uploadFileName.trim() || `${selectedSlotForUpload.type.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    const fname =
+      uploadFileName.trim() ||
+      `${selectedSlotForUpload.type.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`;
 
     if (isCorrecting) {
       await submitCorrection(activeShipmentId, selectedSlotForUpload.id, {
@@ -145,7 +155,10 @@ function Dashboard() {
   };
 
   const myAssignedSlots = slots.filter(
-    (s) => s.assignedToUser.id === currentUser.id || s.assignedToUser.role === currentUser.role || (currentUser.assignedDocType && s.type === currentUser.assignedDocType)
+    (s) =>
+      s.assignedToUser.id === currentUser.id ||
+      s.assignedToUser.role === currentUser.role ||
+      (currentUser.assignedDocType && s.type === currentUser.assignedDocType),
   );
 
   return (
@@ -183,7 +196,9 @@ function Dashboard() {
           </button>
 
           <div className="rounded-2xl border bg-card p-2 text-xs flex items-center gap-2">
-            <span className="text-muted-foreground text-[11px] font-medium hidden sm:inline">Active Case:</span>
+            <span className="text-muted-foreground text-[11px] font-medium hidden sm:inline">
+              Active Case:
+            </span>
             <select
               value={activeShipmentId}
               onChange={(e) => setActiveShipmentId(e.target.value)}
@@ -315,7 +330,9 @@ function Dashboard() {
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h4 className={`font-bold text-sm ${isExempt ? "text-muted-foreground" : "text-foreground"}`}>
+                          <h4
+                            className={`font-bold text-sm ${isExempt ? "text-muted-foreground" : "text-foreground"}`}
+                          >
                             {slot.type}
                           </h4>
                           <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
@@ -325,16 +342,24 @@ function Dashboard() {
                               onChange={(e) => {
                                 reassignSlot(activeShipmentId, slot.id, e.target.value);
                                 const u = allUsers.find((x) => x.id === e.target.value);
-                                toast.success(`Reassigned ${slot.type} to ${u?.name || "specialist"}`);
+                                toast.success(
+                                  `Reassigned ${slot.type} to ${u?.name || "specialist"}`,
+                                );
                               }}
                               className="font-semibold text-foreground bg-transparent border-b border-border/40 pb-0.5 outline-none hover:border-primary text-[11px] cursor-pointer"
                               title="Click to reassign document responsibility"
                             >
-                              {allUsers.filter((u) => u.role !== "ADMIN").map((u) => (
-                                <option key={u.id} value={u.id} className="bg-card text-foreground">
-                                  {u.name} ({u.roleLabel})
-                                </option>
-                              ))}
+                              {allUsers
+                                .filter((u) => u.role !== "ADMIN")
+                                .map((u) => (
+                                  <option
+                                    key={u.id}
+                                    value={u.id}
+                                    className="bg-card text-foreground"
+                                  >
+                                    {u.name} ({u.roleLabel})
+                                  </option>
+                                ))}
                             </select>
                           </div>
                         </div>
@@ -344,23 +369,23 @@ function Dashboard() {
                             isExempt
                               ? "bg-muted text-muted-foreground border-border/50"
                               : isReady
-                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                              : isCorrReq
-                              ? "bg-critical/10 text-critical border-critical/20 animate-pulse"
-                              : isCorrSub
-                              ? "bg-blue-500/10 text-blue-600 border-blue-500/20"
-                              : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                : isCorrReq
+                                  ? "bg-critical/10 text-critical border-critical/20 animate-pulse"
+                                  : isCorrSub
+                                    ? "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                                    : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                           }`}
                         >
                           {isExempt
                             ? "EXEMPT"
                             : isReady
-                            ? "READY"
-                            : isCorrReq
-                            ? "CORRECTION REQ"
-                            : isCorrSub
-                            ? "CORRECTION SUBMITTED"
-                            : "WAITING"}
+                              ? "READY"
+                              : isCorrReq
+                                ? "CORRECTION REQ"
+                                : isCorrSub
+                                  ? "CORRECTION SUBMITTED"
+                                  : "WAITING"}
                         </span>
                       </div>
 
@@ -392,14 +417,17 @@ function Dashboard() {
                       {isCorrSub && (
                         <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-2.5 text-xs text-blue-800 dark:text-blue-300 space-y-2">
                           <div className="font-semibold flex items-center gap-1.5">
-                            <CheckCircle2 className="size-3.5 text-blue-600" /> Corrected version submitted!
+                            <CheckCircle2 className="size-3.5 text-blue-600" /> Corrected version
+                            submitted!
                           </div>
                           <button
                             type="button"
                             onClick={async () => {
                               await approveCorrection(activeShipmentId, slot.id);
                               await reverify();
-                              toast.success(`Correction for ${slot.type} approved! Re-verified to 100% readiness.`);
+                              toast.success(
+                                `Correction for ${slot.type} approved! Re-verified to 100% readiness.`,
+                              );
                             }}
                             className="press w-full rounded-full bg-blue-600 px-3 py-1.5 text-[11px] font-bold text-white hover:brightness-110"
                           >
@@ -420,7 +448,9 @@ function Dashboard() {
                           <Eye className="size-3" /> History ({slot.versions.length} ver)
                         </button>
                       ) : (
-                        <span className="text-[11px] text-muted-foreground font-mono">No uploads</span>
+                        <span className="text-[11px] text-muted-foreground font-mono">
+                          No uploads
+                        </span>
                       )}
 
                       {/* Admin upload on behalf or request correction */}
@@ -432,7 +462,7 @@ function Dashboard() {
                               requestCorrection(
                                 activeShipmentId,
                                 slot.id,
-                                `Please verify carton quantity and specification in ${slot.type}.`
+                                `Please verify carton quantity and specification in ${slot.type}.`,
                               );
                               toast.info(`Correction requested from ${slot.assignedToUser.name}`);
                             }}
@@ -470,7 +500,8 @@ function Dashboard() {
                   <Ship className="size-5 text-primary" /> Shipment Verification Queue
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Track document collection completeness across all registered Kerala export consignments.
+                  Track document collection completeness across all registered Kerala export
+                  consignments.
                 </p>
               </div>
               <Link to="/shipments" className="text-xs font-semibold text-primary hover:underline">
@@ -503,9 +534,7 @@ function Dashboard() {
                           isSelected ? "bg-primary/5 font-medium" : ""
                         }`}
                       >
-                        <td className="py-3.5 px-3 font-mono font-bold text-foreground">
-                          {s.id}
-                        </td>
+                        <td className="py-3.5 px-3 font-mono font-bold text-foreground">{s.id}</td>
                         <td className="py-3.5 px-3">
                           <div className="font-semibold text-foreground">{s.commodity}</div>
                           <div className="text-[10px] text-muted-foreground">
@@ -582,9 +611,7 @@ function Dashboard() {
                 <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">
                   Department Assignment Portal
                 </div>
-                <h2 className="text-2xl font-bold mt-1 text-white">
-                  {currentUser.team}
-                </h2>
+                <h2 className="text-2xl font-bold mt-1 text-white">{currentUser.team}</h2>
                 <div className="text-xs text-ink-muted mt-1">
                   You are authorized to generate, upload, and correct:{" "}
                   <strong className="text-primary font-bold">{currentUser.assignedDocType}</strong>
@@ -614,17 +641,19 @@ function Dashboard() {
                 const isExempt = !slot.required;
 
                 return (
-                  <Reveal key={slot.id} className={`surface p-6 space-y-4 border-2 ${isExempt ? "opacity-75" : ""}`}>
+                  <Reveal
+                    key={slot.id}
+                    className={`surface p-6 space-y-4 border-2 ${isExempt ? "opacity-75" : ""}`}
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="font-mono text-xs text-primary font-bold">
                           {slot.shipmentId}
                         </div>
-                        <h4 className="text-lg font-bold text-foreground mt-0.5">
-                          {slot.type}
-                        </h4>
+                        <h4 className="text-lg font-bold text-foreground mt-0.5">{slot.type}</h4>
                         <div className="text-xs text-muted-foreground mt-0.5">
-                          Commodity: {activeShipment.commodity} ({activeShipment.from} → {activeShipment.to})
+                          Commodity: {activeShipment.commodity} ({activeShipment.from} →{" "}
+                          {activeShipment.to})
                         </div>
                       </div>
 
@@ -633,23 +662,23 @@ function Dashboard() {
                           isExempt
                             ? "bg-muted text-muted-foreground border-border/50"
                             : isReady
-                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                            : isCorrReq
-                            ? "bg-critical/10 text-critical border-critical/30 animate-pulse"
-                            : isCorrSub
-                            ? "bg-blue-500/10 text-blue-600 border-blue-500/20"
-                            : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                              : isCorrReq
+                                ? "bg-critical/10 text-critical border-critical/30 animate-pulse"
+                                : isCorrSub
+                                  ? "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                                  : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                         }`}
                       >
                         {isExempt
                           ? "EXEMPT"
                           : isReady
-                          ? "UPLOADED ✓"
-                          : isCorrReq
-                          ? "CORRECTION REQUESTED"
-                          : isCorrSub
-                          ? "CORRECTION SUBMITTED"
-                          : "UPLOAD REQUIRED"}
+                            ? "UPLOADED ✓"
+                            : isCorrReq
+                              ? "CORRECTION REQUESTED"
+                              : isCorrSub
+                                ? "CORRECTION SUBMITTED"
+                                : "UPLOAD REQUIRED"}
                       </span>
                     </div>
 
@@ -664,7 +693,8 @@ function Dashboard() {
                           "{slot.correctionRequest?.reason}"
                         </p>
                         <div className="text-[11px] opacity-75">
-                          Requested by {slot.correctionRequest?.requestedBy} · {slot.correctionRequest?.requestedAt}
+                          Requested by {slot.correctionRequest?.requestedBy} ·{" "}
+                          {slot.correctionRequest?.requestedAt}
                         </div>
                       </div>
                     )}
@@ -694,10 +724,10 @@ function Dashboard() {
                         {isExempt
                           ? "Document is exempt for this consignment."
                           : isReady
-                          ? "Waiting for Admin verification."
-                          : isCorrReq
-                          ? "Action required to proceed."
-                          : "Upload required export document."}
+                            ? "Waiting for Admin verification."
+                            : isCorrReq
+                              ? "Action required to proceed."
+                              : "Upload required export document."}
                       </div>
 
                       {isExempt ? (
@@ -808,8 +838,8 @@ function Dashboard() {
                         isDone
                           ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-semibold"
                           : isCurrent
-                          ? "bg-primary/10 text-primary font-bold animate-pulse"
-                          : "text-muted-foreground/60"
+                            ? "bg-primary/10 text-primary font-bold animate-pulse"
+                            : "text-muted-foreground/60"
                       }`}
                     >
                       <div className="size-4 shrink-0 flex items-center justify-center">
@@ -828,7 +858,8 @@ function Dashboard() {
               </div>
 
               <div className="text-[11px] text-muted-foreground text-center pt-2">
-                Cross-reconciling Finance, Warehouse, Customs Broker, Buyer, and Quality certificates…
+                Cross-reconciling Finance, Warehouse, Customs Broker, Buyer, and Quality
+                certificates…
               </div>
             </motion.div>
           </div>
@@ -945,7 +976,8 @@ function Dashboard() {
 
                   <div className="pt-1">
                     <div className="text-[11px] font-mono text-primary font-bold">
-                      File selected: {uploadFileName || "default_export_document.pdf"} ({uploadFileSize})
+                      File selected: {uploadFileName || "default_export_document.pdf"} (
+                      {uploadFileSize})
                     </div>
                     {scannedViaCamera && (
                       <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
@@ -956,9 +988,15 @@ function Dashboard() {
                 </div>
 
                 <div className="rounded-xl bg-muted/40 p-3 text-[11px] space-y-1 text-muted-foreground">
-                  <div><strong>Uploader:</strong> {currentUser.name} ({currentUser.roleLabel})</div>
-                  <div><strong>Destination Case:</strong> {selectedSlotForUpload.shipmentId}</div>
-                  <div><strong>Next Version:</strong> V{selectedSlotForUpload.versions.length + 1}</div>
+                  <div>
+                    <strong>Uploader:</strong> {currentUser.name} ({currentUser.roleLabel})
+                  </div>
+                  <div>
+                    <strong>Destination Case:</strong> {selectedSlotForUpload.shipmentId}
+                  </div>
+                  <div>
+                    <strong>Next Version:</strong> V{selectedSlotForUpload.versions.length + 1}
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-end gap-2 pt-2">
@@ -1000,7 +1038,8 @@ function Dashboard() {
                     Version History: {inspectVersionsSlot.type}
                   </h3>
                   <div className="text-xs text-muted-foreground">
-                    Shipment: {inspectVersionsSlot.shipmentId} · Total: {inspectVersionsSlot.versions.length} versions
+                    Shipment: {inspectVersionsSlot.shipmentId} · Total:{" "}
+                    {inspectVersionsSlot.versions.length} versions
                   </div>
                 </div>
                 <button
@@ -1026,7 +1065,9 @@ function Dashboard() {
                           </span>
                         )}
                       </div>
-                      <span className="text-muted-foreground text-[11px] font-mono">{ver.fileSize}</span>
+                      <span className="text-muted-foreground text-[11px] font-mono">
+                        {ver.fileSize}
+                      </span>
                     </div>
 
                     <div className="font-mono text-[11px] text-muted-foreground truncate">
@@ -1034,7 +1075,10 @@ function Dashboard() {
                     </div>
 
                     <div className="flex flex-wrap items-center justify-between text-[11px] text-muted-foreground pt-1 border-t">
-                      <span>Uploaded by: <strong className="text-foreground">{ver.uploadedBy}</strong> ({ver.uploadedByRole})</span>
+                      <span>
+                        Uploaded by: <strong className="text-foreground">{ver.uploadedBy}</strong> (
+                        {ver.uploadedByRole})
+                      </span>
                       <span>{ver.uploadedAt}</span>
                     </div>
 

@@ -18,7 +18,8 @@ import { PageHeader, Reveal, ReadinessRing, StatusBadge } from "@/components/ver
 import { MockQR } from "@/components/verifex/QRCode";
 
 export const Route = createFileRoute("/_app/readiness")({
-  head: () => seo("Export Readiness", "Deterministic export readiness checklist and verified QR code."),
+  head: () =>
+    seo("Export Readiness", "Deterministic export readiness checklist and verified QR code."),
   component: ReadinessPage,
 });
 
@@ -50,7 +51,9 @@ function ReadinessPage() {
     },
     {
       label: "Carton & Package Quantity Consistency",
-      desc: isQtyResolved ? "Reconciled to 1,200 cartons across all documents." : "Invoice (1,200) disagrees with Packing List (1,180).",
+      desc: isQtyResolved
+        ? "Reconciled to 1,200 cartons across all documents."
+        : "Invoice (1,200) disagrees with Packing List (1,180).",
       status: isQtyResolved ? "PASS" : "FAIL",
     },
     {
@@ -60,7 +63,9 @@ function ReadinessPage() {
     },
     {
       label: "HS Code Tariff Line Alignment",
-      desc: isHsResolved ? "HS code 030617 correctly aligned across all export declarations." : "Shipping Bill specifies 030616 while Invoice states 030617.",
+      desc: isHsResolved
+        ? "HS code 030617 correctly aligned across all export declarations."
+        : "Shipping Bill specifies 030616 while Invoice states 030617.",
       status: isHsResolved ? "PASS" : "FAIL",
     },
     {
@@ -75,7 +80,9 @@ function ReadinessPage() {
     },
     {
       label: "Regulatory Certificate Validity",
-      desc: isCertResolved ? "Renewed certificate attached; valid through Jan 2027." : "MPEDA health certificate expires within 48h of vessel sailing date.",
+      desc: isCertResolved
+        ? "Renewed certificate attached; valid through Jan 2027."
+        : "MPEDA health certificate expires within 48h of vessel sailing date.",
       status: isCertResolved ? "PASS" : "WARNING",
     },
     {
@@ -113,15 +120,23 @@ function ReadinessPage() {
         <Reveal className="surface-ink p-6 md:p-8 flex flex-col justify-between">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">Consignment Readiness Audit</div>
-              <div className="mt-1 font-mono text-2xl md:text-3xl font-bold">{activeShipment.id}</div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">
+                Consignment Readiness Audit
+              </div>
+              <div className="mt-1 font-mono text-2xl md:text-3xl font-bold">
+                {activeShipment.id}
+              </div>
               <div className="mt-2 text-lg font-semibold">{activeShipment.commodity}</div>
-              <div className="text-sm text-ink-muted">{activeShipment.from} → {activeShipment.to}</div>
+              <div className="text-sm text-ink-muted">
+                {activeShipment.from} → {activeShipment.to}
+              </div>
 
               <div className="mt-5 flex items-center gap-3">
                 <StatusBadge status={readiness >= 100 ? "ready" : "review"} />
                 <span className="text-xs text-ink-muted">
-                  {readiness >= 100 ? "10/10 Verification Checks Passed" : `${openIssues} Action Items Remaining`}
+                  {readiness >= 100
+                    ? "10/10 Verification Checks Passed"
+                    : `${openIssues} Action Items Remaining`}
                 </span>
               </div>
             </div>
@@ -158,12 +173,16 @@ function ReadinessPage() {
         </Reveal>
 
         {/* Verified QR Card */}
-        <Reveal delay={0.08} className="surface p-6 flex flex-col items-center justify-between text-center">
+        <Reveal
+          delay={0.08}
+          className="surface p-6 flex flex-col items-center justify-between text-center"
+        >
           <div>
             <div className="eyebrow">Digital Integrity Seal</div>
             <h3 className="mt-1 font-semibold text-lg">Verified Port Gate QR</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Scan with mobile to authenticate shipment clearance without disclosing private commercial pricing.
+              Scan with mobile to authenticate shipment clearance without disclosing private
+              commercial pricing.
             </p>
           </div>
 
@@ -207,8 +226,8 @@ function ReadinessPage() {
                   item.status === "PASS"
                     ? "bg-success-soft text-success"
                     : item.status === "WARNING"
-                    ? "bg-warning-soft text-warning"
-                    : "bg-critical-soft text-critical"
+                      ? "bg-warning-soft text-warning"
+                      : "bg-critical-soft text-critical"
                 }`}
               >
                 {item.status === "PASS" ? "✓" : "!"}
@@ -221,8 +240,8 @@ function ReadinessPage() {
                       item.status === "PASS"
                         ? "bg-success-soft text-success"
                         : item.status === "WARNING"
-                        ? "bg-warning-soft text-warning"
-                        : "bg-critical-soft text-critical"
+                          ? "bg-warning-soft text-warning"
+                          : "bg-critical-soft text-critical"
                     }`}
                   >
                     {item.status}

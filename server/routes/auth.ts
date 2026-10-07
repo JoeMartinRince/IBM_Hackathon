@@ -17,7 +17,10 @@ authRouter.post("/login", (req: Request, res: Response) => {
     user = {
       id: `u-${Date.now()}`,
       email,
-      name: email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      name: email
+        .split("@")[0]
+        .replace(/[._]/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
       role: (role as UserRole) || "Documentation Team",
       organization: "Kerala Exporters Association",
       created_at: new Date().toISOString(),

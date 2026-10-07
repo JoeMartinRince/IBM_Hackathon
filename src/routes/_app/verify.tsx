@@ -110,7 +110,9 @@ function VerifyPage() {
 
   const handleStartVerification = async () => {
     if (!check.canStart && currentUser.role === "ADMIN") {
-      toast.error(`Cannot start AI verification: waiting for ${check.missing.join(", ")} (${check.received}/${check.total} received).`);
+      toast.error(
+        `Cannot start AI verification: waiting for ${check.missing.join(", ")} (${check.received}/${check.total} received).`,
+      );
       return;
     }
 
@@ -206,7 +208,9 @@ function VerifyPage() {
                   Logged in as {currentUser.name} ({currentUser.roleLabel})
                 </div>
                 <div className="text-muted-foreground">
-                  Assigned Task: Upload official <span className="font-semibold text-primary">{currentUser.assignedDocType}</span> for {activeShipment.id}.
+                  Assigned Task: Upload official{" "}
+                  <span className="font-semibold text-primary">{currentUser.assignedDocType}</span>{" "}
+                  for {activeShipment.id}.
                 </div>
               </div>
             </div>
@@ -220,8 +224,8 @@ function VerifyPage() {
                     assignedType === "Shipping Bill"
                       ? "Shipping_Bill_SB4471_CochinCustoms.pdf"
                       : assignedType === "Quality Certificate"
-                      ? "MPEDA_Health_Certificate_QC992.pdf"
-                      : "Document_Upload.pdf";
+                        ? "MPEDA_Health_Certificate_QC992.pdf"
+                        : "Document_Upload.pdf";
                   handleQuickUploadAssigned(targetSlot.id, assignedType, defaultFilename);
                 }
               }}
@@ -238,7 +242,9 @@ function VerifyPage() {
       <Reveal className="surface-ink p-6 md:p-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">Target Export Consignment</div>
+            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">
+              Target Export Consignment
+            </div>
             <div className="mt-1 flex items-center gap-3">
               <span className="font-mono text-xl md:text-2xl font-bold">{activeShipment.id}</span>
               <span className="rounded-full bg-primary/20 px-3 py-0.5 text-xs font-medium text-primary">
@@ -246,14 +252,18 @@ function VerifyPage() {
               </span>
             </div>
             <div className="mt-2 text-sm text-ink-muted">
-              Exporter: <span className="text-ink-foreground font-medium">{activeShipment.exporter}</span> · Consignee:{" "}
+              Exporter:{" "}
+              <span className="text-ink-foreground font-medium">{activeShipment.exporter}</span> ·
+              Consignee:{" "}
               <span className="text-ink-foreground font-medium">{activeShipment.consignee}</span>
             </div>
           </div>
           <div className="flex items-center gap-4 text-right">
             <div>
               <div className="text-xs text-ink-muted">Route</div>
-              <div className="font-semibold">{activeShipment.from} → {activeShipment.to}</div>
+              <div className="font-semibold">
+                {activeShipment.from} → {activeShipment.to}
+              </div>
             </div>
             <div className="h-8 w-px bg-white/10" />
             <div>
@@ -270,10 +280,14 @@ function VerifyPage() {
       <Reveal delay={0.05} className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-semibold">Document Collection Status (5 Required Slots)</h3>
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
-              check.canStart ? "bg-success-soft text-success" : "bg-warning-soft text-warning"
-            }`}>
+            <h3 className="text-base font-semibold">
+              Document Collection Status (5 Required Slots)
+            </h3>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                check.canStart ? "bg-success-soft text-success" : "bg-warning-soft text-warning"
+              }`}
+            >
               {check.canStart ? "5/5 Complete" : `${check.received}/${check.total} Uploaded`}
             </span>
           </div>
@@ -295,8 +309,8 @@ function VerifyPage() {
                   isUploaded
                     ? "border-success/30 bg-success/5"
                     : isCorrection
-                    ? "border-warning/40 bg-warning/5"
-                    : "border-border/60 bg-card"
+                      ? "border-warning/40 bg-warning/5"
+                      : "border-border/60 bg-card"
                 }`}
               >
                 <div>
@@ -304,18 +318,22 @@ function VerifyPage() {
                     <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                       {slot.assignedToUser.team.split(" ")[0]}
                     </span>
-                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
-                      isUploaded
-                        ? "bg-success-soft text-success"
-                        : isCorrection
-                        ? "bg-warning-soft text-warning"
-                        : "bg-muted text-muted-foreground"
-                    }`}>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
+                        isUploaded
+                          ? "bg-success-soft text-success"
+                          : isCorrection
+                            ? "bg-warning-soft text-warning"
+                            : "bg-muted text-muted-foreground"
+                      }`}
+                    >
                       {slot.status.replace("_", " ")}
                     </span>
                   </div>
 
-                  <h4 className="mt-2 text-xs font-bold text-foreground line-clamp-1">{slot.type}</h4>
+                  <h4 className="mt-2 text-xs font-bold text-foreground line-clamp-1">
+                    {slot.type}
+                  </h4>
                   <div className="mt-1 text-[11px] text-muted-foreground flex items-center gap-1">
                     <UserCheck className="size-3" />
                     <span className="truncate">{slot.assignedToUser.name}</span>
@@ -334,8 +352,8 @@ function VerifyPage() {
                           slot.type === "Shipping Bill"
                             ? "Shipping_Bill_SB4471_CochinCustoms.pdf"
                             : slot.type === "Quality Certificate"
-                            ? "MPEDA_Health_Certificate_QC992.pdf"
-                            : `${slot.type.replace(/\s+/g, "_")}.pdf`;
+                              ? "MPEDA_Health_Certificate_QC992.pdf"
+                              : `${slot.type.replace(/\s+/g, "_")}.pdf`;
                         handleQuickUploadAssigned(slot.id, slot.type, defaultFilename);
                       }}
                       className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1"
@@ -367,7 +385,9 @@ function VerifyPage() {
           }}
           onClick={() => fileInputRef.current?.click()}
           className={`surface press group relative flex cursor-pointer flex-col items-center justify-center border-2 border-dashed p-8 sm:p-10 text-center transition-all ${
-            isDragging ? "border-primary bg-primary/5 scale-[0.99]" : "border-border hover:border-primary/50"
+            isDragging
+              ? "border-primary bg-primary/5 scale-[0.99]"
+              : "border-border hover:border-primary/50"
           }`}
         >
           <input
@@ -381,9 +401,12 @@ function VerifyPage() {
           <div className="flex size-16 items-center justify-center rounded-3xl bg-primary-soft text-primary group-hover:scale-110 transition-transform">
             <Upload className="size-8" />
           </div>
-          <h3 className="mt-5 text-lg font-semibold">Drop trade documents here or choose an ingestion mode</h3>
+          <h3 className="mt-5 text-lg font-semibold">
+            Drop trade documents here or choose an ingestion mode
+          </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Supports PDF, Scanned Images (PNG, JPG), Excel (.xlsx), and Word (.docx) up to 25 MB each
+            Supports PDF, Scanned Images (PNG, JPG), Excel (.xlsx), and Word (.docx) up to 25 MB
+            each
           </p>
 
           {/* Action Buttons: Browse Files & Open Camera Scanner */}
@@ -415,13 +438,21 @@ function VerifyPage() {
           </div>
 
           <div className="mt-5 flex flex-wrap justify-center gap-2">
-            {["Commercial Invoice", "Packing List", "Shipping Bill", "Purchase Order", "Quality Cert", "Origin Cert"].map(
-              (badge) => (
-                <span key={badge} className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-                  {badge}
-                </span>
-              )
-            )}
+            {[
+              "Commercial Invoice",
+              "Packing List",
+              "Shipping Bill",
+              "Purchase Order",
+              "Quality Cert",
+              "Origin Cert",
+            ].map((badge) => (
+              <span
+                key={badge}
+                className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground"
+              >
+                {badge}
+              </span>
+            ))}
           </div>
         </div>
       </Reveal>

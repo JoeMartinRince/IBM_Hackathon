@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Ship, CheckSquare, Square, CheckCircle2, MinusCircle, Sparkles, Camera, ShieldCheck } from "lucide-react";
+import {
+  X,
+  Ship,
+  CheckSquare,
+  Square,
+  CheckCircle2,
+  MinusCircle,
+  Sparkles,
+  Camera,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useDemo } from "@/lib/demo-store";
@@ -13,7 +23,12 @@ interface NewConsignmentModalProps {
   onCreated?: (shipmentId: string) => void;
 }
 
-const DOCUMENT_OPTIONS: { type: DocType; role: string; officer: string; defaultChecked: boolean }[] = [
+const DOCUMENT_OPTIONS: {
+  type: DocType;
+  role: string;
+  officer: string;
+  defaultChecked: boolean;
+}[] = [
   {
     type: "Commercial Invoice",
     role: "Finance Team",
@@ -55,7 +70,9 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
   const [product, setProduct] = useState("Frozen Shrimp");
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [activeScanType, setActiveScanType] = useState<DocType | null>(null);
-  const [scannedDocs, setScannedDocs] = useState<Record<string, { filename: string; fileSize: string }>>({});
+  const [scannedDocs, setScannedDocs] = useState<
+    Record<string, { filename: string; fileSize: string }>
+  >({});
 
   const [selectedDocs, setSelectedDocs] = useState<Record<DocType, boolean>>({
     "Commercial Invoice": true,
@@ -63,7 +80,7 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
     "Purchase Order": true,
     "Shipping Bill": false,
     "Quality Certificate": false,
-    "Other": false,
+    Other: false,
   });
 
   const toggleDoc = (type: DocType) => {
@@ -95,7 +112,7 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
 
     toast.success(
       `Consignment ${shipmentId} registered! ${selectedList.length} mandatory document(s) configured (${5 - selectedList.length} exempt).`,
-      { icon: <Sparkles className="size-4 text-emerald-500" /> }
+      { icon: <Sparkles className="size-4 text-emerald-500" /> },
     );
 
     onClose();
@@ -143,7 +160,10 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
           </div>
 
           {/* Form - Scrollable Body with Pinned Actions */}
-          <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden text-xs">
+          <form
+            onSubmit={handleSubmit}
+            className="flex-1 flex flex-col min-h-0 overflow-hidden text-xs"
+          >
             {/* Scrollable Body Container */}
             <div className="overflow-y-auto flex-1 pr-1.5 space-y-4 custom-scrollbar py-3">
               {/* Consignment Metadata */}
@@ -195,12 +215,11 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                   <span className="text-xs font-bold uppercase tracking-wider text-foreground">
                     Select Required Documents
                   </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    Mandatory vs Exempt
-                  </span>
+                  <span className="text-[11px] text-muted-foreground">Mandatory vs Exempt</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Ticked documents are <strong>mandatory</strong> for customs clearance. Unticked documents are <strong>exempt (not required)</strong> for this consignment.
+                  Ticked documents are <strong>mandatory</strong> for customs clearance. Unticked
+                  documents are <strong>exempt (not required)</strong> for this consignment.
                 </p>
 
                 <div className="space-y-2 rounded-2xl border bg-card p-3">
@@ -225,7 +244,9 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                             <Square className="size-4 text-muted-foreground shrink-0" />
                           )}
                           <div>
-                            <div className={`font-semibold text-xs flex items-center gap-2 ${isChecked ? "text-foreground" : "text-muted-foreground"}`}>
+                            <div
+                              className={`font-semibold text-xs flex items-center gap-2 ${isChecked ? "text-foreground" : "text-muted-foreground"}`}
+                            >
                               <span>{doc.type}</span>
                               {scanned && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.2 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
@@ -235,9 +256,13 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                             </div>
                             <div className="text-[10px] text-muted-foreground">
                               {isChecked ? (
-                                <span>Mandatory for customs · Assigned: {doc.role} ({doc.officer})</span>
+                                <span>
+                                  Mandatory for customs · Assigned: {doc.role} ({doc.officer})
+                                </span>
                               ) : (
-                                <span className="italic">Exempt · Not needed for this consignment</span>
+                                <span className="italic">
+                                  Exempt · Not needed for this consignment
+                                </span>
                               )}
                             </div>
                           </div>
@@ -279,7 +304,9 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                   <button
                     type="button"
                     onClick={() => {
-                      const firstDoc = DOCUMENT_OPTIONS.find((d) => selectedDocs[d.type])?.type || "Commercial Invoice";
+                      const firstDoc =
+                        DOCUMENT_OPTIONS.find((d) => selectedDocs[d.type])?.type ||
+                        "Commercial Invoice";
                       setActiveScanType(firstDoc);
                       setIsCameraOpen(true);
                     }}
@@ -296,7 +323,8 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                   {requiredCount} REQUIRED DOCUMENTS SELECTED
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  {requiredCount} document(s) marked mandatory for customs verification · {5 - requiredCount} document(s) exempt
+                  {requiredCount} document(s) marked mandatory for customs verification ·{" "}
+                  {5 - requiredCount} document(s) exempt
                 </p>
               </div>
             </div>
@@ -307,8 +335,7 @@ export function NewConsignmentModal({ isOpen, onClose, onCreated }: NewConsignme
                 type="submit"
                 className="w-full press rounded-full bg-primary py-3 text-xs sm:text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] hover:brightness-105 uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Sparkles className="size-4" />
-                [ SUBMIT FOR VERIFICATION ]
+                <Sparkles className="size-4" />[ SUBMIT FOR VERIFICATION ]
               </button>
 
               <button

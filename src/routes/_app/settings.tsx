@@ -25,7 +25,8 @@ import { assistantService } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/settings")({
-  head: () => seo("Settings", "Manage profile, organization, roles, Gemini AI, and execution mode."),
+  head: () =>
+    seo("Settings", "Manage profile, organization, roles, Gemini AI, and execution mode."),
   component: SettingsPage,
 });
 
@@ -38,7 +39,11 @@ function SettingsPage() {
   const [tempKey, setTempKey] = useState(geminiApiKey);
   const [showKey, setShowKey] = useState(false);
   const [testingKey, setTestingKey] = useState(false);
-  const [keyTestResult, setKeyTestResult] = useState<{ valid: boolean; message: string; model?: string | undefined } | null>(null);
+  const [keyTestResult, setKeyTestResult] = useState<{
+    valid: boolean;
+    message: string;
+    model?: string | undefined;
+  } | null>(null);
 
   const roles = [
     "Exporter",
@@ -63,7 +68,11 @@ function SettingsPage() {
     try {
       const res = await assistantService.testGeminiKey(tempKey.trim());
       if (res.valid) {
-        setKeyTestResult({ valid: true, message: res.message || "Key verified successfully!", model: res.model });
+        setKeyTestResult({
+          valid: true,
+          message: res.message || "Key verified successfully!",
+          model: res.model,
+        });
         toast.success("Gemini API key is active and responding!");
       } else {
         setKeyTestResult({ valid: false, message: res.message || "Failed to validate key" });
@@ -111,7 +120,9 @@ function SettingsPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-foreground">{name}</h2>
-              <div className="text-sm text-muted-foreground">{role} · {org}</div>
+              <div className="text-sm text-muted-foreground">
+                {role} · {org}
+              </div>
               <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground font-mono">
                 <Mail className="size-3.5" /> alwinjosegeorge2028@cs.sjcetpalai.ac.in
               </div>
@@ -144,7 +155,9 @@ function SettingsPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="font-semibold text-muted-foreground">Organization / Export House</label>
+              <label className="font-semibold text-muted-foreground">
+                Organization / Export House
+              </label>
               <input
                 value={org}
                 onChange={(e) => setOrg(e.target.value)}
@@ -162,7 +175,8 @@ function SettingsPage() {
                 <Zap className="size-5 text-primary" /> Application Execution Mode
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Switch between offline instant hackathon DEMO MODE and real LIVE MODE backend pipeline.
+                Switch between offline instant hackathon DEMO MODE and real LIVE MODE backend
+                pipeline.
               </p>
             </div>
 
@@ -208,7 +222,8 @@ function SettingsPage() {
                 <Sparkles className="size-5 text-primary" /> Google Gemini API Configuration
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Connect your Google Gemini key for live generative reasoning grounded in export documents.
+                Connect your Google Gemini key for live generative reasoning grounded in export
+                documents.
               </p>
             </div>
 
@@ -220,7 +235,9 @@ function SettingsPage() {
                     : "bg-amber-500/10 text-amber-600 border border-amber-500/20"
                 }`}
               >
-                <span className={`size-2 rounded-full ${geminiApiKey ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+                <span
+                  className={`size-2 rounded-full ${geminiApiKey ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`}
+                />
                 {geminiApiKey ? "Live Gemini Active" : "Deterministic Engine"}
               </span>
             </div>
@@ -330,13 +347,19 @@ function SettingsPage() {
               </div>
               <ul className="text-muted-foreground space-y-1 list-disc list-inside leading-relaxed text-[11px]">
                 <li>
-                  <strong>Document Lineage Grounded:</strong> Prompts are injected with the 5 core documents (Commercial Invoice, Packing List, Shipping Bill, Purchase Order, Quality Certificate) and their respective team ownership (Finance, Warehouse, Customs Broker).
+                  <strong>Document Lineage Grounded:</strong> Prompts are injected with the 5 core
+                  documents (Commercial Invoice, Packing List, Shipping Bill, Purchase Order,
+                  Quality Certificate) and their respective team ownership (Finance, Warehouse,
+                  Customs Broker).
                 </li>
                 <li>
-                  <strong>Consequence Matrix:</strong> Grounded in statutory penalties (Section 111(m)), short-shipment claims, freight disputes, and LC amendment risks.
+                  <strong>Consequence Matrix:</strong> Grounded in statutory penalties (Section
+                  111(m)), short-shipment claims, freight disputes, and LC amendment risks.
                 </li>
                 <li>
-                  <strong>Zero-Config Offline Fallback:</strong> If no API key is provided, VERIFAI automatically runs its deterministic trade engine with pre-computed Golden Record answers.
+                  <strong>Zero-Config Offline Fallback:</strong> If no API key is provided, VERIFAI
+                  automatically runs its deterministic trade engine with pre-computed Golden Record
+                  answers.
                 </li>
               </ul>
             </div>

@@ -71,28 +71,63 @@ const TYPE_SIGNATURES: Record<DocumentType, string[]> = {
     "shipper",
     "freight prepaid",
   ],
-  "Other": [],
+  Other: [],
 };
 
-export function classifyDocument(filename: string, extractedText: string = ""): ClassificationResult {
+export function classifyDocument(
+  filename: string,
+  extractedText: string = "",
+): ClassificationResult {
   const normalizedFilename = filename.toLowerCase();
   const normalizedText = extractedText.toLowerCase();
 
   // 1. Filename heuristic boost
   if (normalizedFilename.includes("invoice") || normalizedFilename.includes("ci-")) {
-    return { documentType: "Commercial Invoice", confidence: 97, matchedKeywords: ["filename: invoice"] };
+    return {
+      documentType: "Commercial Invoice",
+      confidence: 97,
+      matchedKeywords: ["filename: invoice"],
+    };
   }
   if (normalizedFilename.includes("packing") || normalizedFilename.includes("pl-")) {
-    return { documentType: "Packing List", confidence: 95, matchedKeywords: ["filename: packing list"] };
+    return {
+      documentType: "Packing List",
+      confidence: 95,
+      matchedKeywords: ["filename: packing list"],
+    };
   }
-  if (normalizedFilename.includes("shipping") || normalizedFilename.includes("sb-") || normalizedFilename.includes("sb44")) {
-    return { documentType: "Shipping Bill", confidence: 96, matchedKeywords: ["filename: shipping bill"] };
+  if (
+    normalizedFilename.includes("shipping") ||
+    normalizedFilename.includes("sb-") ||
+    normalizedFilename.includes("sb44")
+  ) {
+    return {
+      documentType: "Shipping Bill",
+      confidence: 96,
+      matchedKeywords: ["filename: shipping bill"],
+    };
   }
-  if (normalizedFilename.includes("purchase") || normalizedFilename.includes("po-") || normalizedFilename.includes("po_")) {
-    return { documentType: "Purchase Order", confidence: 94, matchedKeywords: ["filename: purchase order"] };
+  if (
+    normalizedFilename.includes("purchase") ||
+    normalizedFilename.includes("po-") ||
+    normalizedFilename.includes("po_")
+  ) {
+    return {
+      documentType: "Purchase Order",
+      confidence: 94,
+      matchedKeywords: ["filename: purchase order"],
+    };
   }
-  if (normalizedFilename.includes("quality") || normalizedFilename.includes("cert") || normalizedFilename.includes("mpeda")) {
-    return { documentType: "Quality Certificate", confidence: 92, matchedKeywords: ["filename: quality certificate"] };
+  if (
+    normalizedFilename.includes("quality") ||
+    normalizedFilename.includes("cert") ||
+    normalizedFilename.includes("mpeda")
+  ) {
+    return {
+      documentType: "Quality Certificate",
+      confidence: 92,
+      matchedKeywords: ["filename: quality certificate"],
+    };
   }
 
   // 2. Content text keyword matching

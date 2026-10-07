@@ -14,36 +14,45 @@ export function simulateCustomsQueries(discrepancies: DiscrepancyRecord[]): {
       riskScore += 45;
       queries.push({
         id: "CQ-01",
-        question: "Why does the Packing List indicate 1,180 cartons while the Commercial Invoice and Shipping Bill declare 1,200 cartons?",
+        question:
+          "Why does the Packing List indicate 1,180 cartons while the Commercial Invoice and Shipping Bill declare 1,200 cartons?",
         level: "High",
         probability: 94,
-        reason: "Quantity mismatch between primary trade documents creates suspicion of short-landing or undeclared cargo.",
+        reason:
+          "Quantity mismatch between primary trade documents creates suspicion of short-landing or undeclared cargo.",
         affected_documents: ["Commercial Invoice", "Packing List", "Shipping Bill"],
-        suggested_response: "Submit amended Packing List certifying the physical stuffing count of 1,200 cartons verified at factory gate.",
+        suggested_response:
+          "Submit amended Packing List certifying the physical stuffing count of 1,200 cartons verified at factory gate.",
         issue_id: "qty",
       });
     } else if (issue.id === "hs") {
       riskScore += 30;
       queries.push({
         id: "CQ-02",
-        question: "Why is tariff line 030616 declared on the Shipping Bill whereas Commercial Invoice specifies Vannamei shrimp under 030617?",
+        question:
+          "Why is tariff line 030616 declared on the Shipping Bill whereas Commercial Invoice specifies Vannamei shrimp under 030617?",
         level: "Medium",
         probability: 78,
-        reason: "HS code discrepancy affects Duty Drawback classification and export incentive calculations under RoDTEP.",
+        reason:
+          "HS code discrepancy affects Duty Drawback classification and export incentive calculations under RoDTEP.",
         affected_documents: ["Shipping Bill", "Commercial Invoice"],
-        suggested_response: "File amendment request with customs appraiser aligning the Shipping Bill to 030617 before Let Export Order.",
+        suggested_response:
+          "File amendment request with customs appraiser aligning the Shipping Bill to 030617 before Let Export Order.",
         issue_id: "hs",
       });
     } else if (issue.id === "cert") {
       riskScore += 15;
       queries.push({
         id: "CQ-03",
-        question: "Is the Quality / Health Certificate valid through the voyage transit to destination port?",
+        question:
+          "Is the Quality / Health Certificate valid through the voyage transit to destination port?",
         level: "Low",
         probability: 45,
-        reason: "Certificate margin is under 14 days; transit delay could cause rejection at destination customs in Jebel Ali.",
+        reason:
+          "Certificate margin is under 14 days; transit delay could cause rejection at destination customs in Jebel Ali.",
         affected_documents: ["Quality Certificate", "Shipping Schedule"],
-        suggested_response: "Provide endorsed renewal letter from MPEDA valid through January 2027.",
+        suggested_response:
+          "Provide endorsed renewal letter from MPEDA valid through January 2027.",
         issue_id: "cert",
       });
     }

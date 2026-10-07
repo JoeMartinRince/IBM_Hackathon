@@ -15,7 +15,11 @@ async function parsePdfBuffer(buffer: Buffer): Promise<string> {
   }
 }
 
-export async function parseDocument(filePath: string, mimeType: string, filename: string): Promise<string> {
+export async function parseDocument(
+  filePath: string,
+  mimeType: string,
+  filename: string,
+): Promise<string> {
   try {
     const ext = path.extname(filename).toLowerCase();
 
@@ -29,7 +33,13 @@ export async function parseDocument(filePath: string, mimeType: string, filename
     }
 
     // 2. Excel Spreadsheets (.xlsx, .xls, .csv)
-    if (ext === ".xlsx" || ext === ".xls" || ext === ".csv" || mimeType.includes("spreadsheet") || mimeType.includes("excel")) {
+    if (
+      ext === ".xlsx" ||
+      ext === ".xls" ||
+      ext === ".csv" ||
+      mimeType.includes("spreadsheet") ||
+      mimeType.includes("excel")
+    ) {
       const workbook = XLSX.readFile(filePath);
       const lines: string[] = [];
       for (const sheetName of workbook.SheetNames) {

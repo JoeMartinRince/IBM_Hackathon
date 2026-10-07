@@ -41,7 +41,9 @@ export const shipmentService = {
 // 2. Document Service
 export const documentService = {
   async getDocuments(shipmentId: string) {
-    return fetchApi<{ success: boolean; documents: any[] }>(`/api/shipments/${shipmentId}/documents`);
+    return fetchApi<{ success: boolean; documents: any[] }>(
+      `/api/shipments/${shipmentId}/documents`,
+    );
   },
   async uploadDocuments(shipmentId: string, files: File[]) {
     const formData = new FormData();
@@ -56,9 +58,12 @@ export const documentService = {
     return (await res.json()) as { success: boolean; documents: any[] };
   },
   async processDocument(docId: string) {
-    return fetchApi<{ success: boolean; document: any; extracted_fields: any[] }>(`/api/documents/${docId}/process`, {
-      method: "POST",
-    });
+    return fetchApi<{ success: boolean; document: any; extracted_fields: any[] }>(
+      `/api/documents/${docId}/process`,
+      {
+        method: "POST",
+      },
+    );
   },
 };
 
@@ -68,7 +73,9 @@ export const verificationService = {
     return fetchApi<any>(`/api/shipments/${shipmentId}/results`);
   },
   async getGoldenRecord(shipmentId: string) {
-    return fetchApi<{ success: boolean; golden_record: any[] }>(`/api/shipments/${shipmentId}/golden-record`);
+    return fetchApi<{ success: boolean; golden_record: any[] }>(
+      `/api/shipments/${shipmentId}/golden-record`,
+    );
   },
   async overrideGoldenField(shipmentId: string, fieldId: string, value: string) {
     return fetchApi<any>(`/api/shipments/${shipmentId}/golden-record/${fieldId}`, {
@@ -110,13 +117,22 @@ export const verificationService = {
 // 4. Assistant Service
 export const assistantService = {
   async askQuestion(shipmentId: string, question: string, apiKey?: string) {
-    return fetchApi<{ success: boolean; answer: string; citations: string[]; model?: string }>(`/api/shipments/${shipmentId}/assistant`, {
-      method: "POST",
-      body: JSON.stringify({ question, api_key: apiKey }),
-    });
+    return fetchApi<{ success: boolean; answer: string; citations: string[]; model?: string }>(
+      `/api/shipments/${shipmentId}/assistant`,
+      {
+        method: "POST",
+        body: JSON.stringify({ question, api_key: apiKey }),
+      },
+    );
   },
   async testGeminiKey(apiKey: string) {
-    return fetchApi<{ success: boolean; valid: boolean; message: string; model?: string; reply?: string }>(`/api/assistant/test-key`, {
+    return fetchApi<{
+      success: boolean;
+      valid: boolean;
+      message: string;
+      model?: string;
+      reply?: string;
+    }>(`/api/assistant/test-key`, {
       method: "POST",
       body: JSON.stringify({ api_key: apiKey }),
     });

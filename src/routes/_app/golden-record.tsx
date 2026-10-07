@@ -25,15 +25,22 @@ export const Route = createFileRoute("/_app/golden-record")({
 });
 
 function GoldenRecordPage() {
-  const { isResolved, resolve, activeShipment, currentUser, goldenOverrides, setGoldenOverride } = useDemo();
-  const [overrideModal, setOverrideModal] = useState<{ label: string; currentVal: string; issueId?: string | undefined } | null>(null);
+  const { isResolved, resolve, activeShipment, currentUser, goldenOverrides, setGoldenOverride } =
+    useDemo();
+  const [overrideModal, setOverrideModal] = useState<{
+    label: string;
+    currentVal: string;
+    issueId?: string | undefined;
+  } | null>(null);
   const [overrideValue, setOverrideValue] = useState("");
   const [overrideReason, setOverrideReason] = useState("");
 
   const handleOpenOverride = (label: string, currentVal: string, issueId?: string) => {
     setOverrideModal({ label, currentVal, issueId });
     setOverrideValue(currentVal);
-    setOverrideReason(`Verified physical evidence in consultation with port authority for ${label}.`);
+    setOverrideReason(
+      `Verified physical evidence in consultation with port authority for ${label}.`,
+    );
   };
 
   const handleSaveOverride = async () => {
@@ -42,7 +49,9 @@ function GoldenRecordPage() {
     if (overrideModal.issueId) {
       await resolve(overrideModal.issueId);
     }
-    toast.success(`Golden Record overridden for ${overrideModal.label}: "${overrideValue}". Audit trail recorded.`);
+    toast.success(
+      `Golden Record overridden for ${overrideModal.label}: "${overrideValue}". Audit trail recorded.`,
+    );
     setOverrideModal(null);
   };
 
@@ -65,7 +74,9 @@ function GoldenRecordPage() {
       <Reveal className="surface-ink p-6 md:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">Master Shipment Identifier</div>
+            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">
+              Master Shipment Identifier
+            </div>
             <div className="mt-1 font-mono text-2xl md:text-3xl font-bold">{activeShipment.id}</div>
             <div className="mt-2 text-sm text-ink-muted">
               {activeShipment.exporter} → {activeShipment.consignee}
@@ -105,13 +116,17 @@ function GoldenRecordPage() {
                       hasConflict
                         ? "border-critical/40 bg-critical/5"
                         : isOverridden
-                        ? "border-primary/40 bg-primary/5"
-                        : "bg-card hover:bg-muted/30"
+                          ? "border-primary/40 bg-primary/5"
+                          : "bg-card hover:bg-muted/30"
                     }`}
                   >
                     <div>
-                      <div className="text-[11px] font-medium text-muted-foreground">{field.label}</div>
-                      <div className="font-mono text-sm font-bold text-foreground mt-0.5">{displayValue}</div>
+                      <div className="text-[11px] font-medium text-muted-foreground">
+                        {field.label}
+                      </div>
+                      <div className="font-mono text-sm font-bold text-foreground mt-0.5">
+                        {displayValue}
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2 text-right">
@@ -132,7 +147,9 @@ function GoldenRecordPage() {
                       {/* Admin Override Action */}
                       {currentUser.role === "ADMIN" && (
                         <button
-                          onClick={() => handleOpenOverride(field.label, displayValue, field.issueId)}
+                          onClick={() =>
+                            handleOpenOverride(field.label, displayValue, field.issueId)
+                          }
                           className="press inline-flex items-center gap-1 rounded-full border bg-card px-2 py-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground"
                           title="Manually override this attribute in Golden Record"
                         >
@@ -140,7 +157,9 @@ function GoldenRecordPage() {
                         </button>
                       )}
 
-                      <span className="font-mono text-xs text-muted-foreground">{field.confidence}%</span>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {field.confidence}%
+                      </span>
                     </div>
                   </div>
                 );
@@ -165,20 +184,27 @@ function GoldenRecordPage() {
                   <Edit2 className="size-5 text-primary" />
                   <h3 className="font-semibold text-lg">Override Golden Record Value</h3>
                 </div>
-                <button onClick={() => setOverrideModal(null)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setOverrideModal(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Target Attribute</div>
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                    Target Attribute
+                  </div>
                   <div className="font-bold text-base text-foreground">{overrideModal.label}</div>
                   <div className="text-xs text-muted-foreground">Shipment: {activeShipment.id}</div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-foreground block mb-1">New Reconciled Value:</label>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    New Reconciled Value:
+                  </label>
                   <input
                     type="text"
                     value={overrideValue}
@@ -188,7 +214,9 @@ function GoldenRecordPage() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-foreground block mb-1">Audit Justification Reason:</label>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    Audit Justification Reason:
+                  </label>
                   <textarea
                     rows={3}
                     value={overrideReason}

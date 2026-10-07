@@ -9,9 +9,11 @@ All requests and responses use `application/json` content-type unless otherwise 
 ## 1. System Health
 
 ### `GET /api/health`
+
 Returns the operational health and execution mode of the VERIFAI engine.
 
 **Response `200 OK`**:
+
 ```json
 {
   "status": "healthy",
@@ -26,9 +28,11 @@ Returns the operational health and execution mode of the VERIFAI engine.
 ## 2. Authentication & User Profiles
 
 ### `GET /api/auth/profiles`
+
 Lists demo user personas available for instant testing.
 
 **Response `200 OK`**:
+
 ```json
 {
   "success": true,
@@ -59,9 +63,11 @@ Lists demo user personas available for instant testing.
 ```
 
 ### `POST /api/auth/login`
+
 Authenticates a user session or switches persona.
 
 **Request Body**:
+
 ```json
 {
   "email": "alwin@malabarocean.in",
@@ -74,14 +80,17 @@ Authenticates a user session or switches persona.
 ## 3. Shipments API
 
 ### `GET /api/shipments`
+
 Fetches all export shipments with optional search and category filters.
 
 **Query Parameters**:
+
 - `search` (optional): Filter by shipment ID, commodity, exporter, consignee
 - `category` (optional): `Seafood`, `Spices`, `Coir`, `Rubber`, `Tea`
 - `status` (optional): `READY`, `UNDER_REVIEW`, `DRAFT`, `SHIPPED`
 
 **Response `200 OK`**:
+
 ```json
 {
   "success": true,
@@ -109,12 +118,15 @@ Fetches all export shipments with optional search and category filters.
 ```
 
 ### `GET /api/shipments/:id`
+
 Retrieves detailed information for a specific shipment.
 
 ### `POST /api/shipments`
+
 Registers a new export shipment draft.
 
 **Request Body**:
+
 ```json
 {
   "exporter": "Wayanad Organic Spices Ltd",
@@ -134,15 +146,19 @@ Registers a new export shipment draft.
 ## 4. Document Management & Ingestion
 
 ### `GET /api/shipments/:id/documents`
+
 Lists all uploaded trade documents associated with the shipment.
 
 ### `POST /api/shipments/:id/documents`
+
 Uploads one or more shipping files (`multipart/form-data`).
 
 **Form Data Fields**:
+
 - `files`: File[] (supports PDF, XLSX, DOCX, PNG, JPG)
 
 **Response `201 Created`**:
+
 ```json
 {
   "success": true,
@@ -160,6 +176,7 @@ Uploads one or more shipping files (`multipart/form-data`).
 ```
 
 ### `POST /api/documents/:id/process`
+
 Triggers classification, OCR extraction, and field normalization on a document.
 
 ---
@@ -167,7 +184,9 @@ Triggers classification, OCR extraction, and field normalization on a document.
 ## 5. Verification & Discrepancies
 
 ### `GET /api/shipments/:id/results`
+
 Returns comprehensive verification results:
+
 - Readiness score ($0-100\%$)
 - Customs risk index
 - Discrepancy list with severities and affected documents
@@ -175,9 +194,11 @@ Returns comprehensive verification results:
 - 10-point compliance checklist
 
 ### `GET /api/shipments/:id/golden-record`
+
 Returns the consensus Golden Record dataset.
 
 **Response `200 OK`**:
+
 ```json
 {
   "success": true,
@@ -198,9 +219,11 @@ Returns the consensus Golden Record dataset.
 ```
 
 ### `PATCH /api/shipments/:id/golden-record/:fieldId`
+
 Overrides or resolves a contested Golden Record field with audit log.
 
 **Request Body**:
+
 ```json
 {
   "value": "1,200 Cartons",
@@ -209,9 +232,11 @@ Overrides or resolves a contested Golden Record field with audit log.
 ```
 
 ### `POST /api/discrepancies/:id/resolve`
+
 Applies an automated 1-click resolution to a detected discrepancy.
 
 **Request Body**:
+
 ```json
 {
   "resolved_by": "Alwin Joseph"
@@ -219,6 +244,7 @@ Applies an automated 1-click resolution to a detected discrepancy.
 ```
 
 ### `POST /api/shipments/:id/reverify`
+
 Re-runs the deterministic verification engine after edits or document re-uploads.
 
 ---
@@ -226,16 +252,20 @@ Re-runs the deterministic verification engine after edits or document re-uploads
 ## 6. Customs Risk & Reports
 
 ### `POST /api/shipments/:id/customs-risk`
+
 Calculates projected customs queries and statutory rebuttal drafts.
 
 ### `POST /api/shipments/:id/report`
+
 Generates a structured Verification Certificate containing:
+
 - Certificate ID & Timestamp
 - Shipment Golden Record snapshot
 - Discrepancy resolution history
 - Cryptographic verification signature
 
 ### `POST /api/shipments/:id/qr`
+
 Generates a public verification token and QR verification payload.
 
 ---
@@ -243,9 +273,11 @@ Generates a public verification token and QR verification payload.
 ## 7. Natural Language Assistant
 
 ### `POST /api/shipments/:id/assistant`
+
 Grounds an export trade query against the shipment's verified documents.
 
 **Request Body**:
+
 ```json
 {
   "question": "What is the net weight and container number for this shipment?"
@@ -253,6 +285,7 @@ Grounds an export trade query against the shipment's verified documents.
 ```
 
 **Response `200 OK`**:
+
 ```json
 {
   "success": true,
@@ -270,9 +303,11 @@ Grounds an export trade query against the shipment's verified documents.
 ## 8. Public Verification Portal
 
 ### `GET /api/verify-status/:token`
+
 Public verification endpoint scanned by foreign customs, freight forwarders, or port gate officers.
 
 **Response `200 OK`**:
+
 ```json
 {
   "success": true,

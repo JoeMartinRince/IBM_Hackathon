@@ -39,14 +39,40 @@ export function convertToUsd(amount: number, currency: string): number {
 }
 
 // 3. ISO 6346 Container Number Checksum Validation
-export function validateContainerNumber(containerNo: string): { valid: boolean; calculatedCheckDigit?: number } {
+export function validateContainerNumber(containerNo: string): {
+  valid: boolean;
+  calculatedCheckDigit?: number;
+} {
   const clean = containerNo.replace(/[^A-Z0-9]/gi, "").toUpperCase();
   if (clean.length !== 11) return { valid: false };
 
   const charValues: Record<string, number> = {
-    A: 10, B: 12, C: 13, D: 14, E: 15, F: 16, G: 17, H: 18, I: 19, J: 20,
-    K: 21, L: 23, M: 24, N: 25, O: 26, P: 27, Q: 28, R: 29, S: 30, T: 31,
-    U: 32, V: 34, W: 35, X: 36, Y: 37, Z: 38,
+    A: 10,
+    B: 12,
+    C: 13,
+    D: 14,
+    E: 15,
+    F: 16,
+    G: 17,
+    H: 18,
+    I: 19,
+    J: 20,
+    K: 21,
+    L: 23,
+    M: 24,
+    N: 25,
+    O: 26,
+    P: 27,
+    Q: 28,
+    R: 29,
+    S: 30,
+    T: 31,
+    U: 32,
+    V: 34,
+    W: 35,
+    X: 36,
+    Y: 37,
+    Z: 38,
   };
 
   let sum = 0;
@@ -60,13 +86,26 @@ export function validateContainerNumber(containerNo: string): { valid: boolean; 
   const expectedCheckDigit = remainder === 10 ? 0 : remainder;
   const actualCheckDigit = parseInt(clean[10] ?? "-1", 10);
 
-  return { valid: expectedCheckDigit === actualCheckDigit, calculatedCheckDigit: expectedCheckDigit };
+  return {
+    valid: expectedCheckDigit === actualCheckDigit,
+    calculatedCheckDigit: expectedCheckDigit,
+  };
 }
 
 // 4. Fuzzy / Semantic String Matching
 export function areSemanticallyEquivalent(strA: string, strB: string): boolean {
-  const cleanA = strA.toLowerCase().replace(/[^a-z0-9]/g, " ").trim().split(/\s+/).filter(Boolean);
-  const cleanB = strB.toLowerCase().replace(/[^a-z0-9]/g, " ").trim().split(/\s+/).filter(Boolean);
+  const cleanA = strA
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  const cleanB = strB
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
 
   const setA = new Set(cleanA);
   const setB = new Set(cleanB);
@@ -92,7 +131,7 @@ export function validateDateSequence(
   invoiceDate?: string,
   shippingBillDate?: string,
   shipmentDate?: string,
-  certExpiryDate?: string
+  certExpiryDate?: string,
 ): { valid: boolean; issues: string[] } {
   const issues: string[] = [];
 
@@ -115,7 +154,9 @@ export function validateDateSequence(
     if (marginDays < 0) {
       issues.push("Quality / Health Certificate expires before planned vessel departure.");
     } else if (marginDays < 14) {
-      issues.push(`Certificate expires only ${Math.round(marginDays)} days after vessel departure (recommended margin ≥ 14 days).`);
+      issues.push(
+        `Certificate expires only ${Math.round(marginDays)} days after vessel departure (recommended margin ≥ 14 days).`,
+      );
     }
   }
 
@@ -125,7 +166,7 @@ export function validateDateSequence(
 // 6. Readiness Checklist Generator
 export function generateReadinessChecklist(
   shipmentId: string,
-  discrepancies: DiscrepancyRecord[]
+  discrepancies: DiscrepancyRecord[],
 ): VerificationCheckItem[] {
   const openIds = new Set(discrepancies.filter((d) => d.status === "OPEN").map((d) => d.id));
 
@@ -159,7 +200,8 @@ export function generateReadinessChecklist(
       category: "Weight",
       label: "Weight & Physical Plausibility",
       status: "PASS",
-      description: "Gross weight (13,450 KG) exceeds net weight (12,000 KG); unit weight plausibility confirmed.",
+      description:
+        "Gross weight (13,450 KG) exceeds net weight (12,000 KG); unit weight plausibility confirmed.",
     },
     {
       id: "chk-5",

@@ -25,11 +25,18 @@ import {
 import { toast } from "sonner";
 import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
-import { PageHeader, Reveal, ReadinessRing, StatusBadge, Chip } from "@/components/verifex/primitives";
+import {
+  PageHeader,
+  Reveal,
+  ReadinessRing,
+  StatusBadge,
+  Chip,
+} from "@/components/verifex/primitives";
 import { discrepancies, comparisonFields, type Discrepancy } from "@/lib/data";
 
 export const Route = createFileRoute("/_app/results")({
-  head: () => seo("Verification Results", "Cross-document verification analysis and discrepancy detection."),
+  head: () =>
+    seo("Verification Results", "Cross-document verification analysis and discrepancy detection."),
   component: ResultsPage,
 });
 
@@ -58,7 +65,7 @@ function ResultsPage() {
   // Correction workflow modal state
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [correctionReason, setCorrectionReason] = useState(
-    "Commercial Invoice declares 1,200 cartons, but Packing List specifies 1,180 cartons. Please recount the Willingdon Island warehouse lot and upload a revised Packing List (1,200 cartons)."
+    "Commercial Invoice declares 1,200 cartons, but Packing List specifies 1,180 cartons. Please recount the Willingdon Island warehouse lot and upload a revised Packing List (1,200 cartons).",
   );
   const [uploadV2ModalOpen, setUploadV2ModalOpen] = useState(false);
   const [v2Filename, setV2Filename] = useState("Packing_List_V2_Corrected_1200ctns.pdf");
@@ -101,7 +108,9 @@ function ResultsPage() {
     if (!plSlot) return;
     await approveCorrection(activeShipment.id, plSlot.id);
     await reverify();
-    toast.success("Correction approved! Quantity aligned to 1,200 cartons. Readiness is now 100% READY.");
+    toast.success(
+      "Correction approved! Quantity aligned to 1,200 cartons. Readiness is now 100% READY.",
+    );
   };
 
   return (
@@ -133,7 +142,9 @@ function ResultsPage() {
       <Reveal className="surface-ink p-6 md:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">Consignment Verification Report</div>
+            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">
+              Consignment Verification Report
+            </div>
             <div className="mt-1 flex items-center gap-3">
               <span className="font-mono text-xl md:text-3xl font-bold">{activeShipment.id}</span>
               <StatusBadge status={readiness >= 100 ? "ready" : "review"} />
@@ -164,9 +175,11 @@ function ResultsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-semibold">Detected Discrepancies & Suggested Fixes</h2>
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
-              openIssues > 0 ? "bg-critical-soft text-critical" : "bg-success-soft text-success"
-            }`}>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                openIssues > 0 ? "bg-critical-soft text-critical" : "bg-success-soft text-success"
+              }`}
+            >
               {openIssues > 0 ? `${openIssues} Open` : "All Resolved"}
             </span>
           </div>
@@ -185,15 +198,21 @@ function ResultsPage() {
                 key={d.id}
                 layout
                 className={`surface p-5 transition-all ${
-                  resolved ? "border-success/30 bg-success/5 opacity-80" : "hover:shadow-[var(--shadow-float)]"
+                  resolved
+                    ? "border-success/30 bg-success/5 opacity-80"
+                    : "hover:shadow-[var(--shadow-float)]"
                 }`}
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="space-y-3 max-w-2xl">
                     <div className="flex items-center gap-2">
-                      <Chip tone={resolved ? "verified" : d.severity}>{resolved ? "Resolved" : d.severity}</Chip>
+                      <Chip tone={resolved ? "verified" : d.severity}>
+                        {resolved ? "Resolved" : d.severity}
+                      </Chip>
                       <h3 className="text-base font-semibold">{d.title}</h3>
-                      <span className="font-mono text-xs text-muted-foreground">({d.difference})</span>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        ({d.difference})
+                      </span>
                     </div>
 
                     <p className="text-sm text-muted-foreground">{d.explanation}</p>
@@ -211,28 +230,44 @@ function ResultsPage() {
                               <span>Commercial Invoice</span>
                               <span className="font-mono">v1</span>
                             </div>
-                            <div className="mt-1 font-mono text-sm font-bold text-foreground">1,200 cartons</div>
+                            <div className="mt-1 font-mono text-sm font-bold text-foreground">
+                              1,200 cartons
+                            </div>
                             <div className="mt-1 text-[10px] text-muted-foreground truncate">
                               Finance Team (Rahul Nair)
                             </div>
                           </div>
 
                           {/* Packing List */}
-                          <div className={`rounded-xl border p-3 text-xs ${
-                            resolved
-                              ? "border-success/40 bg-success/5"
-                              : plSlot?.status === "CORRECTION_SUBMITTED"
-                              ? "border-primary/40 bg-primary/5"
-                              : "border-critical/30 bg-card"
-                          }`}>
+                          <div
+                            className={`rounded-xl border p-3 text-xs ${
+                              resolved
+                                ? "border-success/40 bg-success/5"
+                                : plSlot?.status === "CORRECTION_SUBMITTED"
+                                  ? "border-primary/40 bg-primary/5"
+                                  : "border-critical/30 bg-card"
+                            }`}
+                          >
                             <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
                               <span>Packing List</span>
-                              <span className="font-mono">{plSlot && plSlot.versions.length > 1 ? `v${plSlot.versions.length}` : "v1"}</span>
+                              <span className="font-mono">
+                                {plSlot && plSlot.versions.length > 1
+                                  ? `v${plSlot.versions.length}`
+                                  : "v1"}
+                              </span>
                             </div>
-                            <div className={`mt-1 font-mono text-sm font-bold ${
-                              resolved ? "text-success" : plSlot?.status === "CORRECTION_SUBMITTED" ? "text-primary" : "text-critical"
-                            }`}>
-                              {resolved || plSlot?.status === "CORRECTION_SUBMITTED" ? "1,200 cartons" : "1,180 cartons"}
+                            <div
+                              className={`mt-1 font-mono text-sm font-bold ${
+                                resolved
+                                  ? "text-success"
+                                  : plSlot?.status === "CORRECTION_SUBMITTED"
+                                    ? "text-primary"
+                                    : "text-critical"
+                              }`}
+                            >
+                              {resolved || plSlot?.status === "CORRECTION_SUBMITTED"
+                                ? "1,200 cartons"
+                                : "1,180 cartons"}
                             </div>
                             <div className="mt-1 text-[10px] text-muted-foreground truncate">
                               Warehouse (Akhil Varma)
@@ -245,7 +280,9 @@ function ResultsPage() {
                               <span>Shipping Bill</span>
                               <span className="font-mono">v1</span>
                             </div>
-                            <div className="mt-1 font-mono text-sm font-bold text-foreground">1,200 cartons</div>
+                            <div className="mt-1 font-mono text-sm font-bold text-foreground">
+                              1,200 cartons
+                            </div>
                             <div className="mt-1 text-[10px] text-muted-foreground truncate">
                               Customs Broker (Kavitha)
                             </div>
@@ -259,7 +296,9 @@ function ResultsPage() {
                               <AlertTriangle className="size-4 shrink-0 text-warning mt-0.5" />
                               <div>
                                 <span className="font-bold">Correction Requested by Admin:</span>{" "}
-                                <span className="text-muted-foreground">{plSlot.correctionRequest?.reason}</span>
+                                <span className="text-muted-foreground">
+                                  {plSlot.correctionRequest?.reason}
+                                </span>
                               </div>
                             </div>
                             <button
@@ -276,9 +315,12 @@ function ResultsPage() {
                             <div className="flex items-start gap-2">
                               <Sparkles className="size-4 shrink-0 text-primary mt-0.5" />
                               <div>
-                                <span className="font-bold text-foreground">Corrected Packing List V2 Uploaded:</span>{" "}
+                                <span className="font-bold text-foreground">
+                                  Corrected Packing List V2 Uploaded:
+                                </span>{" "}
                                 <span className="text-muted-foreground">
-                                  Warehouse reconciled lot to 1,200 cartons. Pending Admin verification approval.
+                                  Warehouse reconciled lot to 1,200 cartons. Pending Admin
+                                  verification approval.
                                 </span>
                               </div>
                             </div>
@@ -294,12 +336,18 @@ function ResultsPage() {
                     ) : (
                       <div className="grid grid-cols-2 gap-3 pt-2 sm:max-w-md">
                         <div className="rounded-xl border bg-card p-2.5 text-xs">
-                          <div className="text-[10px] text-muted-foreground font-medium">{d.left.doc}</div>
+                          <div className="text-[10px] text-muted-foreground font-medium">
+                            {d.left.doc}
+                          </div>
                           <div className="font-semibold">{d.left.value}</div>
                         </div>
                         <div className="rounded-xl border bg-card p-2.5 text-xs">
-                          <div className="text-[10px] text-muted-foreground font-medium">{d.right.doc}</div>
-                          <div className={`font-semibold ${resolved ? "text-success" : "text-critical"}`}>
+                          <div className="text-[10px] text-muted-foreground font-medium">
+                            {d.right.doc}
+                          </div>
+                          <div
+                            className={`font-semibold ${resolved ? "text-success" : "text-critical"}`}
+                          >
                             {resolved ? d.left.value : d.right.value}
                           </div>
                         </div>
@@ -341,7 +389,9 @@ function ResultsPage() {
                           <button
                             onClick={() => {
                               setIgnoreModal(d);
-                              setIgnoreReason("Customer waiver granted for 20-carton container shipment variance.");
+                              setIgnoreReason(
+                                "Customer waiver granted for 20-carton container shipment variance.",
+                              );
                             }}
                             className="text-[10px] text-muted-foreground hover:text-foreground font-medium underline"
                           >
@@ -378,7 +428,9 @@ function ResultsPage() {
                         <button
                           onClick={() => {
                             setIgnoreModal(d);
-                            setIgnoreReason("Clerical variation within permissible statutory boundary.");
+                            setIgnoreReason(
+                              "Clerical variation within permissible statutory boundary.",
+                            );
                           }}
                           className="text-[10px] text-muted-foreground hover:text-foreground font-medium underline"
                         >
@@ -400,7 +452,8 @@ function ResultsPage() {
           <div>
             <h2 className="text-xl font-semibold">Document Cross-Reference Matrix</h2>
             <p className="text-xs text-muted-foreground">
-              Compares Commercial Invoice (CI), Packing List (PL), Shipping Bill (SB), and Purchase Order (PO).
+              Compares Commercial Invoice (CI), Packing List (PL), Shipping Bill (SB), and Purchase
+              Order (PO).
             </p>
           </div>
           <Link to="/golden-record" className="text-xs text-muted-foreground hover:text-foreground">
@@ -425,17 +478,25 @@ function ResultsPage() {
                 {comparisonFields.map((row, idx) => {
                   const hasOpenIssue = row.issueId && !isResolved(row.issueId);
                   const displayStatus = hasOpenIssue ? row.status : "verified";
-                  const plValue = row.issueId === "qty" && isResolved("qty") ? "1,200 cartons" : row.values.PL || "—";
-                  const sbValue = row.issueId === "hs" && isResolved("hs") ? "030617" : row.values.SB || "—";
+                  const plValue =
+                    row.issueId === "qty" && isResolved("qty")
+                      ? "1,200 cartons"
+                      : row.values.PL || "—";
+                  const sbValue =
+                    row.issueId === "hs" && isResolved("hs") ? "030617" : row.values.SB || "—";
 
                   return (
                     <tr key={idx} className="hover:bg-muted/30 transition-colors">
                       <td className="p-4 font-medium">{row.field}</td>
                       <td className="p-4 font-mono text-xs">{row.values.CI || "—"}</td>
-                      <td className={`p-4 font-mono text-xs ${hasOpenIssue && row.issueId === "qty" ? "text-critical font-bold" : ""}`}>
+                      <td
+                        className={`p-4 font-mono text-xs ${hasOpenIssue && row.issueId === "qty" ? "text-critical font-bold" : ""}`}
+                      >
                         {plValue}
                       </td>
-                      <td className={`p-4 font-mono text-xs ${hasOpenIssue && row.issueId === "hs" ? "text-critical font-bold" : ""}`}>
+                      <td
+                        className={`p-4 font-mono text-xs ${hasOpenIssue && row.issueId === "hs" ? "text-critical font-bold" : ""}`}
+                      >
                         {sbValue}
                       </td>
                       <td className="p-4 font-mono text-xs">{row.values.PO || "—"}</td>
@@ -466,7 +527,10 @@ function ResultsPage() {
                   <Send className="size-5 text-warning" />
                   <h3 className="font-semibold text-lg">Request Document Correction</h3>
                 </div>
-                <button onClick={() => setRequestModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setRequestModalOpen(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
@@ -474,8 +538,12 @@ function ResultsPage() {
               <div className="space-y-3">
                 <div className="rounded-xl bg-muted/40 p-3 text-xs space-y-1">
                   <div className="font-semibold text-foreground">Target Document Slot:</div>
-                  <div className="text-muted-foreground">Packing List (Assigned to Akhil Varma — Warehouse Team)</div>
-                  <div className="text-muted-foreground">Shipment: <span className="font-mono font-medium">{activeShipment.id}</span></div>
+                  <div className="text-muted-foreground">
+                    Packing List (Assigned to Akhil Varma — Warehouse Team)
+                  </div>
+                  <div className="text-muted-foreground">
+                    Shipment: <span className="font-mono font-medium">{activeShipment.id}</span>
+                  </div>
                 </div>
 
                 <div>
@@ -525,7 +593,10 @@ function ResultsPage() {
                   <Upload className="size-5 text-primary" />
                   <h3 className="font-semibold text-lg">Upload Corrected Packing List V2</h3>
                 </div>
-                <button onClick={() => setUploadV2ModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setUploadV2ModalOpen(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
@@ -533,11 +604,16 @@ function ResultsPage() {
               <div className="space-y-3">
                 <div className="rounded-xl bg-success-soft p-3 text-xs text-success space-y-1">
                   <div className="font-semibold">Reconciliation Note:</div>
-                  <div>Warehouse lot recounted. Quantity adjusted to match Commercial Invoice (1,200 cartons).</div>
+                  <div>
+                    Warehouse lot recounted. Quantity adjusted to match Commercial Invoice (1,200
+                    cartons).
+                  </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-foreground block mb-1">File Name:</label>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    File Name:
+                  </label>
                   <input
                     type="text"
                     value={v2Filename}
@@ -581,46 +657,67 @@ function ResultsPage() {
                   <FileText className="size-5 text-primary" />
                   <h3 className="font-semibold text-lg">Source Evidence & Provenance</h3>
                 </div>
-                <button onClick={() => setInspectModal(null)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setInspectModal(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Source Document</div>
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                    Source Document
+                  </div>
                   <div className="font-semibold text-base">{inspectModal.evidence.source}</div>
                 </div>
 
                 <div className="rounded-2xl border bg-muted/40 p-4 font-mono text-xs text-foreground space-y-1">
-                  <div className="text-[10px] uppercase text-muted-foreground font-sans">Extracted Raw Text Snippet</div>
+                  <div className="text-[10px] uppercase text-muted-foreground font-sans">
+                    Extracted Raw Text Snippet
+                  </div>
                   <div className="font-bold text-critical">"{inspectModal.evidence.value}"</div>
                   <p className="mt-2 text-muted-foreground text-[11px] font-sans">
-                    Rule applied: <span className="font-medium text-foreground">{inspectModal.evidence.rule}</span>
+                    Rule applied:{" "}
+                    <span className="font-medium text-foreground">
+                      {inspectModal.evidence.rule}
+                    </span>
                   </p>
                 </div>
 
                 {/* Provenance Audit Details */}
                 <div className="rounded-2xl border bg-card p-3 space-y-2 text-xs">
                   <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1.5">
-                    <ShieldCheck className="size-3.5 text-primary" /> Tamper-Evident Provenance Trail
+                    <ShieldCheck className="size-3.5 text-primary" /> Tamper-Evident Provenance
+                    Trail
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
                     <div>
                       <span className="text-muted-foreground">Assigned Team:</span>{" "}
                       <span className="font-medium text-foreground">
-                        {inspectModal.id === "qty" ? "Warehouse Logistics" : inspectModal.id === "hs" ? "Customs Broker (CHA)" : "MPEDA Inspection"}
+                        {inspectModal.id === "qty"
+                          ? "Warehouse Logistics"
+                          : inspectModal.id === "hs"
+                            ? "Customs Broker (CHA)"
+                            : "MPEDA Inspection"}
                       </span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Sign-off Officer:</span>{" "}
                       <span className="font-medium text-foreground">
-                        {inspectModal.id === "qty" ? "Akhil Varma" : inspectModal.id === "hs" ? "Kavitha Menon" : "Dr. Ananya Pillai"}
+                        {inspectModal.id === "qty"
+                          ? "Akhil Varma"
+                          : inspectModal.id === "hs"
+                            ? "Kavitha Menon"
+                            : "Dr. Ananya Pillai"}
                       </span>
                     </div>
                     <div className="col-span-2">
                       <span className="text-muted-foreground">Audit Record:</span>{" "}
-                      <span className="font-mono text-[10px] text-muted-foreground">SHA256:7f9b8c...a449 (Immutable)</span>
+                      <span className="font-mono text-[10px] text-muted-foreground">
+                        SHA256:7f9b8c...a449 (Immutable)
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -670,14 +767,18 @@ function ResultsPage() {
                   <ShieldAlert className="size-5 text-warning" />
                   <h3 className="font-semibold text-lg">Ignore Discrepancy with Reason</h3>
                 </div>
-                <button onClick={() => setIgnoreModal(null)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setIgnoreModal(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div className="rounded-xl bg-muted/40 p-3 text-xs">
-                  <span className="font-semibold">{ignoreModal.title}</span> ({ignoreModal.difference})
+                  <span className="font-semibold">{ignoreModal.title}</span> (
+                  {ignoreModal.difference})
                 </div>
 
                 <div>

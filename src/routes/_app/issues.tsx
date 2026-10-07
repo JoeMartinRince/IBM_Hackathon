@@ -48,7 +48,7 @@ function IssuesPage() {
   // Correction workflow states
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [correctionReason, setCorrectionReason] = useState(
-    "Commercial Invoice declares 1,200 cartons, but Packing List specifies 1,180 cartons. Please recount the Willingdon Island warehouse lot and upload revised Packing List."
+    "Commercial Invoice declares 1,200 cartons, but Packing List specifies 1,180 cartons. Please recount the Willingdon Island warehouse lot and upload revised Packing List.",
   );
   const [uploadV2ModalOpen, setUploadV2ModalOpen] = useState(false);
   const [v2Filename, setV2Filename] = useState("Packing_List_V2_Corrected_1200ctns.pdf");
@@ -123,9 +123,13 @@ function IssuesPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-2.5">
-                    <Chip tone={resolved ? "verified" : d.severity}>{resolved ? "Resolved" : d.severity}</Chip>
+                    <Chip tone={resolved ? "verified" : d.severity}>
+                      {resolved ? "Resolved" : d.severity}
+                    </Chip>
                     <h3 className="text-lg font-semibold">{d.title}</h3>
-                    <span className="font-mono text-xs text-muted-foreground">({d.difference})</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      ({d.difference})
+                    </span>
                   </div>
 
                   <p className="text-sm text-muted-foreground leading-relaxed">{d.explanation}</p>
@@ -142,27 +146,47 @@ function IssuesPage() {
                             <span>Commercial Invoice</span>
                             <span className="font-mono">v1</span>
                           </div>
-                          <div className="mt-1 font-mono text-sm font-bold text-foreground">1,200 cartons</div>
-                          <div className="mt-1 text-[10px] text-muted-foreground truncate">Finance (Rahul Nair)</div>
+                          <div className="mt-1 font-mono text-sm font-bold text-foreground">
+                            1,200 cartons
+                          </div>
+                          <div className="mt-1 text-[10px] text-muted-foreground truncate">
+                            Finance (Rahul Nair)
+                          </div>
                         </div>
 
-                        <div className={`rounded-xl border p-3 text-xs ${
-                          resolved
-                            ? "border-success/40 bg-success/5"
-                            : plSlot?.status === "CORRECTION_SUBMITTED"
-                            ? "border-primary/40 bg-primary/5"
-                            : "border-critical/30 bg-card"
-                        }`}>
+                        <div
+                          className={`rounded-xl border p-3 text-xs ${
+                            resolved
+                              ? "border-success/40 bg-success/5"
+                              : plSlot?.status === "CORRECTION_SUBMITTED"
+                                ? "border-primary/40 bg-primary/5"
+                                : "border-critical/30 bg-card"
+                          }`}
+                        >
                           <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
                             <span>Packing List</span>
-                            <span className="font-mono">{plSlot && plSlot.versions.length > 1 ? `v${plSlot.versions.length}` : "v1"}</span>
+                            <span className="font-mono">
+                              {plSlot && plSlot.versions.length > 1
+                                ? `v${plSlot.versions.length}`
+                                : "v1"}
+                            </span>
                           </div>
-                          <div className={`mt-1 font-mono text-sm font-bold ${
-                            resolved ? "text-success" : plSlot?.status === "CORRECTION_SUBMITTED" ? "text-primary" : "text-critical"
-                          }`}>
-                            {resolved || plSlot?.status === "CORRECTION_SUBMITTED" ? "1,200 cartons" : "1,180 cartons"}
+                          <div
+                            className={`mt-1 font-mono text-sm font-bold ${
+                              resolved
+                                ? "text-success"
+                                : plSlot?.status === "CORRECTION_SUBMITTED"
+                                  ? "text-primary"
+                                  : "text-critical"
+                            }`}
+                          >
+                            {resolved || plSlot?.status === "CORRECTION_SUBMITTED"
+                              ? "1,200 cartons"
+                              : "1,180 cartons"}
                           </div>
-                          <div className="mt-1 text-[10px] text-muted-foreground truncate">Warehouse (Akhil Varma)</div>
+                          <div className="mt-1 text-[10px] text-muted-foreground truncate">
+                            Warehouse (Akhil Varma)
+                          </div>
                         </div>
 
                         <div className="rounded-xl border bg-card p-3 text-xs">
@@ -170,8 +194,12 @@ function IssuesPage() {
                             <span>Shipping Bill</span>
                             <span className="font-mono">v1</span>
                           </div>
-                          <div className="mt-1 font-mono text-sm font-bold text-foreground">1,200 cartons</div>
-                          <div className="mt-1 text-[10px] text-muted-foreground truncate">Customs Broker (Kavitha)</div>
+                          <div className="mt-1 font-mono text-sm font-bold text-foreground">
+                            1,200 cartons
+                          </div>
+                          <div className="mt-1 text-[10px] text-muted-foreground truncate">
+                            Customs Broker (Kavitha)
+                          </div>
                         </div>
                       </div>
 
@@ -181,8 +209,12 @@ function IssuesPage() {
                           <div className="flex items-center gap-2">
                             <AlertTriangle className="size-4 shrink-0 text-warning" />
                             <div>
-                              <span className="font-bold text-foreground">Correction In-Progress:</span>{" "}
-                              <span className="text-muted-foreground">{plSlot.correctionRequest?.reason}</span>
+                              <span className="font-bold text-foreground">
+                                Correction In-Progress:
+                              </span>{" "}
+                              <span className="text-muted-foreground">
+                                {plSlot.correctionRequest?.reason}
+                              </span>
                             </div>
                           </div>
                           <button
@@ -199,8 +231,12 @@ function IssuesPage() {
                           <div className="flex items-center gap-2">
                             <Sparkles className="size-4 shrink-0 text-primary" />
                             <div>
-                              <span className="font-bold text-foreground">Packing List V2 Ready:</span>{" "}
-                              <span className="text-muted-foreground">Adjusted to 1,200 cartons by Warehouse. Ready for approval.</span>
+                              <span className="font-bold text-foreground">
+                                Packing List V2 Ready:
+                              </span>{" "}
+                              <span className="text-muted-foreground">
+                                Adjusted to 1,200 cartons by Warehouse. Ready for approval.
+                              </span>
                             </div>
                           </div>
                           <button
@@ -218,13 +254,17 @@ function IssuesPage() {
                         <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                           {d.left.doc}
                         </div>
-                        <div className="mt-1 font-mono text-sm font-bold text-foreground">{d.left.value}</div>
+                        <div className="mt-1 font-mono text-sm font-bold text-foreground">
+                          {d.left.value}
+                        </div>
                       </div>
                       <div className="rounded-2xl border bg-muted/30 p-3.5">
                         <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                           {d.right.doc}
                         </div>
-                        <div className={`mt-1 font-mono text-sm font-bold ${resolved ? "text-success" : "text-critical"}`}>
+                        <div
+                          className={`mt-1 font-mono text-sm font-bold ${resolved ? "text-success" : "text-critical"}`}
+                        >
                           {resolved ? d.left.value : d.right.value}
                         </div>
                       </div>
@@ -267,7 +307,9 @@ function IssuesPage() {
                         <button
                           onClick={() => {
                             setIgnoreModal(d);
-                            setIgnoreReason("Customer waiver granted for container shipment variance.");
+                            setIgnoreReason(
+                              "Customer waiver granted for container shipment variance.",
+                            );
                           }}
                           className="text-[10px] text-muted-foreground hover:text-foreground font-medium underline"
                         >
@@ -299,7 +341,9 @@ function IssuesPage() {
                       <button
                         onClick={() => {
                           setIgnoreModal(d);
-                          setIgnoreReason("Clerical variation within permissible statutory boundary.");
+                          setIgnoreReason(
+                            "Clerical variation within permissible statutory boundary.",
+                          );
                         }}
                         className="text-[10px] text-muted-foreground hover:text-foreground font-medium underline"
                       >
@@ -329,7 +373,10 @@ function IssuesPage() {
                   <Send className="size-5 text-warning" />
                   <h3 className="font-semibold text-lg">Request Document Correction</h3>
                 </div>
-                <button onClick={() => setRequestModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setRequestModalOpen(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
@@ -337,8 +384,12 @@ function IssuesPage() {
               <div className="space-y-3">
                 <div className="rounded-xl bg-muted/40 p-3 text-xs space-y-1">
                   <div className="font-semibold text-foreground">Target Slot: Packing List</div>
-                  <div className="text-muted-foreground">Assigned to: Akhil Varma (Warehouse Team)</div>
-                  <div className="text-muted-foreground">Shipment: <span className="font-mono">{activeShipment.id}</span></div>
+                  <div className="text-muted-foreground">
+                    Assigned to: Akhil Varma (Warehouse Team)
+                  </div>
+                  <div className="text-muted-foreground">
+                    Shipment: <span className="font-mono">{activeShipment.id}</span>
+                  </div>
                 </div>
 
                 <div>
@@ -388,7 +439,10 @@ function IssuesPage() {
                   <Upload className="size-5 text-primary" />
                   <h3 className="font-semibold text-lg">Upload Corrected Packing List V2</h3>
                 </div>
-                <button onClick={() => setUploadV2ModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setUploadV2ModalOpen(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
@@ -396,11 +450,16 @@ function IssuesPage() {
               <div className="space-y-3">
                 <div className="rounded-xl bg-success-soft p-3 text-xs text-success space-y-1">
                   <div className="font-semibold">Reconciliation Note:</div>
-                  <div>Warehouse lot recounted. Quantity updated to 1,200 cartons to align with Commercial Invoice.</div>
+                  <div>
+                    Warehouse lot recounted. Quantity updated to 1,200 cartons to align with
+                    Commercial Invoice.
+                  </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-foreground block mb-1">File Name:</label>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    File Name:
+                  </label>
                   <input
                     type="text"
                     value={v2Filename}
@@ -444,22 +503,32 @@ function IssuesPage() {
                   <FileText className="size-5 text-primary" />
                   <h3 className="font-semibold text-lg">Source Evidence Details</h3>
                 </div>
-                <button onClick={() => setInspectModal(null)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setInspectModal(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Document Source</div>
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                    Document Source
+                  </div>
                   <div className="font-semibold text-base">{inspectModal.evidence.source}</div>
                 </div>
 
                 <div className="rounded-2xl border bg-muted/40 p-4 font-mono text-xs text-foreground space-y-1">
-                  <div className="text-[10px] uppercase text-muted-foreground font-sans">Extracted Raw Text Snippet</div>
+                  <div className="text-[10px] uppercase text-muted-foreground font-sans">
+                    Extracted Raw Text Snippet
+                  </div>
                   <div className="font-bold text-critical">"{inspectModal.evidence.value}"</div>
                   <p className="mt-2 text-muted-foreground text-[11px] font-sans">
-                    Verification Rule: <span className="font-medium text-foreground">{inspectModal.evidence.rule}</span>
+                    Verification Rule:{" "}
+                    <span className="font-medium text-foreground">
+                      {inspectModal.evidence.rule}
+                    </span>
                   </p>
                 </div>
 
@@ -471,13 +540,21 @@ function IssuesPage() {
                     <div>
                       <span className="text-muted-foreground">Responsible Unit:</span>{" "}
                       <span className="font-medium text-foreground">
-                        {inspectModal.id === "qty" ? "Warehouse Logistics" : inspectModal.id === "hs" ? "Customs Clearance (CHA)" : "Quality Authority"}
+                        {inspectModal.id === "qty"
+                          ? "Warehouse Logistics"
+                          : inspectModal.id === "hs"
+                            ? "Customs Clearance (CHA)"
+                            : "Quality Authority"}
                       </span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Recorded Sign-off:</span>{" "}
                       <span className="font-medium text-foreground">
-                        {inspectModal.id === "qty" ? "Akhil Varma" : inspectModal.id === "hs" ? "Kavitha Menon" : "Dr. Ananya Pillai"}
+                        {inspectModal.id === "qty"
+                          ? "Akhil Varma"
+                          : inspectModal.id === "hs"
+                            ? "Kavitha Menon"
+                            : "Dr. Ananya Pillai"}
                       </span>
                     </div>
                   </div>
@@ -528,14 +605,18 @@ function IssuesPage() {
                   <AlertTriangle className="size-5 text-warning" />
                   <h3 className="font-semibold text-lg">Ignore Discrepancy with Justification</h3>
                 </div>
-                <button onClick={() => setIgnoreModal(null)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setIgnoreModal(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-5" />
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div className="rounded-xl bg-muted/40 p-3 text-xs">
-                  <span className="font-semibold">{ignoreModal.title}</span> ({ignoreModal.difference})
+                  <span className="font-semibold">{ignoreModal.title}</span> (
+                  {ignoreModal.difference})
                 </div>
 
                 <div>
@@ -562,7 +643,9 @@ function IssuesPage() {
                 <button
                   onClick={async () => {
                     await ignoreDiscrepancy(ignoreModal.id, ignoreReason);
-                    toast.info(`Discrepancy "${ignoreModal.title}" ignored with logged audit justification.`);
+                    toast.info(
+                      `Discrepancy "${ignoreModal.title}" ignored with logged audit justification.`,
+                    );
                     setIgnoreModal(null);
                   }}
                   className="press rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"

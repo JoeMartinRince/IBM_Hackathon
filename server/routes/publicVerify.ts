@@ -15,7 +15,7 @@ publicVerifyRouter.get("/verify-status/:token", (req: Request, res: Response) =>
 
   const shipment = db.shipments.get(tokenRecord.shipment_id);
   const docsCount = Array.from(db.documents.values()).filter(
-    (d) => d.shipment_id === tokenRecord.shipment_id
+    (d) => d.shipment_id === tokenRecord.shipment_id,
   ).length;
 
   res.json({
@@ -32,7 +32,8 @@ publicVerifyRouter.get("/verify-status/:token", (req: Request, res: Response) =>
       expires_at: tokenRecord.expires_at,
       documents_verified_count: docsCount,
       integrity_seal: "VERIFAI-AUTHENTICATED-EXPORT-RECORD",
-      security_notice: "Commercial contract values and financial records are redacted for public verification.",
+      security_notice:
+        "Commercial contract values and financial records are redacted for public verification.",
     },
   });
 });

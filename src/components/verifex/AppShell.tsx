@@ -3,8 +3,25 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  LayoutGrid, Ship, ScanSearch, AlertTriangle, Database, ShieldAlert, FileText, BarChart3,
-  Settings, Bell, Search, Sparkles, Home, User, Brain, ShieldCheck, Zap, ChevronDown, Check,
+  LayoutGrid,
+  Ship,
+  ScanSearch,
+  AlertTriangle,
+  Database,
+  ShieldAlert,
+  FileText,
+  BarChart3,
+  Settings,
+  Bell,
+  Search,
+  Sparkles,
+  Home,
+  User,
+  Brain,
+  ShieldCheck,
+  Zap,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -31,7 +48,11 @@ export function Logo({ compact = false }: { compact?: boolean }) {
       <div className="flex size-9 items-center justify-center rounded-xl bg-ink text-ink-foreground">
         <ShieldCheck className="size-5 text-primary" />
       </div>
-      {!compact && <span className="font-semibold tracking-tight">VERIF<span className="text-primary">AI</span></span>}
+      {!compact && (
+        <span className="font-semibold tracking-tight">
+          VERIF<span className="text-primary">AI</span>
+        </span>
+      )}
     </Link>
   );
 }
@@ -40,15 +61,22 @@ function Sidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { t, currentUser } = useDemo();
 
-  const filteredNavItems = currentUser.role === "ADMIN"
-    ? navItems
-    : navItems.filter((n) => ["/dashboard", "/shipments", "/verify", "/assistant"].includes(n.to));
+  const filteredNavItems =
+    currentUser.role === "ADMIN"
+      ? navItems
+      : navItems.filter((n) =>
+          ["/dashboard", "/shipments", "/verify", "/assistant"].includes(n.to),
+        );
 
   return (
     <aside className="sticky top-0 hidden h-screen shrink-0 flex-col border-r bg-sidebar p-3 md:flex md:w-[76px] lg:w-64 lg:p-4">
       <div className="flex h-12 items-center px-1.5 lg:px-2">
-        <span className="lg:hidden"><Logo compact /></span>
-        <span className="hidden lg:block"><Logo /></span>
+        <span className="lg:hidden">
+          <Logo compact />
+        </span>
+        <span className="hidden lg:block">
+          <Logo />
+        </span>
       </div>
       <nav className="mt-6 flex flex-1 flex-col gap-1 overflow-y-auto">
         {filteredNavItems.map((n) => {
@@ -61,7 +89,9 @@ function Sidebar() {
               title={translatedLabel}
               className={cn(
                 "relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors justify-center lg:justify-start",
-                active ? "text-ink-foreground" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+                active
+                  ? "text-ink-foreground"
+                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
               )}
             >
               {active && (
@@ -83,9 +113,13 @@ function Sidebar() {
           title="Settings"
           className="flex items-center justify-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-muted-foreground hover:bg-sidebar-accent lg:justify-start"
         >
-          <Settings className="size-[18px]" /><span className="hidden lg:inline">{t("settings")}</span>
+          <Settings className="size-[18px]" />
+          <span className="hidden lg:inline">{t("settings")}</span>
         </Link>
-        <Link to="/settings" className="flex items-center justify-center gap-3 rounded-2xl p-2 hover:bg-sidebar-accent lg:justify-start">
+        <Link
+          to="/settings"
+          className="flex items-center justify-center gap-3 rounded-2xl p-2 hover:bg-sidebar-accent lg:justify-start"
+        >
           <div className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shrink-0">
             {currentUser.avatar}
           </div>
@@ -100,7 +134,8 @@ function Sidebar() {
 }
 
 function TopBar() {
-  const { setNotifOpen, lang, setLang, mode, setMode, currentUser, setCurrentUser, allUsers } = useDemo();
+  const { setNotifOpen, lang, setLang, mode, setMode, currentUser, setCurrentUser, allUsers } =
+    useDemo();
   const [query, setQuery] = useState("");
   const [personaOpen, setPersonaOpen] = useState(false);
   const navigate = useNavigate();
@@ -114,7 +149,9 @@ function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 flex items-center gap-3 bg-background/80 px-4 py-3 backdrop-blur-xl md:px-8">
-      <div className="md:hidden"><Logo compact /></div>
+      <div className="md:hidden">
+        <Logo compact />
+      </div>
       <form onSubmit={handleSearch} className="relative hidden flex-1 sm:block md:max-w-md">
         <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
@@ -137,10 +174,14 @@ function TopBar() {
               {currentUser.avatar}
             </div>
             <span className="hidden sm:inline font-medium text-foreground">{currentUser.name}</span>
-            <span className={cn(
-              "rounded-full px-2 py-0.5 text-[10px] font-bold",
-              currentUser.role === "ADMIN" ? "bg-primary/10 text-primary border border-primary/20" : "bg-muted text-muted-foreground border"
-            )}>
+            <span
+              className={cn(
+                "rounded-full px-2 py-0.5 text-[10px] font-bold",
+                currentUser.role === "ADMIN"
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "bg-muted text-muted-foreground border",
+              )}
+            >
               {currentUser.role}
             </span>
             <ChevronDown className="size-3 text-muted-foreground" />
@@ -165,7 +206,7 @@ function TopBar() {
                       }}
                       className={cn(
                         "flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-xs transition-colors hover:bg-muted/50",
-                        currentUser.id === u.id ? "bg-primary/10 font-semibold" : ""
+                        currentUser.id === u.id ? "bg-primary/10 font-semibold" : "",
                       )}
                     >
                       <div className="flex size-7 items-center justify-center rounded-full bg-ink text-[11px] font-bold text-ink-foreground shrink-0">
@@ -174,9 +215,13 @@ function TopBar() {
                       <div className="flex-1 min-w-0">
                         <div className="truncate text-foreground font-medium text-xs flex items-center gap-1.5">
                           {u.name}
-                          {u.role === "ADMIN" && <span className="text-[10px] text-primary font-bold">Admin</span>}
+                          {u.role === "ADMIN" && (
+                            <span className="text-[10px] text-primary font-bold">Admin</span>
+                          )}
                         </div>
-                        <div className="truncate text-[10px] text-muted-foreground">{u.roleLabel}</div>
+                        <div className="truncate text-[10px] text-muted-foreground">
+                          {u.roleLabel}
+                        </div>
                       </div>
                       {currentUser.id === u.id && (
                         <Check className="size-3.5 text-primary shrink-0" />
@@ -196,7 +241,7 @@ function TopBar() {
             "press hidden rounded-full px-3 py-1.5 text-xs font-bold transition-all sm:inline-flex items-center gap-1.5",
             mode === "DEMO"
               ? "bg-primary-soft text-primary hover:bg-primary hover:text-primary-foreground"
-              : "bg-ink text-ink-foreground hover:brightness-125"
+              : "bg-ink text-ink-foreground hover:brightness-125",
           )}
         >
           <Zap className="size-3" />
@@ -207,13 +252,20 @@ function TopBar() {
             <button
               key={l}
               onClick={() => setLang(l)}
-              className={cn("rounded-full px-2.5 py-1 font-medium transition-colors", lang === l ? "bg-ink text-ink-foreground" : "text-muted-foreground")}
+              className={cn(
+                "rounded-full px-2.5 py-1 font-medium transition-colors",
+                lang === l ? "bg-ink text-ink-foreground" : "text-muted-foreground",
+              )}
             >
               {l}
             </button>
           ))}
         </div>
-        <button onClick={() => setNotifOpen(true)} aria-label="Notifications" className="press relative flex size-11 items-center justify-center rounded-full border bg-card">
+        <button
+          onClick={() => setNotifOpen(true)}
+          aria-label="Notifications"
+          className="press relative flex size-11 items-center justify-center rounded-full border bg-card"
+        >
           <Bell className="size-[18px]" />
           <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-primary ring-2 ring-card" />
         </button>
@@ -235,14 +287,28 @@ function MobileNav() {
     <nav className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-around rounded-full bg-ink px-2 py-2 text-ink-foreground shadow-[var(--shadow-float)] md:hidden">
       {items.map((it) => {
         const active = path.startsWith(it.to);
-        if ("center" in it) return (
-          <Link key={it.to} to={it.to} aria-label="Verify" className="press -mt-7 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[var(--shadow-glow)] ring-4 ring-background">
-            <it.icon className="size-6" />
-          </Link>
-        );
+        if ("center" in it)
+          return (
+            <Link
+              key={it.to}
+              to={it.to}
+              aria-label="Verify"
+              className="press -mt-7 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[var(--shadow-glow)] ring-4 ring-background"
+            >
+              <it.icon className="size-6" />
+            </Link>
+          );
         return (
-          <Link key={it.to} to={it.to} className={cn("flex flex-col items-center gap-0.5 px-2 py-1 text-[10px]", active ? "text-ink-foreground" : "text-ink-muted")}>
-            <it.icon className={cn("size-5", active && "text-primary")} />{it.label}
+          <Link
+            key={it.to}
+            to={it.to}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-2 py-1 text-[10px]",
+              active ? "text-ink-foreground" : "text-ink-muted",
+            )}
+          >
+            <it.icon className={cn("size-5", active && "text-primary")} />
+            {it.label}
           </Link>
         );
       })}
@@ -256,20 +322,33 @@ function NotificationDrawer() {
   return (
     <Sheet open={notifOpen} onOpenChange={setNotifOpen}>
       <SheetContent className="w-full border-l-0 bg-background p-0 sm:max-w-sm">
-        <SheetHeader className="p-6 pb-2"><SheetTitle className="text-2xl">Notifications</SheetTitle></SheetHeader>
+        <SheetHeader className="p-6 pb-2">
+          <SheetTitle className="text-2xl">Notifications</SheetTitle>
+        </SheetHeader>
         <div className="flex flex-col gap-3 p-4">
           <div className="surface p-4 flex gap-3 border-l-4 border-l-primary">
             <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-primary" />
             <div className="flex-1">
               <div className="text-sm font-semibold">{openIssues} open issues detected</div>
-              <div className="text-xs text-muted-foreground">{activeShipment.id} · {activeShipment.commodity}</div>
+              <div className="text-xs text-muted-foreground">
+                {activeShipment.id} · {activeShipment.commodity}
+              </div>
             </div>
             <span className="text-xs text-muted-foreground">Now</span>
           </div>
           {notifications.map((n, i) => (
-            <motion.div key={i} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="surface flex gap-3 p-4">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.06 }}
+              className="surface flex gap-3 p-4"
+            >
               <span className={cn("mt-1.5 size-2.5 shrink-0 rounded-full", toneDot[n.tone])} />
-              <div className="flex-1"><div className="text-sm font-medium">{n.title}</div><div className="text-xs text-muted-foreground">{n.sub}</div></div>
+              <div className="flex-1">
+                <div className="text-sm font-medium">{n.title}</div>
+                <div className="text-xs text-muted-foreground">{n.sub}</div>
+              </div>
               <span className="text-xs text-muted-foreground">{n.time}</span>
             </motion.div>
           ))}

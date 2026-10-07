@@ -26,7 +26,7 @@ shipmentsRouter.get("/", (req: Request, res: Response) => {
         s.exporter.toLowerCase().includes(q) ||
         s.consignee.toLowerCase().includes(q) ||
         s.origin_port.toLowerCase().includes(q) ||
-        s.destination_port.toLowerCase().includes(q)
+        s.destination_port.toLowerCase().includes(q),
     );
   }
 
@@ -46,7 +46,9 @@ shipmentsRouter.get("/:id", (req: Request, res: Response) => {
 shipmentsRouter.post("/", (req: Request, res: Response) => {
   const body = req.body;
   if (!body.commodity || !body.exporter || !body.consignee) {
-    return res.status(400).json({ success: false, error: "Missing required fields (commodity, exporter, consignee)" });
+    return res
+      .status(400)
+      .json({ success: false, error: "Missing required fields (commodity, exporter, consignee)" });
   }
 
   const id = `EXP-KL-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -137,7 +139,7 @@ shipmentsRouter.post("/:id/slots/:slotId/upload", (req: Request, res: Response) 
     file_size || "240 KB",
     uploader || "Document User",
     role || "User",
-    notes
+    notes,
   );
 
   if (!updatedSlot) {
@@ -155,8 +157,21 @@ shipmentsRouter.post("/:id/slots/:slotId/upload", (req: Request, res: Response) 
   });
 });
 
+function checkAdminAuthorization(req: Request): boolean {
+  const role =
+    (req.headers["x-user-role"] as string) || req.body.role || req.body.user_role || "ADMIN";
+  const normalized = role.toLowerCase();
+  return normalized === "admin" || normalized === "government/admin";
+}
+
 // POST /api/shipments/:id/slots/:slotId/request-correction - Admin requests correction
 shipmentsRouter.post("/:id/slots/:slotId/request-correction", (req: Request, res: Response) => {
+  if (!checkAdminAuthorization(req)) {
+    return res.status(403).json({
+      success: false,
+      error: "Access Denied: Only Admin can request document corrections.",
+    });
+  }
   const { reason, requested_by } = req.body;
   if (!reason) {
     return res.status(400).json({ success: false, error: "Reason for correction is required" });
@@ -166,7 +181,7 @@ shipmentsRouter.post("/:id/slots/:slotId/request-correction", (req: Request, res
     req.params.id,
     req.params.slotId,
     reason,
-    requested_by || "Admin"
+    requested_by || "Admin",
   );
 
   if (!updatedSlot) {
@@ -185,7 +200,7 @@ shipmentsRouter.post("/:id/slots/:slotId/submit-correction", (req: Request, res:
     filename || "corrected_document.pdf",
     file_size || "220 KB",
     uploader || "Warehouse Team",
-    role || "WAREHOUSE"
+    role || "WAREHOUSE",
   );
 
   if (!updatedSlot) {
@@ -197,11 +212,17 @@ shipmentsRouter.post("/:id/slots/:slotId/submit-correction", (req: Request, res:
 
 // POST /api/shipments/:id/slots/:slotId/approve-correction - Admin approves correction
 shipmentsRouter.post("/:id/slots/:slotId/approve-correction", (req: Request, res: Response) => {
+  if (!checkAdminAuthorization(req)) {
+    return res.status(403).json({
+      success: false,
+      error: "Access Denied: Only Admin can approve document corrections.",
+    });
+  }
   const { approved_by } = req.body;
   const updatedSlot = db.approveCorrection(
     req.params.id,
     req.params.slotId,
-    approved_by || "Alwin Joseph"
+    approved_by || "Alwin Joseph",
   );
 
   if (!updatedSlot) {
@@ -228,6 +249,12 @@ shipmentsRouter.post("/:id/slots/:slotId/approve-correction", (req: Request, res
 
 // POST /api/shipments/:id/start-analysis - Admin triggers AI analysis (Gated by 5/5 check)
 shipmentsRouter.post("/:id/start-analysis", (req: Request, res: Response) => {
+  if (!checkAdminAuthorization(req)) {
+    return res.status(403).json({
+      success: false,
+      error: "Access Denied: Only Admin can start AI verification analysis.",
+    });
+  }
   const check = db.canStartAnalysis(req.params.id);
   if (!check.canStart) {
     return res.status(400).json({
@@ -268,4 +295,3 @@ shipmentsRouter.get("/:id/audit-trail", (req: Request, res: Response) => {
   const logs = db.auditLogs.filter((l) => l.shipment_id === req.params.id);
   res.json({ success: true, shipment_id: req.params.id, logs });
 });
-

@@ -13,7 +13,11 @@ import { seo } from "@/lib/seo";
 import { MockQR } from "@/components/verifex/QRCode";
 
 export const Route = createFileRoute("/verify-status/$token")({
-  head: () => seo("Export Verification Authenticity", "Public verification portal for verified export consignments."),
+  head: () =>
+    seo(
+      "Export Verification Authenticity",
+      "Public verification portal for verified export consignments.",
+    ),
   component: PublicVerifyStatusPage,
 });
 
@@ -59,32 +63,48 @@ function PublicVerifyStatusPage() {
           {/* Verification Details */}
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="rounded-2xl border bg-muted/20 p-3.5">
-              <div className="text-muted-foreground uppercase text-[10px] font-semibold">Shipment Ref</div>
-              <div className="font-mono font-bold text-sm text-foreground mt-0.5">EXP-KL-2026-1042</div>
+              <div className="text-muted-foreground uppercase text-[10px] font-semibold">
+                Shipment Ref
+              </div>
+              <div className="font-mono font-bold text-sm text-foreground mt-0.5">
+                EXP-KL-2026-1042
+              </div>
             </div>
 
             <div className="rounded-2xl border bg-muted/20 p-3.5">
-              <div className="text-muted-foreground uppercase text-[10px] font-semibold">Readiness Score</div>
+              <div className="text-muted-foreground uppercase text-[10px] font-semibold">
+                Readiness Score
+              </div>
               <div className="font-mono font-bold text-sm text-success mt-0.5">100% READY</div>
             </div>
 
             <div className="rounded-2xl border bg-muted/20 p-3.5">
-              <div className="text-muted-foreground uppercase text-[10px] font-semibold">Commodity</div>
+              <div className="text-muted-foreground uppercase text-[10px] font-semibold">
+                Commodity
+              </div>
               <div className="font-semibold text-foreground mt-0.5">Frozen Shrimp 21/25</div>
             </div>
 
             <div className="rounded-2xl border bg-muted/20 p-3.5">
-              <div className="text-muted-foreground uppercase text-[10px] font-semibold">Origin Port</div>
+              <div className="text-muted-foreground uppercase text-[10px] font-semibold">
+                Origin Port
+              </div>
               <div className="font-semibold text-foreground mt-0.5">Cochin (INCOK)</div>
             </div>
 
             <div className="rounded-2xl border bg-muted/20 p-3.5 col-span-2">
-              <div className="text-muted-foreground uppercase text-[10px] font-semibold">Registered Exporter</div>
-              <div className="font-semibold text-foreground mt-0.5">Malabar Ocean Foods Pvt Ltd, Cochin</div>
+              <div className="text-muted-foreground uppercase text-[10px] font-semibold">
+                Registered Exporter
+              </div>
+              <div className="font-semibold text-foreground mt-0.5">
+                Malabar Ocean Foods Pvt Ltd, Cochin
+              </div>
             </div>
 
             <div className="rounded-2xl border bg-muted/20 p-3.5 col-span-2">
-              <div className="text-muted-foreground uppercase text-[10px] font-semibold">Destination Port</div>
+              <div className="text-muted-foreground uppercase text-[10px] font-semibold">
+                Destination Port
+              </div>
               <div className="font-semibold text-foreground mt-0.5">Jebel Ali Port, Dubai, UAE</div>
             </div>
           </div>
@@ -93,7 +113,9 @@ function PublicVerifyStatusPage() {
           <div className="rounded-2xl bg-muted/40 p-4 text-xs text-muted-foreground flex items-start gap-2.5">
             <Lock className="size-4 shrink-0 mt-0.5 text-foreground" />
             <div>
-              <strong>Privacy Protection Notice:</strong> In accordance with maritime trade security regulations, commercial unit prices, total contract value, and banking parameters are redacted from public token verification.
+              <strong>Privacy Protection Notice:</strong> In accordance with maritime trade security
+              regulations, commercial unit prices, total contract value, and banking parameters are
+              redacted from public token verification.
             </div>
           </div>
 

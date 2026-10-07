@@ -50,16 +50,13 @@ describe("VERIFAI Verification Engine", () => {
     it("recognizes commercial equivalences across document descriptions", () => {
       const match = areSemanticallyEquivalent(
         "Frozen Shrimp 21/25",
-        "Frozen Shrimps (21-25 count)"
+        "Frozen Shrimps (21-25 count)",
       );
       expect(match).toBe(true);
     });
 
     it("flags distinct trade commodities as mismatched", () => {
-      const match = areSemanticallyEquivalent(
-        "Frozen Vannamei Shrimp",
-        "Natural Rubber Grade 20"
-      );
+      const match = areSemanticallyEquivalent("Frozen Vannamei Shrimp", "Natural Rubber Grade 20");
       expect(match).toBe(false);
     });
   });
@@ -71,7 +68,7 @@ describe("VERIFAI Verification Engine", () => {
         "2026-10-06",
         "2026-10-10",
         "2026-10-16",
-        "2027-01-18"
+        "2027-01-18",
       );
       expect(check.valid).toBe(true);
       expect(check.issues.length).toBe(0);
@@ -83,7 +80,7 @@ describe("VERIFAI Verification Engine", () => {
         "2026-10-06",
         "2026-10-10",
         "2026-10-16",
-        "2026-10-18" // Only 2 days buffer
+        "2026-10-18", // Only 2 days buffer
       );
       expect(check.valid).toBe(false);
       expect(check.issues.some((i) => i.includes("margin"))).toBe(true);

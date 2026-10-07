@@ -1,11 +1,5 @@
 export type ShipmentStatus =
-  | "DRAFT"
-  | "PROCESSING"
-  | "UNDER_REVIEW"
-  | "ACTION_REQUIRED"
-  | "READY"
-  | "VERIFIED"
-  | "ARCHIVED";
+  "DRAFT" | "PROCESSING" | "UNDER_REVIEW" | "ACTION_REQUIRED" | "READY" | "VERIFIED" | "ARCHIVED";
 
 export type DiscrepancySeverity = "CRITICAL" | "MAJOR" | "MINOR" | "INFO";
 
@@ -20,35 +14,16 @@ export type DocumentType =
   | "Other";
 
 export type DocumentStatus =
-  | "UPLOADING"
-  | "UPLOADED"
-  | "CLASSIFYING"
-  | "EXTRACTING"
-  | "VERIFIED"
-  | "FAILED";
+  "UPLOADING" | "UPLOADED" | "CLASSIFYING" | "EXTRACTING" | "VERIFIED" | "FAILED";
 
 export type VerificationItemStatus = "MATCH" | "WARNING" | "MISMATCH" | "MISSING" | "UNVERIFIED";
 
 export type UserRole =
-  | "Exporter"
-  | "Customs Broker"
-  | "Freight Forwarder"
-  | "Documentation Team"
-  | "Government/Admin";
+  "Exporter" | "Customs Broker" | "Freight Forwarder" | "Documentation Team" | "Government/Admin";
 
-export type AppRole =
-  | "ADMIN"
-  | "FINANCE"
-  | "WAREHOUSE"
-  | "CUSTOMS_BROKER"
-  | "BUYER"
-  | "QUALITY";
+export type AppRole = "ADMIN" | "FINANCE" | "WAREHOUSE" | "CUSTOMS_BROKER" | "BUYER" | "QUALITY";
 
-export type SlotStatus =
-  | "WAITING"
-  | "READY"
-  | "CORRECTION_REQUESTED"
-  | "CORRECTION_SUBMITTED";
+export type SlotStatus = "WAITING" | "READY" | "CORRECTION_REQUESTED" | "CORRECTION_SUBMITTED";
 
 export interface DocumentVersionRecord {
   version: number;

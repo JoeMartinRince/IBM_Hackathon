@@ -14,7 +14,8 @@ import { PageHeader, Reveal } from "@/components/verifex/primitives";
 import { riskQuestions } from "@/lib/data";
 
 export const Route = createFileRoute("/_app/customs")({
-  head: () => seo("Customs Risk", "Simulated customs query analysis and pre-submission risk assessment."),
+  head: () =>
+    seo("Customs Risk", "Simulated customs query analysis and pre-submission risk assessment."),
   component: CustomsRiskPage,
 });
 
@@ -41,10 +42,15 @@ function CustomsRiskPage() {
       <Reveal className="surface-ink p-6 md:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">Customs Port Audit Simulation</div>
+            <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted">
+              Customs Port Audit Simulation
+            </div>
             <div className="font-mono text-2xl font-bold">{activeShipment.id}</div>
             <div className="text-sm text-ink-muted">
-              Destination Authority: <span className="text-ink-foreground font-semibold">Dubai Customs / UAE Port Control</span>
+              Destination Authority:{" "}
+              <span className="text-ink-foreground font-semibold">
+                Dubai Customs / UAE Port Control
+              </span>
             </div>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center sm:text-right">
@@ -70,14 +76,16 @@ function CustomsRiskPage() {
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="space-y-3 flex-1">
                     <div className="flex items-center gap-2.5">
-                      <span className="font-mono text-xs font-bold text-muted-foreground">QUERY #{q.id}</span>
+                      <span className="font-mono text-xs font-bold text-muted-foreground">
+                        QUERY #{q.id}
+                      </span>
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase ${
                           resolved
                             ? "bg-success-soft text-success"
                             : q.level === "High"
-                            ? "bg-critical-soft text-critical"
-                            : "bg-warning-soft text-warning"
+                              ? "bg-critical-soft text-critical"
+                              : "bg-warning-soft text-warning"
                         }`}
                       >
                         {resolved ? "Risk Mitigated" : `${q.level} Probability`}
@@ -90,14 +98,19 @@ function CustomsRiskPage() {
                     <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
                       <span className="text-muted-foreground font-medium">Scrutinized Docs:</span>
                       {q.docs.map((doc) => (
-                        <span key={doc} className="rounded-full bg-muted px-2.5 py-0.5 font-mono text-xs">
+                        <span
+                          key={doc}
+                          className="rounded-full bg-muted px-2.5 py-0.5 font-mono text-xs"
+                        >
                           {doc}
                         </span>
                       ))}
                     </div>
 
                     <div className="rounded-xl border bg-muted/30 p-3 text-xs space-y-1">
-                      <div className="font-semibold text-foreground">Recommended Exporter Response:</div>
+                      <div className="font-semibold text-foreground">
+                        Recommended Exporter Response:
+                      </div>
                       <div className="text-muted-foreground">{q.action}</div>
                     </div>
                   </div>

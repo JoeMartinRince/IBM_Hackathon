@@ -12,20 +12,17 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import {
-  BarChart3,
-  Anchor,
-  Clock,
-  TrendingUp,
-  FileCheck,
-  ShieldAlert,
-} from "lucide-react";
+import { BarChart3, Anchor, Clock, TrendingUp, FileCheck, ShieldAlert } from "lucide-react";
 import { seo } from "@/lib/seo";
 import { PageHeader, Reveal, StatTile } from "@/components/verifex/primitives";
 import { insightsData } from "@/lib/data";
 
 export const Route = createFileRoute("/_app/insights")({
-  head: () => seo("Kerala Export Intelligence", "Aggregated compliance trends for Cochin and Vizhinjam ports."),
+  head: () =>
+    seo(
+      "Kerala Export Intelligence",
+      "Aggregated compliance trends for Cochin and Vizhinjam ports.",
+    ),
   component: InsightsPage,
 });
 
@@ -61,14 +58,20 @@ function InsightsPage() {
           <div className="flex items-center justify-between border-b pb-3">
             <div>
               <h3 className="font-semibold text-lg">Top Documentation Error Types</h3>
-              <p className="text-xs text-muted-foreground">Historical distribution across Kerala export filings</p>
+              <p className="text-xs text-muted-foreground">
+                Historical distribution across Kerala export filings
+              </p>
             </div>
             <ShieldAlert className="size-5 text-primary" />
           </div>
 
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={insightsData.issues} layout="vertical" margin={{ left: 20, right: 20 }}>
+              <BarChart
+                data={insightsData.issues}
+                layout="vertical"
+                margin={{ left: 20, right: 20 }}
+              >
                 <XAxis type="number" hide />
                 <YAxis dataKey="name" type="category" width={110} tick={{ fontSize: 11 }} />
                 <Tooltip />
@@ -83,7 +86,9 @@ function InsightsPage() {
           <div className="flex items-center justify-between border-b pb-3">
             <div>
               <h3 className="font-semibold text-lg">Commodity Volume Distribution</h3>
-              <p className="text-xs text-muted-foreground">Seafood, Spices, Rubber, and Agro exports</p>
+              <p className="text-xs text-muted-foreground">
+                Seafood, Spices, Rubber, and Agro exports
+              </p>
             </div>
             <BarChart3 className="size-5 text-primary" />
           </div>
@@ -115,14 +120,19 @@ function InsightsPage() {
           <div className="flex items-center justify-between border-b pb-3">
             <div>
               <h3 className="font-semibold text-lg">First-Pass Export Readiness Trend (2026)</h3>
-              <p className="text-xs text-muted-foreground">Percentage of shipments cleared without port customs queries</p>
+              <p className="text-xs text-muted-foreground">
+                Percentage of shipments cleared without port customs queries
+              </p>
             </div>
             <TrendingUp className="size-5 text-success" />
           </div>
 
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={insightsData.readiness} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <LineChart
+                data={insightsData.readiness}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+              >
                 <XAxis dataKey="m" tick={{ fontSize: 12 }} />
                 <YAxis domain={[50, 100]} tick={{ fontSize: 12 }} />
                 <Tooltip />

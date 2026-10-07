@@ -11,7 +11,7 @@ export function updateGoldenRecordField(
   shipmentId: string,
   fieldId: string,
   authoritativeValue: string,
-  updatedBy: string
+  updatedBy: string,
 ): GoldenRecordField | null {
   const recordList = db.goldenRecords.get(shipmentId);
   if (!recordList) return null;

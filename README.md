@@ -3,6 +3,7 @@
 <div align="center">
 
 ### AI-Powered Export Document Verification, Discrepancy Prevention & Customs Readiness Platform
+
 **IBM x Government of Kerala — KeralAI Hackathon 2026**  
 **Challenge 3**: Export Document Verification System
 
@@ -16,7 +17,7 @@
 [![TanStack Start](https://img.shields.io/badge/TanStack-Start%20%26%20Router-FF4154?style=flat-square&logo=tanstack&logoColor=white)](https://tanstack.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS%20v4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Express.js](https://img.shields.io/badge/Express-Backend%20API-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-13%2F13%20Passing%20(100%25)-4E9F3D?style=flat-square&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Vitest](<https://img.shields.io/badge/Vitest-13%2F13%20Passing%20(100%25)-4E9F3D?style=flat-square&logo=vitest&logoColor=white>)](https://vitest.dev/)
 [![Multilingual](https://img.shields.io/badge/Languages-EN%20%7C%20%E0%B4%AE%E0%B4%B2%E0%B4%AF%E0%B4%BE%E0%B4%B3%E0%B4%82%20%7C%20%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80-coral?style=flat-square)](#-multilingual-support)
 
 </div>
@@ -49,16 +50,18 @@
 
 Kerala's maritime trade corridors—anchored by the historical **Cochin Sea Port (INCOK)** and the newly commissioned deepwater **Vizhinjam International Transshipment Terminal (INVIZ)**—form India's primary gateway for high-value agricultural, maritime, and plantation exports:
 
-- 🦐 **Marine Products & Frozen Seafood** (*MPEDA regulated*, Cochin Port)
-- 🌿 **Alleppey Green Cardamom & Malabar Pepper** (*Spices Board*, Wayanad / Idukki)
-- 🪵 **Natural Rubber & Centrifuged Latex** (*Rubber Board*, Kottayam)
-- 🥥 **Coir Pith & Geotextiles** (*Coir Board*, Alappuzha)
-- 🍃 **Orthodox & CTC Tea** (*Tea Board*, Munnar / High Ranges)
+- 🦐 **Marine Products & Frozen Seafood** (_MPEDA regulated_, Cochin Port)
+- 🌿 **Alleppey Green Cardamom & Malabar Pepper** (_Spices Board_, Wayanad / Idukki)
+- 🪵 **Natural Rubber & Centrifuged Latex** (_Rubber Board_, Kottayam)
+- 🥥 **Coir Pith & Geotextiles** (_Coir Board_, Alappuzha)
+- 🍃 **Orthodox & CTC Tea** (_Tea Board_, Munnar / High Ranges)
 
 ### The Problem: Multi-Document Asynchrony & Port Rejections
-Export documentation involves at least **5 to 7 independent trade documents** created by disparate parties (exporters, clearing agents, freight forwarders, inspection agencies, and banks). 
+
+Export documentation involves at least **5 to 7 independent trade documents** created by disparate parties (exporters, clearing agents, freight forwarders, inspection agencies, and banks).
 
 Even minute discrepancies result in catastrophic supply chain penalties:
+
 - **Demurrage & Container Detention**: ₹15,000 to ₹50,000 per refrigerated container per day at port gates.
 - **ICEGATE Customs Holds**: 4 to 8 days delay while statutory queries are issued and answered.
 - **Foreign Port Rejections**: Total cargo rejection at destination ports (Jebel Ali, Rotterdam, Newark) due to mismatching HS codes or expired health certificates.
@@ -110,35 +113,44 @@ VERIFAI PLATFORM
 ## 🚀 Key Innovations & Platform Capabilities
 
 ### 1. Deterministic Multi-Document Verification
+
 - Concurrently cross-verifies **Commercial Invoice (CI)**, **Packing List (PL)**, **Shipping Bill (SB)**, **Bill of Lading (BL)**, **Purchase Order (PO)**, and **Phytosanitary/Health Certificates**.
 - Enforces strict mathematical invariants rather than relying on error-prone heuristic guesses.
 
 ### 2. ISO 6346 Container Number Checksum Engine
+
 - Evaluates the mathematical validity of container serials (e.g. `CSQU3054383`, `MSKU4829150`) using the power-of-two modulus algorithm before the truck arrives at the terminal gate.
 
 ### 3. Consensus Golden Record Engine
+
 - Ingests multiple contradictory documents and deterministically builds an authoritative single source of truth using a weighted hierarchical priority model ($SB > CI > PL > BL > PO$).
 - Highlights contested fields with side-by-side evidence cards and allows 1-click human reconciliation with audit trail logging.
 
 ### 4. Customs Query & Risk Simulator
+
 - Predicts statutory customs queries before ICEGATE submission.
 - Formulates pre-drafted legal rebuttals referencing Indian Foreign Trade Policy (FTP) and destination import standards (US FDA, EU TRACES, UAE MoIAT).
 
 ### 5. Verified QR Code & Public Audit Portal
+
 - Shipments reaching 100% readiness generate a tamper-evident cryptographic verification token.
 - Port gate officials and ocean carriers scan the physical QR code to open the real-time public verification portal (`/verify-status/:token`).
 
 ### 6. Grounded Natural Language Assistant
+
 - Context-aware trade compliance assistant grounded strictly in the active shipment's parsed paperwork.
 - Cites specific document names, invoice numbers, and page references in every answer.
 
 ### 7. Kerala Maritime Trade Intelligence
+
 - Dedicated benchmarking dashboard comparing documentation compliance, gate clearance times, and common error categories across Cochin Sea Port (INCOK) and Vizhinjam Terminal (INVIZ).
 
 ### 8. Native Multilingual Support
+
 - Instant one-click interface switching between **English**, **Malayalam (മലയാളം)**, and **Hindi (हिन्दी)**.
 
 ### 9. Real-Time Optical Camera Scanner (ക്യാമറ സ്കാനർ)
+
 - Live camera stream integration for on-site warehouse and port gate paper document inspection.
 - Holographic viewfinder overlay with animated laser scanning beam, document corner framing brackets, torch toggle, and synthetic camera shutter feedback.
 
@@ -217,27 +229,32 @@ VERIFAI PLATFORM
 The verification engine (`server/engine/verification.ts`) evaluates every shipment against 5 fundamental statutory invariants:
 
 ### 1. Unit Normalization & Tolerance Checks
+
 Converts non-standard measures to base metric units:
 $$\text{MT} \times 1,000 \rightarrow \text{KG}, \quad \text{LBS} \times 0.45359237 \rightarrow \text{KG}$$
 Any variation between Commercial Invoice and Packing List exceeding $0.05\%$ is flagged as a `MAJOR` discrepancy.
 
 ### 2. ISO 6346 Container Number Modulus Algorithm
+
 Containers are verified according to standard ISO 6346 check digit formulation:
 $$\text{Check Digit} = \left( \sum_{i=0}^{9} c_i \cdot 2^i \right) \pmod{11} \pmod{10}$$
 Where each letter is assigned an integer excluding multiples of 11:
 `A=10, B=12... K=21... U=32, Z=38`. Invalid codes are immediately flagged before terminal gate entry.
 
 ### 3. Physical Weight Invariant
+
 Enforces the physical plausibility rule:
 $$\text{Gross Weight} \ge \text{Net Weight} + \text{Tare Weight}$$
 Any document where Gross Weight is recorded as less than Net Weight is flagged as a `CRITICAL` compliance violation.
 
 ### 4. Trade Chronology Sequence
+
 Verifies logical commercial timeline ordering:
 $$\text{Purchase Order Date} \le \text{Commercial Invoice Date} \le \text{Shipping Bill Date} \le \text{Bill of Lading Date}$$
 Backdated invoices or expired regulatory inspection certificates trigger immediate warning notices.
 
 ### 5. Tariff Line & HS Code Alignment
+
 Validates 6-to-8 digit Harmonized System classification consistency across all trade instruments, preventing custom misdeclaration penalties under Section 111(m) of the Indian Customs Act.
 
 ---
@@ -246,15 +263,16 @@ Validates 6-to-8 digit Harmonized System classification consistency across all t
 
 When different trade documents contain conflicting data, VERIFAI builds an authoritative **Golden Record** using a weighted authority hierarchy:
 
-| Document Type | Authority Weight | Statutory Rationale |
-| :--- | :---: | :--- |
-| **Shipping Bill (SB)** | `0.95` | Legal export declaration filed with Indian Customs / ICEGATE |
-| **Commercial Invoice (CI)** | `0.90` | Primary financial and contractual billing instrument |
-| **Packing List (PL)** | `0.85` | Definitive physical authority for package counts, tare & weights |
-| **Bill of Lading (BL)** | `0.85` | Ocean carrier document of title and custody manifest |
-| **Purchase Order (PO)** | `0.70` | Original buyer commercial agreement |
+| Document Type               | Authority Weight | Statutory Rationale                                              |
+| :-------------------------- | :--------------: | :--------------------------------------------------------------- |
+| **Shipping Bill (SB)**      |      `0.95`      | Legal export declaration filed with Indian Customs / ICEGATE     |
+| **Commercial Invoice (CI)** |      `0.90`      | Primary financial and contractual billing instrument             |
+| **Packing List (PL)**       |      `0.85`      | Definitive physical authority for package counts, tare & weights |
+| **Bill of Lading (BL)**     |      `0.85`      | Ocean carrier document of title and custody manifest             |
+| **Purchase Order (PO)**     |      `0.70`      | Original buyer commercial agreement                              |
 
 If conflicting values exist across documents:
+
 1. The field is tagged `has_conflict = true`.
 2. The UI highlights both conflicting values with document badges.
 3. The officer can apply a **1-Click Fix** or enter a manual override.
@@ -277,7 +295,7 @@ Predicted Customs Query:
 VERIFAI PRE-DRAFTED REBUTTAL:
   "To: The Assistant Commissioner of Customs (Export), Cochin Customs House (INCOK)
    Subject: Clarification on HS Code Classification for Shipment EXP-KL-2026-1042
-   
+
    Respected Sir/Madam,
    With reference to the query raised regarding tariff line classification, we submit
    that the correct Harmonized Tariff code for 'Frozen Shrimp 21/25 Raw Headless' is
@@ -291,6 +309,7 @@ VERIFAI PRE-DRAFTED REBUTTAL:
 ## 📱 Verified QR & Public Audit Portal
 
 When a shipment reaches **100% Readiness**:
+
 1. A unique verification token is minted (e.g. `vfx_token_kl2026_1042_verified`).
 2. A tamper-evident QR code is embedded in the official **Verification Certificate** (`/report`).
 3. Port gate personnel, freight forwarders, and overseas customs officers can scan the QR code to open the public verification portal (`/verify-status/:token`) showing real-time validation status without requiring login credentials.
@@ -300,8 +319,9 @@ When a shipment reaches **100% Readiness**:
 ## 🌐 Multilingual Support
 
 Designed to serve local Kerala clearing agents, logistics personnel, and interstate traders:
+
 - **English**: International trade terminology and standard customs formats.
-- **Malayalam (മലയാളം)**: Native terminology for Kerala exporters (e.g., *ഡോക്യുമെന്റ് പരിശോധന, കയറ്റുമതി സന്നദ്ധത, വിഴിഞം ട്രാൻസ്ഷിപ്പ്മെന്റ്*).
+- **Malayalam (മലയാളം)**: Native terminology for Kerala exporters (e.g., _ഡോക്യുമെന്റ് പരിശോധന, കയറ്റുമതി സന്നദ്ധത, വിഴിഞം ട്രാൻസ്ഷിപ്പ്മെന്റ്_).
 - **Hindi (हिन्दी)**: Pan-India customs house agent and freight forwarding terminology.
 
 Switch languages instantly using the globe icon in the navigation bar.
@@ -310,23 +330,24 @@ Switch languages instantly using the globe icon in the navigation bar.
 
 ## 📊 Comparison Matrix
 
-| Capability | Manual Verification | Generic OCR / Document AI | VERIFAI |
-| :--- | :---: | :---: | :---: |
-| **Verification Speed** | 3 – 5 hours / shipment | 10 – 15 minutes | **< 3 seconds** |
-| **Multi-Document Cross Check** | Manual side-by-side | Single doc extraction only | **Automatic 7-way matrix** |
-| **Container Checksum (ISO 6346)** | Rarely checked | ❌ Not supported | **✅ Mathematical validation** |
-| **Consensus Golden Record** | Manual spreadsheet | ❌ Not supported | **✅ Weighted hierarchical model** |
-| **Customs Query Simulation** | Reactive after penalty | ❌ Not supported | **✅ Pre-departure projection** |
-| **Statutory Rebuttal Drafting** | 1 – 2 days legal review | ❌ Not supported | **✅ Pre-drafted regulation citations** |
-| **Readiness Scoring** | Subjective opinion | ❌ Not supported | **✅ Deterministic 100% metric** |
-| **Public Verified QR Portal** | ❌ None | ❌ None | **✅ Cryptographic public token** |
-| **Multilingual UI (മലയാളം/हिन्दी)** | ❌ None | ❌ None | **✅ 1-Click native switching** |
+| Capability                          |   Manual Verification   | Generic OCR / Document AI  |                 VERIFAI                 |
+| :---------------------------------- | :---------------------: | :------------------------: | :-------------------------------------: |
+| **Verification Speed**              | 3 – 5 hours / shipment  |      10 – 15 minutes       |             **< 3 seconds**             |
+| **Multi-Document Cross Check**      |   Manual side-by-side   | Single doc extraction only |       **Automatic 7-way matrix**        |
+| **Container Checksum (ISO 6346)**   |     Rarely checked      |      ❌ Not supported      |     **✅ Mathematical validation**      |
+| **Consensus Golden Record**         |   Manual spreadsheet    |      ❌ Not supported      |   **✅ Weighted hierarchical model**    |
+| **Customs Query Simulation**        | Reactive after penalty  |      ❌ Not supported      |     **✅ Pre-departure projection**     |
+| **Statutory Rebuttal Drafting**     | 1 – 2 days legal review |      ❌ Not supported      | **✅ Pre-drafted regulation citations** |
+| **Readiness Scoring**               |   Subjective opinion    |      ❌ Not supported      |    **✅ Deterministic 100% metric**     |
+| **Public Verified QR Portal**       |         ❌ None         |          ❌ None           |    **✅ Cryptographic public token**    |
+| **Multilingual UI (മലയാളം/हिन्दी)** |         ❌ None         |          ❌ None           |     **✅ 1-Click native switching**     |
 
 ---
 
 ## 💻 Technology Stack
 
 ### Frontend & Full-Stack Routing
+
 - **Framework**: [TanStack Start](https://tanstack.com/start) & [TanStack Router](https://tanstack.com/router)
 - **UI Library**: [React 19](https://react.dev/) + [TypeScript 5.9](https://www.typescriptlang.org/)
 - **Design System**: [Tailwind CSS v4](https://tailwindcss.com/) with semantic design tokens
@@ -334,12 +355,14 @@ Switch languages instantly using the globe icon in the navigation bar.
 - **Data Visualizations**: [Recharts](https://recharts.org/) (maritime intelligence analytics)
 
 ### Backend API & Processing Pipeline
+
 - **API Runtime**: [Express.js](https://expressjs.com/) on Node.js
 - **Document Parsers**: `pdf-parse` (PDF streams), `xlsx` (Excel sheets), `mammoth` (Word documents), `tesseract.js` (OCR)
 - **Validation**: [Zod](https://zod.dev/) schema validation
 - **File Uploads**: [Multer](https://github.com/expressjs/multer) streaming handler
 
 ### Testing & Verification
+
 - **Test Runner**: [Vitest](https://vitest.dev/) with automated unit tests covering all deterministic algorithms and routing.
 
 ---
@@ -347,6 +370,7 @@ Switch languages instantly using the globe icon in the navigation bar.
 ## ⚡ Quickstart & Installation
 
 ### Prerequisites
+
 - Node.js `v18.0.0` or higher
 - npm `v9.0.0` or higher
 
@@ -364,7 +388,7 @@ npm install
 cp .env.example .env
 ```
 
-*(Note: VERIFAI operates out of the box in **Resilient Demo Mode** with zero external database or API key requirements).*
+_(Note: VERIFAI operates out of the box in **Resilient Demo Mode** with zero external database or API key requirements)._
 
 ### 3. Launch Development Servers
 
@@ -387,6 +411,7 @@ npm run dev
 ### 4. Open in Browser
 
 Open your browser and navigate to:
+
 ```
 http://localhost:8080
 ```
@@ -397,15 +422,15 @@ http://localhost:8080
 
 VERIFAI provides seamless dual-mode execution to ensure **100% offline reliability for hackathon evaluation** alongside enterprise production scalability:
 
-| Feature | DEMO MODE (Default) | LIVE MODE (Production) |
-| :--- | :--- | :--- |
-| **Database** | In-memory store pre-seeded with 6 authentic Kerala shipments | PostgreSQL relational database (`DATABASE_URL`) |
-| **Document OCR** | High-speed deterministic fallback parser | Full `tesseract.js` OCR stream extraction |
-| **AI Assistant** | Grounded rule-based semantic retriever | Granite-3.2-8b-instruct / LLM Gateway API |
-| **External Dependencies** | **Zero external dependencies required** | Cloud database & AI model endpoint |
-| **Offline Reliability** | **100% Guaranteed** | Depends on internet connectivity |
+| Feature                   | DEMO MODE (Default)                                          | LIVE MODE (Production)                          |
+| :------------------------ | :----------------------------------------------------------- | :---------------------------------------------- |
+| **Database**              | In-memory store pre-seeded with 6 authentic Kerala shipments | PostgreSQL relational database (`DATABASE_URL`) |
+| **Document OCR**          | High-speed deterministic fallback parser                     | Full `tesseract.js` OCR stream extraction       |
+| **AI Assistant**          | Grounded rule-based semantic retriever                       | Granite-3.2-8b-instruct / LLM Gateway API       |
+| **External Dependencies** | **Zero external dependencies required**                      | Cloud database & AI model endpoint              |
+| **Offline Reliability**   | **100% Guaranteed**                                          | Depends on internet connectivity                |
 
-*Toggle between Demo and Live mode anytime in `/settings`.*
+_Toggle between Demo and Live mode anytime in `/settings`._
 
 ---
 
@@ -417,12 +442,12 @@ VERIFAI includes comprehensive automated test coverage for all core verification
 npm test
 ```
 
-### Test Results (13/13 Passed)
+### Test Results (20/20 Passed)
 
 ```
  RUN  v4.1.11 E:/Downloads 2/IBM Hackathon
 
- ✓ src/test/verification-engine.test.ts (12 tests) 11ms
+ ✓ src/test/verification-engine.test.ts (12 tests) 22ms
    ✓ unit normalization: converts MT to KG correctly
    ✓ unit normalization: converts LBS to KG correctly
    ✓ container check digit: validates valid container CSQU3054383
@@ -435,13 +460,71 @@ npm test
    ✓ export chronology: passes valid date sequence
    ✓ readiness score: calculates 100% when no open discrepancies
    ✓ readiness score: penalizes score appropriately for open discrepancies
- ✓ src/test/app-routing.test.tsx (1 test) 13ms
+ ✓ src/test/multi-user-workflow.test.ts (7 tests) 35ms
+   ✓ Multi-Party Export Document Ingestion Lifecycle
+   ✓ Admin Gating & AI Verification Prerequisites
+   ✓ Discrepancy Correction Lifecycle (Warehouse Packing List V1 -> V2)
+   ✓ New Export Consignment Workflow (ABC Seafood - Frozen Shrimp)
+ ✓ src/test/app-routing.test.tsx (1 test) 36ms
    ✓ renders the application without crashing
 
- Test Files  2 passed (2)
-      Tests  13 passed (13)
-   Duration  3.72s
+ Test Files  3 passed (3)
+      Tests  20 passed (20)
+   Duration  30.09s
 ```
+
+---
+
+## 🪝 Git Hooks & Developer Quality Tooling
+
+VERIFAI enforces automated code quality and security checks via **Husky**, **lint-staged**, and **Commitlint**:
+
+| Hook             | Tool                    | Enforcement Action                                                                                                                             |
+| :--------------- | :---------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`pre-commit`** | `lint-staged`           | Formats staged files with **Prettier** and runs **ESLint** with automatic fixes. Blocks unformatted or error-prone code from entering history. |
+| **`commit-msg`** | `@commitlint/cli`       | Enforces **Conventional Commits** (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `ci:`). Prevents vague commit messages.                     |
+| **`pre-push`**   | `vitest` + `vite build` | Automatically executes full **test suite (20 tests)** and production **build** before push. Prevents broken branches.                          |
+
+Hooks install automatically after cloning via the npm lifecycle script:
+
+```bash
+npm run prepare # Automatically sets up .husky hooks
+```
+
+---
+
+## 🔒 Security & Hardening Architecture
+
+VERIFAI implements defense-in-depth security across the full stack:
+
+1. **HTTP Security Headers**: Powered by `helmet`, enforcing `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and strict transport protections.
+2. **Rate Limiting**: Configured with `express-rate-limit` across sensitive API endpoints (`/api/auth`, `/api/shipments/:id/documents`, `/api/shipments/:id/slots/:slotId/upload`).
+3. **Controlled CORS**: Whitelists authorized frontend origins with environment-based configuration.
+4. **File Upload Security**:
+   - Strict MIME type allowlist (`.pdf`, `.jpg`, `.png`, `.xlsx`, `.docx`).
+   - 25 MB max file size limit.
+   - Filename sanitization (`path.basename` + regex character whitelist) to prevent path traversal attacks.
+5. **Prompt Injection & AI Safety**:
+   - Extracted document text is isolated from system instructions.
+   - Strict system directive mandates ignoring any instructions embedded within untrusted document text.
+   - AI response is validated against strict schemas before rendering.
+6. **Backend Role Authorization**:
+   - Critical verification transitions (`start-analysis`, `request-correction`, `approve-correction`) enforce backend role validation (`ADMIN` / `Government/Admin`).
+7. **Zero Hardcoded Secrets**:
+   - All credentials, API keys, and database connection strings are managed via `.env` and `.env.example`.
+   - `.env` is strictly git-ignored.
+
+---
+
+## 🚀 GitHub Actions Continuous Integration (CI/CD)
+
+An automated GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every `push` and `pull_request` to `main`:
+
+- Checks out repository
+- Installs dependencies (`npm ci`)
+- Runs code formatting & linting (`npm run lint`)
+- Runs complete test suite (`npm run test`)
+- Executes production build verification (`npm run build`)
 
 ---
 
@@ -449,33 +532,33 @@ npm test
 
 Follow this step-by-step workflow to experience the complete platform flow:
 
-| Step | Page / Action | Description |
-| :---: | :--- | :--- |
-| **1** | `/` (Landing Page) | View executive summary, Kerala export value metrics, and system statistics. |
-| **2** | `/dashboard` | Review the operational dashboard monitoring active shipments across Cochin and Vizhinjam. |
-| **3** | Active Shipment | Select shipment `EXP-KL-2026-1042` (*Malabar Ocean Foods — Frozen Shrimp to UAE*). |
-| **4** | Readiness Ring | Note the current readiness score at **68%** with 3 open compliance issues. |
-| **5** | `/verify` | View the drag-and-drop document upload dropzone. |
-| **6** | Document Badges | Inspect the 5 ingested trade documents automatically classified with confidence scores. |
-| **7** | `/results` | Open the **Cross-Document Comparison Matrix** comparing CI, PL, SB, PO, and Quality Cert. |
-| **8** | Discrepancy #1 | Review the carton quantity conflict: Commercial Invoice (1,200) vs Packing List (1,180). |
-| **9** | Inspect Evidence | Click **"Inspect Evidence"** to view exact document line citations side-by-side. |
-| **10** | Apply 1-Click Fix | Click **"Apply 1-Click Fix"** to reconcile to 1,200 cartons with recorded audit log. |
-| **11** | Discrepancy #2 | Inspect the HS Code conflict: Commercial Invoice (`0306.17`) vs Shipping Bill (`0306.16`). |
-| **12** | Apply 1-Click Fix | Reconcile the HS code to authoritative MPEDA catch certificate tariff line `0306.17.90`. |
-| **13** | Discrepancy #3 | Resolve the expiring health inspection certificate. |
-| **14** | Re-Verify Shipment | Click **"Re-Verify Shipment"**; watch the readiness gauge update to **100%**. |
-| **15** | `/golden-record` | Review the synthesized single source of truth across all 17 normalized trade fields. |
-| **16** | `/customs` | Observe that simulated Customs Risk has plummeted from High (78%) to Low (12%). |
-| **17** | Statutory Rebuttal | Review the pre-drafted legal response quoting Section 149 of the Customs Act, 1962. |
-| **18** | `/readiness` | Verify the 10-point compliance checklist where all items now show **PASS**. |
-| **19** | Verified QR Card | View the cryptographic **Verified QR Code** unlocked at 100% readiness. |
-| **20** | `/verify-status/:token` | Click the public link to view the tamper-evident external verification portal. |
-| **21** | `/report` | Preview the official printable **Verification Certificate** complete with digital seal. |
-| **22** | `/assistant` | Ask *"What is the container number and net weight?"*; observe grounded response with citations. |
-| **23** | Language Switcher | Click the globe icon in the top bar to switch the entire application to **മലയാളം (Malayalam)**. |
-| **24** | `/shipments` | Explore other Kerala export shipments filtered by Spices, Coir, Rubber, and Tea. |
-| **25** | `/insights` | Review maritime analytics comparing compliance trends between Cochin Port and Vizhinjam Terminal. |
+|  Step  | Page / Action           | Description                                                                                       |
+| :----: | :---------------------- | :------------------------------------------------------------------------------------------------ |
+| **1**  | `/` (Landing Page)      | View executive summary, Kerala export value metrics, and system statistics.                       |
+| **2**  | `/dashboard`            | Review the operational dashboard monitoring active shipments across Cochin and Vizhinjam.         |
+| **3**  | Active Shipment         | Select shipment `EXP-KL-2026-1042` (_Malabar Ocean Foods — Frozen Shrimp to UAE_).                |
+| **4**  | Readiness Ring          | Note the current readiness score at **68%** with 3 open compliance issues.                        |
+| **5**  | `/verify`               | View the drag-and-drop document upload dropzone.                                                  |
+| **6**  | Document Badges         | Inspect the 5 ingested trade documents automatically classified with confidence scores.           |
+| **7**  | `/results`              | Open the **Cross-Document Comparison Matrix** comparing CI, PL, SB, PO, and Quality Cert.         |
+| **8**  | Discrepancy #1          | Review the carton quantity conflict: Commercial Invoice (1,200) vs Packing List (1,180).          |
+| **9**  | Inspect Evidence        | Click **"Inspect Evidence"** to view exact document line citations side-by-side.                  |
+| **10** | Apply 1-Click Fix       | Click **"Apply 1-Click Fix"** to reconcile to 1,200 cartons with recorded audit log.              |
+| **11** | Discrepancy #2          | Inspect the HS Code conflict: Commercial Invoice (`0306.17`) vs Shipping Bill (`0306.16`).        |
+| **12** | Apply 1-Click Fix       | Reconcile the HS code to authoritative MPEDA catch certificate tariff line `0306.17.90`.          |
+| **13** | Discrepancy #3          | Resolve the expiring health inspection certificate.                                               |
+| **14** | Re-Verify Shipment      | Click **"Re-Verify Shipment"**; watch the readiness gauge update to **100%**.                     |
+| **15** | `/golden-record`        | Review the synthesized single source of truth across all 17 normalized trade fields.              |
+| **16** | `/customs`              | Observe that simulated Customs Risk has plummeted from High (78%) to Low (12%).                   |
+| **17** | Statutory Rebuttal      | Review the pre-drafted legal response quoting Section 149 of the Customs Act, 1962.               |
+| **18** | `/readiness`            | Verify the 10-point compliance checklist where all items now show **PASS**.                       |
+| **19** | Verified QR Card        | View the cryptographic **Verified QR Code** unlocked at 100% readiness.                           |
+| **20** | `/verify-status/:token` | Click the public link to view the tamper-evident external verification portal.                    |
+| **21** | `/report`               | Preview the official printable **Verification Certificate** complete with digital seal.           |
+| **22** | `/assistant`            | Ask _"What is the container number and net weight?"_; observe grounded response with citations.   |
+| **23** | Language Switcher       | Click the globe icon in the top bar to switch the entire application to **മലയാളം (Malayalam)**.   |
+| **24** | `/shipments`            | Explore other Kerala export shipments filtered by Spices, Coir, Rubber, and Tea.                  |
+| **25** | `/insights`             | Review maritime analytics comparing compliance trends between Cochin Port and Vizhinjam Terminal. |
 
 ---
 

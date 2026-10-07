@@ -12,7 +12,13 @@ import {
 } from "lucide-react";
 import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
-import { PageHeader, Reveal, StatusBadge, ProgressBar, CommodityThumb } from "@/components/verifex/primitives";
+import {
+  PageHeader,
+  Reveal,
+  StatusBadge,
+  ProgressBar,
+  CommodityThumb,
+} from "@/components/verifex/primitives";
 import { shipments, type Shipment } from "@/lib/data";
 import { NewConsignmentModal } from "@/components/verifex/NewConsignmentModal";
 

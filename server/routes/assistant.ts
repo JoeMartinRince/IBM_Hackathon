@@ -32,12 +32,19 @@ assistantRouter.post("/shipments/:id/assistant", async (req: Request, res: Respo
 
 // POST /api/assistant/test-key - Validate Gemini API Key
 assistantRouter.post("/assistant/test-key", async (req: Request, res: Response) => {
-  const apiKey = (req.body.api_key || process.env.GEMINI_API_KEY || process.env.AI_API_KEY || "").toString().trim();
+  const apiKey = (req.body.api_key || process.env.GEMINI_API_KEY || process.env.AI_API_KEY || "")
+    .toString()
+    .trim();
   if (!apiKey) {
     return res.status(400).json({ success: false, error: "No API key provided" });
   }
 
-  const testModels = ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-pro-latest"];
+  const testModels = [
+    "gemini-flash-lite-latest",
+    "gemini-3.5-flash-lite",
+    "gemini-flash-latest",
+    "gemini-pro-latest",
+  ];
   let lastError = "Failed to connect to Google API";
 
   for (const model of testModels) {
@@ -50,7 +57,9 @@ assistantRouter.post("/assistant/test-key", async (req: Request, res: Response) 
           "x-goog-api-key": apiKey,
         },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: "Respond with the word PONG if you receive this." }] }],
+          contents: [
+            { role: "user", parts: [{ text: "Respond with the word PONG if you receive this." }] },
+          ],
         }),
       });
 

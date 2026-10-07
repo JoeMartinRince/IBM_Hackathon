@@ -12,7 +12,7 @@ export interface ExtractedFieldItem {
 export function extractStructuredFields(
   documentType: DocumentType,
   text: string,
-  filename: string
+  filename: string,
 ): ExtractedFieldItem[] {
   const fields: ExtractedFieldItem[] = [];
 

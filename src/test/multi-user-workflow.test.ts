@@ -73,7 +73,7 @@ describe("VERIFAI Multi-User Document Collection & Verification Workflow", () =>
         "Shipping_Bill_SB4471_CochinCustoms.pdf",
         "312 KB",
         "Kavitha Menon",
-        "CUSTOMS_BROKER"
+        "CUSTOMS_BROKER",
       );
 
       // Still gated (4/5)
@@ -89,7 +89,7 @@ describe("VERIFAI Multi-User Document Collection & Verification Workflow", () =>
         "MPEDA_Health_Certificate_QC992.pdf",
         "1.2 MB",
         "Dr. Ananya Pillai",
-        "QUALITY"
+        "QUALITY",
       );
 
       // Now 5/5 present -> Verification UNLOCKED
@@ -126,7 +126,7 @@ describe("VERIFAI Multi-User Document Collection & Verification Workflow", () =>
         "Packing_List_V2_Corrected_1200ctns.pdf",
         "194 KB",
         "Akhil Varma",
-        "WAREHOUSE"
+        "WAREHOUSE",
       );
 
       expect(submitted?.status).toBe("CORRECTION_SUBMITTED");

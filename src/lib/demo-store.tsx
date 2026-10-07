@@ -46,12 +46,26 @@ interface DemoState {
   allUsers: DemoUser[];
   documentSlots: Record<string, DocumentSlot[]>;
   getActiveSlots: (shipmentId?: string) => DocumentSlot[];
-  uploadSlotDocument: (shipmentId: string, slotId: string, file: { name: string; size: string }, notes?: string) => Promise<void>;
+  uploadSlotDocument: (
+    shipmentId: string,
+    slotId: string,
+    file: { name: string; size: string },
+    notes?: string,
+  ) => Promise<void>;
   requestCorrection: (shipmentId: string, slotId: string, reason: string) => Promise<void>;
-  submitCorrection: (shipmentId: string, slotId: string, file: { name: string; size: string }) => Promise<void>;
+  submitCorrection: (
+    shipmentId: string,
+    slotId: string,
+    file: { name: string; size: string },
+  ) => Promise<void>;
   approveCorrection: (shipmentId: string, slotId: string) => Promise<void>;
   startAiAnalysis: (shipmentId: string) => Promise<boolean>;
-  canStartAnalysis: (shipmentId?: string) => { canStart: boolean; received: number; total: number; missing: string[] };
+  canStartAnalysis: (shipmentId?: string) => {
+    canStart: boolean;
+    received: number;
+    total: number;
+    missing: string[];
+  };
   isAnalyzing: boolean;
   setIsAnalyzing: (v: boolean) => void;
   analysisCompleted: Record<string, boolean>;
@@ -146,7 +160,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       // Offline fallback
     }
     const currentSlots = getActiveSlots(activeShipmentId);
-    const plSlot = currentSlots.find((s) => s.id.includes("pl") || s.type.toLowerCase().includes("packing"));
+    const plSlot = currentSlots.find(
+      (s) => s.id.includes("pl") || s.type.toLowerCase().includes("packing"),
+    );
     if ((plSlot?.status === "READY" && plSlot.versions.length > 1) || resolved.includes("qty")) {
       setResolved(["qty", "hs", "cert"]);
     }
@@ -162,7 +178,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
 
   const getActiveSlots = (shipmentId?: string): DocumentSlot[] => {
     const id = shipmentId || activeShipmentId;
-    return documentSlots[id] || initialDocumentSlots[id] || initialDocumentSlots["VFX-2026-001"] || [];
+    return (
+      documentSlots[id] || initialDocumentSlots[id] || initialDocumentSlots["VFX-2026-001"] || []
+    );
   };
 
   const canStartAnalysis = (shipmentId?: string) => {
@@ -184,10 +202,14 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     shipmentId: string,
     slotId: string,
     file: { name: string; size: string },
-    notes?: string
+    notes?: string,
   ) => {
     setDocumentSlots((prev) => {
-      const currentList = prev[shipmentId] ?? initialDocumentSlots[shipmentId] ?? initialDocumentSlots["VFX-2026-001"] ?? [];
+      const currentList =
+        prev[shipmentId] ??
+        initialDocumentSlots[shipmentId] ??
+        initialDocumentSlots["VFX-2026-001"] ??
+        [];
       const updatedList = currentList.map((slot) => {
         if (slot.id === slotId || slot.type.toLowerCase() === slotId.toLowerCase()) {
           const nextVer = (slot.versions?.length || 0) + 1;
@@ -246,7 +268,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
 
   const requestCorrection = async (shipmentId: string, slotId: string, reason: string) => {
     setDocumentSlots((prev) => {
-      const currentList = prev[shipmentId] ?? initialDocumentSlots[shipmentId] ?? initialDocumentSlots["VFX-2026-001"] ?? [];
+      const currentList =
+        prev[shipmentId] ??
+        initialDocumentSlots[shipmentId] ??
+        initialDocumentSlots["VFX-2026-001"] ??
+        [];
       const updatedList = currentList.map((slot) => {
         if (slot.id === slotId || slot.type.toLowerCase() === slotId.toLowerCase()) {
           return {
@@ -285,9 +311,17 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     } catch {}
   };
 
-  const submitCorrection = async (shipmentId: string, slotId: string, file: { name: string; size: string }) => {
+  const submitCorrection = async (
+    shipmentId: string,
+    slotId: string,
+    file: { name: string; size: string },
+  ) => {
     setDocumentSlots((prev) => {
-      const currentList = prev[shipmentId] ?? initialDocumentSlots[shipmentId] ?? initialDocumentSlots["VFX-2026-001"] ?? [];
+      const currentList =
+        prev[shipmentId] ??
+        initialDocumentSlots[shipmentId] ??
+        initialDocumentSlots["VFX-2026-001"] ??
+        [];
       const updatedList = currentList.map((slot) => {
         if (slot.id === slotId || slot.type.toLowerCase() === slotId.toLowerCase()) {
           const nextVer = (slot.versions?.length || 0) + 1;
@@ -352,7 +386,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
 
   const approveCorrection = async (shipmentId: string, slotId: string) => {
     setDocumentSlots((prev) => {
-      const currentList = prev[shipmentId] ?? initialDocumentSlots[shipmentId] ?? initialDocumentSlots["VFX-2026-001"] ?? [];
+      const currentList =
+        prev[shipmentId] ??
+        initialDocumentSlots[shipmentId] ??
+        initialDocumentSlots["VFX-2026-001"] ??
+        [];
       const updatedList = currentList.map((slot) => {
         if (slot.id === slotId || slot.type.toLowerCase() === slotId.toLowerCase()) {
           return {
@@ -416,7 +454,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     if (!targetUser) return;
 
     setDocumentSlots((prev) => {
-      const currentList = prev[shipmentId] ?? initialDocumentSlots[shipmentId] ?? initialDocumentSlots["VFX-2026-001"] ?? [];
+      const currentList =
+        prev[shipmentId] ??
+        initialDocumentSlots[shipmentId] ??
+        initialDocumentSlots["VFX-2026-001"] ??
+        [];
       const updatedList = currentList.map((slot) => {
         if (slot.id === slotId || slot.type.toLowerCase() === slotId.toLowerCase()) {
           return {
@@ -457,38 +499,39 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     const id = data.id || `EXP-ABC-2026-${Math.floor(100 + Math.random() * 900)}`;
     const category: Shipment["category"] = data.category || "Seafood";
 
-    const defaultAssignments: Record<DocType, { user: DemoUser; filename: string; size: string }> = {
-      "Commercial Invoice": {
-        user: demoUsers[1]!,
-        filename: `Commercial_Invoice_${data.exporter.replace(/\s+/g, "_")}_INV902.pdf`,
-        size: "248 KB",
-      },
-      "Packing List": {
-        user: demoUsers[2]!,
-        filename: `Packing_List_${data.exporter.replace(/\s+/g, "_")}_PL102.pdf`,
-        size: "186 KB",
-      },
-      "Purchase Order": {
-        user: demoUsers[4]!,
-        filename: `Purchase_Order_${data.exporter.replace(/\s+/g, "_")}_PO881.xlsx`,
-        size: "64 KB",
-      },
-      "Shipping Bill": {
-        user: demoUsers[3]!,
-        filename: `Shipping_Bill_SB4471.pdf`,
-        size: "312 KB",
-      },
-      "Quality Certificate": {
-        user: demoUsers[5]!,
-        filename: `MPEDA_Quality_Cert_QC992.pdf`,
-        size: "1.2 MB",
-      },
-      "Other": {
-        user: demoUsers[0]!,
-        filename: "Document.pdf",
-        size: "100 KB",
-      },
-    };
+    const defaultAssignments: Record<DocType, { user: DemoUser; filename: string; size: string }> =
+      {
+        "Commercial Invoice": {
+          user: demoUsers[1]!,
+          filename: `Commercial_Invoice_${data.exporter.replace(/\s+/g, "_")}_INV902.pdf`,
+          size: "248 KB",
+        },
+        "Packing List": {
+          user: demoUsers[2]!,
+          filename: `Packing_List_${data.exporter.replace(/\s+/g, "_")}_PL102.pdf`,
+          size: "186 KB",
+        },
+        "Purchase Order": {
+          user: demoUsers[4]!,
+          filename: `Purchase_Order_${data.exporter.replace(/\s+/g, "_")}_PO881.xlsx`,
+          size: "64 KB",
+        },
+        "Shipping Bill": {
+          user: demoUsers[3]!,
+          filename: `Shipping_Bill_SB4471.pdf`,
+          size: "312 KB",
+        },
+        "Quality Certificate": {
+          user: demoUsers[5]!,
+          filename: `MPEDA_Quality_Cert_QC992.pdf`,
+          size: "1.2 MB",
+        },
+        Other: {
+          user: demoUsers[0]!,
+          filename: "Document.pdf",
+          size: "100 KB",
+        },
+      };
 
     const targetTypes: DocType[] = [
       "Commercial Invoice",

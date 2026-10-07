@@ -26,7 +26,11 @@ import { PageHeader, Reveal } from "@/components/verifex/primitives";
 import { commodityRules, destinationRules } from "@/lib/data";
 
 export const Route = createFileRoute("/_app/intelligence")({
-  head: () => seo("AI Intelligence", "Export regulatory frameworks, document lineage, and discrepancy consequence matrix."),
+  head: () =>
+    seo(
+      "AI Intelligence",
+      "Export regulatory frameworks, document lineage, and discrepancy consequence matrix.",
+    ),
   component: IntelligencePage,
 });
 
@@ -78,7 +82,8 @@ export const consequenceMatrix = [
     discrepancy: "Quantity Mismatch",
     example: "Invoice 1,200 cartons vs Packing List 1,180 cartons",
     docs: "Invoice ↔ Packing List",
-    consequence: "Short-shipment insurance claim, physical re-inspection at port gate, demurrage costs.",
+    consequence:
+      "Short-shipment insurance claim, physical re-inspection at port gate, demurrage costs.",
     severity: "CRITICAL",
     icon: Layers,
     color: "text-critical",
@@ -96,7 +101,8 @@ export const consequenceMatrix = [
     discrepancy: "HS Code Conflict",
     example: "Invoice 0306.17 vs Shipping Bill 0306.16",
     docs: "Invoice ↔ Shipping Bill",
-    consequence: "Duty rate recalculation, customs penalty under Section 111(m) of the Indian Customs Act.",
+    consequence:
+      "Duty rate recalculation, customs penalty under Section 111(m) of the Indian Customs Act.",
     severity: "CRITICAL",
     icon: Scale,
     color: "text-critical",
@@ -105,7 +111,8 @@ export const consequenceMatrix = [
     discrepancy: "Weight Variance",
     example: "Gross weight 18,000 kg vs 17,850 kg",
     docs: "Packing List ↔ Shipping Bill",
-    consequence: "Ocean carrier freight billing dispute, SOLAS VGM terminal gate turn-around penalty.",
+    consequence:
+      "Ocean carrier freight billing dispute, SOLAS VGM terminal gate turn-around penalty.",
     severity: "MEDIUM",
     icon: Scale,
     color: "text-amber-500",
@@ -114,7 +121,8 @@ export const consequenceMatrix = [
     discrepancy: "Date Mismatch",
     example: "PO date 12-Aug vs Actual ship date 15-Aug",
     docs: "PO ↔ Bill of Lading",
-    consequence: "Letter of Credit (LC) amendment required, banking discrepancy fee, payment deferral.",
+    consequence:
+      "Letter of Credit (LC) amendment required, banking discrepancy fee, payment deferral.",
     severity: "HIGH",
     icon: Calendar,
     color: "text-primary",
@@ -125,22 +133,26 @@ export const targetPersonas = [
   {
     title: "Exporters (Primary)",
     subtitle: "Seafood Processors, Spice Houses, Rubber Planters",
-    benefit: "Verify 100% data consistency before container leaves factory premises to prevent expensive port demurrage and shipment rejection.",
+    benefit:
+      "Verify 100% data consistency before container leaves factory premises to prevent expensive port demurrage and shipment rejection.",
   },
   {
     title: "Customs Brokers (CHA)",
     subtitle: "Authorized Customs Clearance Agents",
-    benefit: "Automate cross-checking of client documents against ICEGATE Shipping Bill to eliminate Section 111(m) penalty liabilities.",
+    benefit:
+      "Automate cross-checking of client documents against ICEGATE Shipping Bill to eliminate Section 111(m) penalty liabilities.",
   },
   {
     title: "Export Documentation Teams",
     subtitle: "Back-Office Operational Specialists",
-    benefit: "Replace manual 30-minute 5-document manual cross-checking with 8-second multi-document AI consensus verification.",
+    benefit:
+      "Replace manual 30-minute 5-document manual cross-checking with 8-second multi-document AI consensus verification.",
   },
   {
     title: "Freight Forwarders",
     subtitle: "Ocean & Air Logistics Coordinators",
-    benefit: "Ensure SOLAS VGM weights, container stuffing carton totals, and commodity descriptions match carrier manifests.",
+    benefit:
+      "Ensure SOLAS VGM weights, container stuffing carton totals, and commodity descriptions match carrier manifests.",
   },
 ];
 
@@ -167,10 +179,12 @@ function IntelligencePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
-              <FileText className="size-5 text-primary" /> The 5 Core Export Documents & Ownership Lineage
+              <FileText className="size-5 text-primary" /> The 5 Core Export Documents & Ownership
+              Lineage
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Cross-reconciliation matrix across the 3 generative teams, buyer authorization, and statutory testing authority.
+              Cross-reconciliation matrix across the 3 generative teams, buyer authorization, and
+              statutory testing authority.
             </p>
           </div>
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 w-fit">
@@ -182,12 +196,18 @@ function IntelligencePage() {
           {documentLineage.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <Reveal key={item.doc} delay={idx * 0.04} className="surface p-5 space-y-3 flex flex-col justify-between">
+              <Reveal
+                key={item.doc}
+                delay={idx * 0.04}
+                className="surface p-5 space-y-3 flex flex-col justify-between"
+              >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="space-y-1">
                       <h3 className="font-bold text-sm text-foreground">{item.doc}</h3>
-                      <span className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.color}`}>
+                      <span
+                        className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.color}`}
+                      >
                         Generated by: {item.owner}
                       </span>
                     </div>
@@ -195,9 +215,7 @@ function IntelligencePage() {
                       <Icon className="size-4 text-primary" />
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {item.role}
-                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{item.role}</p>
                 </div>
 
                 <div className="pt-2 border-t border-border/50">
@@ -206,7 +224,10 @@ function IntelligencePage() {
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {item.keyFields.map((f, fi) => (
-                      <span key={fi} className="text-[10px] font-mono rounded bg-card px-1.5 py-0.5 border text-foreground">
+                      <span
+                        key={fi}
+                        className="text-[10px] font-mono rounded bg-card px-1.5 py-0.5 border text-foreground"
+                      >
                         {f}
                       </span>
                     ))}
@@ -223,10 +244,12 @@ function IntelligencePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
           <div>
             <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
-              <AlertOctagon className="size-5 text-critical" /> Discrepancy & Operational Consequence Matrix
+              <AlertOctagon className="size-5 text-critical" /> Discrepancy & Operational
+              Consequence Matrix
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              The statutory impact and financial penalties triggered when cross-document inconsistencies occur.
+              The statutory impact and financial penalties triggered when cross-document
+              inconsistencies occur.
             </p>
           </div>
           <div className="text-xs font-mono text-muted-foreground bg-muted/40 px-3 py-1 rounded-full border">
@@ -250,16 +273,16 @@ function IntelligencePage() {
                 <tr key={i} className="hover:bg-muted/20 transition-colors">
                   <td className="py-3.5 px-3 font-semibold text-foreground">
                     <div className="flex items-center gap-2">
-                      <span className={`size-2 rounded-full ${c.severity === "CRITICAL" ? "bg-critical animate-pulse" : "bg-amber-500"}`} />
+                      <span
+                        className={`size-2 rounded-full ${c.severity === "CRITICAL" ? "bg-critical animate-pulse" : "bg-amber-500"}`}
+                      />
                       {c.discrepancy}
                     </div>
                   </td>
                   <td className="py-3.5 px-3 font-mono text-muted-foreground text-[11px]">
                     {c.example}
                   </td>
-                  <td className="py-3.5 px-3 text-muted-foreground font-medium">
-                    {c.docs}
-                  </td>
+                  <td className="py-3.5 px-3 text-muted-foreground font-medium">{c.docs}</td>
                   <td className="py-3.5 px-3 font-medium text-foreground max-w-xs">
                     {c.consequence}
                   </td>
@@ -269,8 +292,8 @@ function IntelligencePage() {
                         c.severity === "CRITICAL"
                           ? "bg-critical/10 text-critical border border-critical/20"
                           : c.severity === "HIGH"
-                          ? "bg-amber-500/10 text-amber-600 border border-amber-500/20"
-                          : "bg-blue-500/10 text-blue-600 border border-blue-500/20"
+                            ? "bg-amber-500/10 text-amber-600 border border-amber-500/20"
+                            : "bg-blue-500/10 text-blue-600 border border-blue-500/20"
                       }`}
                     >
                       {c.severity}
@@ -299,12 +322,12 @@ function IntelligencePage() {
             <Reveal key={p.title} delay={idx * 0.05} className="surface p-5 space-y-2">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-sm text-foreground">{p.title}</h3>
-                <span className="text-[10px] font-mono text-muted-foreground">User Persona {idx + 1}</span>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  User Persona {idx + 1}
+                </span>
               </div>
               <div className="text-xs font-medium text-primary">{p.subtitle}</div>
-              <p className="text-xs text-muted-foreground leading-relaxed pt-1">
-                {p.benefit}
-              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed pt-1">{p.benefit}</p>
             </Reveal>
           ))}
         </div>
@@ -327,7 +350,9 @@ function IntelligencePage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-base">{cat} Exports</h3>
-                    <div className="text-xs text-muted-foreground">{rules.length} mandatory checkpoints</div>
+                    <div className="text-xs text-muted-foreground">
+                      {rules.length} mandatory checkpoints
+                    </div>
                   </div>
                 </div>
 
@@ -353,7 +378,8 @@ function IntelligencePage() {
               <Globe className="size-5 text-primary" /> Destination Country Import Checklists
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Specific certificate and labeling requirements enforced by foreign customs authorities.
+              Specific certificate and labeling requirements enforced by foreign customs
+              authorities.
             </p>
           </div>
 
@@ -363,7 +389,9 @@ function IntelligencePage() {
                 key={dest}
                 onClick={() => setSelectedDestination(dest)}
                 className={`rounded-full px-3 py-1 font-semibold transition-colors ${
-                  selectedDestination === dest ? "bg-ink text-ink-foreground" : "text-muted-foreground"
+                  selectedDestination === dest
+                    ? "bg-ink text-ink-foreground"
+                    : "text-muted-foreground"
                 }`}
               >
                 {dest}
@@ -387,7 +415,9 @@ function IntelligencePage() {
         </div>
 
         <div className="mt-4 rounded-xl bg-muted/40 p-3 text-[11px] text-muted-foreground">
-          <strong>Notice:</strong> These compliance assistance rules are pre-submission verification aids and do not constitute guaranteed legal advice. Official bilateral protocols may be updated by regulatory boards.
+          <strong>Notice:</strong> These compliance assistance rules are pre-submission verification
+          aids and do not constitute guaranteed legal advice. Official bilateral protocols may be
+          updated by regulatory boards.
         </div>
       </Reveal>
     </div>

@@ -6,10 +6,10 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. Users & Profiles
 CREATE TABLE IF NOT EXISTS profiles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL CHECK (role IN ('Exporter', 'Customs Broker', 'Freight Forwarder', 'Documentation Team', 'Government/Admin')),
+    role VARCHAR(50) NOT NULL,
     organization VARCHAR(255) NOT NULL DEFAULT 'Kerala Export Consortium',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 -- 2. Shipments
 CREATE TABLE IF NOT EXISTS shipments (
-    id VARCHAR(50) PRIMARY KEY, -- e.g. EXP-KL-2026-1042
+    id VARCHAR(50) PRIMARY KEY, -- e.g. EXP-KL-2026-1042, VFX-2026-001
     exporter VARCHAR(255) NOT NULL,
     consignee VARCHAR(255) NOT NULL,
     commodity VARCHAR(255) NOT NULL,
@@ -45,9 +45,53 @@ CREATE TABLE IF NOT EXISTS shipments (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Documents
+-- 3. Document Slots (Multi-User Role-Based Ingestion)
+CREATE TABLE IF NOT EXISTS document_slots (
+    id VARCHAR(100) PRIMARY KEY,
+    shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
+    document_type VARCHAR(100) NOT NULL,
+    required BOOLEAN DEFAULT TRUE,
+    assigned_user_id VARCHAR(100) NOT NULL,
+    assigned_user_name VARCHAR(255) NOT NULL,
+    assigned_user_role VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'WAITING' CHECK (status IN ('WAITING', 'READY', 'CORRECTION_REQUESTED', 'CORRECTION_SUBMITTED')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Document Versions (Version Control & Re-verification Tracking)
+CREATE TABLE IF NOT EXISTS document_versions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    slot_id VARCHAR(100) NOT NULL REFERENCES document_slots(id) ON DELETE CASCADE,
+    shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
+    version INT NOT NULL DEFAULT 1,
+    filename VARCHAR(255) NOT NULL,
+    file_size VARCHAR(50) NOT NULL DEFAULT '250 KB',
+    uploaded_by VARCHAR(255) NOT NULL,
+    uploaded_by_role VARCHAR(100) NOT NULL,
+    uploaded_at TIMESTAMPTZ DEFAULT NOW(),
+    status VARCHAR(50) NOT NULL DEFAULT 'APPROVED',
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Correction Requests (Admin Gated Discrepancy Reconciliation)
+CREATE TABLE IF NOT EXISTS correction_requests (
+    id VARCHAR(100) PRIMARY KEY,
+    slot_id VARCHAR(100) NOT NULL REFERENCES document_slots(id) ON DELETE CASCADE,
+    shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
+    discrepancy_title VARCHAR(255) DEFAULT 'Reconciliation Request',
+    reason TEXT NOT NULL,
+    requested_by VARCHAR(255) NOT NULL,
+    requested_at TIMESTAMPTZ DEFAULT NOW(),
+    status VARCHAR(50) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'SUBMITTED', 'APPROVED')),
+    submitted_version INT,
+    submitted_at TIMESTAMPTZ
+);
+
+-- 6. Documents (Raw Upload & File Metadata)
 CREATE TABLE IF NOT EXISTS documents (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
     filename VARCHAR(255) NOT NULL,
     file_path TEXT NOT NULL,
@@ -63,9 +107,9 @@ CREATE TABLE IF NOT EXISTS documents (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Extracted Fields
+-- 7. Extracted Fields (Cross-Document Verification Attributes)
 CREATE TABLE IF NOT EXISTS extracted_fields (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
     document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
     field_name VARCHAR(100) NOT NULL,
@@ -77,9 +121,9 @@ CREATE TABLE IF NOT EXISTS extracted_fields (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Golden Records
+-- 8. Golden Records (Synthesized Source of Truth)
 CREATE TABLE IF NOT EXISTS golden_records (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
     section VARCHAR(50) NOT NULL,
     label VARCHAR(100) NOT NULL,
@@ -92,7 +136,7 @@ CREATE TABLE IF NOT EXISTS golden_records (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. Discrepancies
+-- 9. Discrepancies
 CREATE TABLE IF NOT EXISTS discrepancies (
     id VARCHAR(100) PRIMARY KEY,
     shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
@@ -119,9 +163,9 @@ CREATE TABLE IF NOT EXISTS discrepancies (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 7. Audit Logs
+-- 10. Audit Logs
 CREATE TABLE IF NOT EXISTS audit_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
     user_name VARCHAR(255) NOT NULL,
     user_role VARCHAR(100) NOT NULL,
@@ -130,7 +174,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 8. Verification Tokens (for Verified Public QR Scan)
+-- 11. Verification Tokens (for Verified Public QR Scan)
 CREATE TABLE IF NOT EXISTS verification_tokens (
     token VARCHAR(100) PRIMARY KEY,
     shipment_id VARCHAR(50) NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
@@ -146,6 +190,8 @@ CREATE TABLE IF NOT EXISTS verification_tokens (
 -- Indexes for optimal lookup performance
 CREATE INDEX IF NOT EXISTS idx_shipments_category ON shipments(category);
 CREATE INDEX IF NOT EXISTS idx_shipments_status ON shipments(status);
+CREATE INDEX IF NOT EXISTS idx_document_slots_shipment_id ON document_slots(shipment_id);
+CREATE INDEX IF NOT EXISTS idx_document_versions_slot_id ON document_versions(slot_id);
 CREATE INDEX IF NOT EXISTS idx_documents_shipment_id ON documents(shipment_id);
 CREATE INDEX IF NOT EXISTS idx_extracted_fields_shipment_id ON extracted_fields(shipment_id);
 CREATE INDEX IF NOT EXISTS idx_discrepancies_shipment_id ON discrepancies(shipment_id);

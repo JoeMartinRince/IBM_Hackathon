@@ -22,7 +22,9 @@ const storage = multer.diskStorage({
   },
   filename: (_req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + "-" + file.originalname);
+    // Prevent path traversal and malicious filenames
+    const sanitizedName = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g, "_");
+    cb(null, `${uniqueSuffix}-${sanitizedName}`);
   },
 });
 
@@ -40,7 +42,10 @@ const upload = multer({
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/msword",
     ];
-    if (allowed.includes(file.mimetype) || file.originalname.match(/\.(pdf|jpe?g|png|xlsx|xls|docx)$/i)) {
+    if (
+      allowed.includes(file.mimetype) ||
+      file.originalname.match(/\.(pdf|jpe?g|png|xlsx|xls|docx)$/i)
+    ) {
       cb(null, true);
     } else {
       cb(new Error("Unsupported file format. Please upload PDF, JPG, PNG, XLSX, or DOCX."));
@@ -109,7 +114,7 @@ documentsRouter.post(
     }
 
     res.status(201).json({ success: true, documents: createdDocs });
-  }
+  },
 );
 
 // POST /api/documents/:id/process - Run OCR, text extraction, classification, and field extraction
