@@ -44,6 +44,34 @@ export class DataStore {
     // Initial Realistic Kerala Shipments
     const seedShipments: ShipmentRecord[] = [
       {
+        id: "EXP-ABC-2026-001",
+        exporter: "ABC Seafood",
+        consignee: "Gulf Fresh Trading LLC, Dubai",
+        commodity: "Frozen Shrimp",
+        category: "Seafood",
+        origin_port: "Cochin Port (INCOK)",
+        destination_port: "Dubai",
+        destination_country: "UAE",
+        container_number: "MSKU 482915-3",
+        seal_number: "ML-2209184",
+        incoterm: "CIF Dubai",
+        currency: "USD",
+        total_value: 128000,
+        quantity: 1200,
+        unit: "cartons",
+        net_weight: 12000,
+        gross_weight: 13450,
+        cbm: 58.2,
+        shipment_date: "2026-10-16",
+        status: "UNDER_REVIEW",
+        readiness_score: 60,
+        risk_score: 36,
+        issues_count: 2,
+        created_by: defaultProfile.id,
+        created_at: new Date(Date.now() - 1800000).toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
         id: "VFX-2026-001",
         exporter: "Malabar Ocean Foods Pvt Ltd",
         consignee: "Gulf Fresh Trading LLC",
@@ -883,6 +911,7 @@ export class DataStore {
 
     this.documentSlots.set("VFX-2026-001", createInitialSlots("VFX-2026-001"));
     this.documentSlots.set("EXP-KL-2026-1042", createInitialSlots("EXP-KL-2026-1042"));
+    this.documentSlots.set("EXP-ABC-2026-001", createInitialSlots("EXP-ABC-2026-001"));
   }
 
   public getSlots(shipmentId: string): DocumentSlotRecord[] {

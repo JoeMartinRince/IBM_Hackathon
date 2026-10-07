@@ -147,4 +147,34 @@ describe("VERIFAI Multi-User Document Collection & Verification Workflow", () =>
       expect(logs.some((l) => l.action.includes("Approved"))).toBe(true);
     });
   });
+
+  describe("New Export Consignment Workflow (ABC Seafood - Frozen Shrimp)", () => {
+    it("initializes consignment with 3 uploaded documents and 2 waiting documents", () => {
+      const abcSlots = db.getSlots("EXP-ABC-2026-001");
+      expect(abcSlots.length).toBe(5);
+
+      const readySlots = abcSlots.filter((s) => s.status === "READY");
+      const waitingSlots = abcSlots.filter((s) => s.status === "WAITING");
+
+      expect(readySlots.length).toBe(3);
+      expect(readySlots.map((s) => s.document_type)).toEqual([
+        "Commercial Invoice",
+        "Packing List",
+        "Purchase Order",
+      ]);
+
+      expect(waitingSlots.length).toBe(2);
+      expect(waitingSlots.map((s) => s.document_type)).toEqual([
+        "Shipping Bill",
+        "Quality Certificate",
+      ]);
+
+      // Gating prevents analysis with 3/5 documents
+      const check = db.canStartAnalysis("EXP-ABC-2026-001");
+      expect(check.canStart).toBe(false);
+      expect(check.received).toBe(3);
+      expect(check.total).toBe(5);
+      expect(check.missing).toEqual(["Shipping Bill", "Quality Certificate"]);
+    });
+  });
 });

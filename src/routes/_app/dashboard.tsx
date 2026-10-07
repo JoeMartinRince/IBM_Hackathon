@@ -27,12 +27,14 @@ import {
   Play,
   Send,
   RefreshCw,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { seo } from "@/lib/seo";
 import { shipments, type DocumentSlot, type DocumentVersion } from "@/lib/data";
 import { useDemo } from "@/lib/demo-store";
 import { Reveal, ReadinessRing, ShipmentCard, StatTile, StatusBadge, ProgressBar } from "@/components/verifex/primitives";
+import { NewConsignmentModal } from "@/components/verifex/NewConsignmentModal";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => seo("Overview", "Current state of your export documentation and multi-user workflow."),
@@ -73,6 +75,7 @@ function Dashboard() {
   const [uploadFileSize, setUploadFileSize] = useState("240 KB");
   const [uploadTitle, setUploadTitle] = useState("");
   const [inspectVersionsSlot, setInspectVersionsSlot] = useState<DocumentSlot | null>(null);
+  const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
 
   // Analysis progress animation state
   const [analysisStepIndex, setAnalysisStepIndex] = useState(0);
@@ -166,7 +169,14 @@ function Dashboard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setShowNewConsignmentModal(true)}
+            className="press inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3.5 py-2 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+          >
+            <Plus className="size-3.5" /> New Export Consignment
+          </button>
+
           <div className="rounded-2xl border bg-card p-2 text-xs flex items-center gap-2">
             <span className="text-muted-foreground text-[11px] font-medium hidden sm:inline">Active Case:</span>
             <select
@@ -936,6 +946,12 @@ function Dashboard() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* New Export Consignment Modal */}
+      <NewConsignmentModal
+        isOpen={showNewConsignmentModal}
+        onClose={() => setShowNewConsignmentModal(false)}
+      />
     </div>
   );
 }

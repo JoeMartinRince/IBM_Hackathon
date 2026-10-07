@@ -363,13 +363,18 @@ export const initialDocumentSlots: Record<string, DocumentSlot[]> = {
   ],
 };
 
-// Mirror for EXP-KL-2026-1042 so both identifiers work interchangeably
+// Mirror for EXP-KL-2026-1042 and EXP-ABC-2026-001 so identifiers work seamlessly
 initialDocumentSlots["EXP-KL-2026-1042"] = initialDocumentSlots["VFX-2026-001"]!.map(s => ({
   ...s,
   shipmentId: "EXP-KL-2026-1042",
 }));
+initialDocumentSlots["EXP-ABC-2026-001"] = initialDocumentSlots["VFX-2026-001"]!.map(s => ({
+  ...s,
+  shipmentId: "EXP-ABC-2026-001",
+}));
 
 export const shipments: Shipment[] = [
+  { id: "EXP-ABC-2026-001", commodity: "Frozen Shrimp", category: "Seafood", from: "Cochin Port (INCOK)", to: "Dubai", readiness: 60, status: "review", issues: 2, updated: "Just now", exporter: "ABC Seafood", consignee: "Gulf Fresh Trading LLC, Dubai", value: "USD 128,000" },
   { id: "VFX-2026-001", commodity: "Frozen Seafood Export", category: "Seafood", from: "Cochin Port (INCOK)", to: "Jebel Ali, Dubai", readiness: 84, status: "review", issues: 3, updated: "Just now", exporter: "Malabar Ocean Foods Pvt Ltd", consignee: "Gulf Fresh Trading LLC", value: "USD 186,400" },
   { id: "EXP-KL-2026-1042", commodity: "Frozen Shrimp", category: "Seafood", from: "Cochin", to: "Dubai", readiness: 84, status: "review", issues: 3, updated: "12 min ago", exporter: "Malabar Ocean Foods Pvt Ltd", consignee: "Gulf Fresh Trading LLC", value: "USD 186,400" },
   { id: "EXP-KL-2026-1041", commodity: "Black Pepper", category: "Spices", from: "Cochin", to: "Hamburg", readiness: 100, status: "ready", issues: 0, updated: "2 h ago", exporter: "Wayanad Spice Collective", consignee: "Nordgewürz GmbH", value: "EUR 92,750" },

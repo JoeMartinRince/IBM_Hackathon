@@ -18,12 +18,14 @@ import {
   Lock,
   Clock,
   UserCheck,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
 import { PageHeader, Reveal, StatusBadge } from "@/components/verifex/primitives";
 import { CameraScanner } from "@/components/verifex/CameraScanner";
+import { NewConsignmentModal } from "@/components/verifex/NewConsignmentModal";
 import { shipments, type DocType, type ShipmentDocument } from "@/lib/data";
 
 export const Route = createFileRoute("/_app/verify")({
@@ -49,6 +51,7 @@ function VerifyPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
   const [processStep, setProcessStep] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -167,7 +170,13 @@ function VerifyPage() {
         title="Verify Export Documents"
         sub="Multi-user export dossier collection (Commercial Invoice, Packing List, Shipping Bill, PO, Quality Certificate). VERIFAI cross-verifies when all required slots are present."
         right={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setShowNewConsignmentModal(true)}
+              className="press inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3.5 py-2 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+            >
+              <Plus className="size-3.5" /> New Export Consignment
+            </button>
             <span className="text-xs text-muted-foreground">Active:</span>
             <select
               value={activeShipmentId}
@@ -549,6 +558,12 @@ function VerifyPage() {
           }
         }}
         shipmentId={activeShipment.id}
+      />
+
+      {/* New Export Consignment Modal */}
+      <NewConsignmentModal
+        isOpen={showNewConsignmentModal}
+        onClose={() => setShowNewConsignmentModal(false)}
       />
     </div>
   );

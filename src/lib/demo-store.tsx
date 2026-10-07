@@ -10,6 +10,8 @@ import {
   type DemoUser,
   type DocumentSlot,
   type DocumentVersion,
+  type DocType,
+  type SlotStatus,
 } from "./data";
 import { translations, type Language } from "./i18n";
 import { verificationService } from "./services/api";
@@ -57,6 +59,14 @@ interface DemoState {
   goldenOverrides: Record<string, string>;
   setGoldenOverride: (fieldLabel: string, value: string, reason?: string) => void;
   ignoreDiscrepancy: (id: string, reason: string) => Promise<void>;
+  createConsignment: (data: {
+    id?: string | undefined;
+    exporter: string;
+    destination: string;
+    commodity: string;
+    category?: Shipment["category"] | undefined;
+    selectedDocTypes: DocType[];
+  }) => string;
 }
 
 const Ctx = createContext<DemoState | null>(null);
@@ -434,6 +444,134 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const createConsignment = (data: {
+    id?: string | undefined;
+    exporter: string;
+    destination: string;
+    commodity: string;
+    category?: Shipment["category"] | undefined;
+    selectedDocTypes: DocType[];
+  }): string => {
+    const id = data.id || `EXP-ABC-2026-${Math.floor(100 + Math.random() * 900)}`;
+    const category: Shipment["category"] = data.category || "Seafood";
+
+    const defaultAssignments: Record<DocType, { user: DemoUser; filename: string; size: string }> = {
+      "Commercial Invoice": {
+        user: demoUsers[1]!,
+        filename: `Commercial_Invoice_${data.exporter.replace(/\s+/g, "_")}_INV902.pdf`,
+        size: "248 KB",
+      },
+      "Packing List": {
+        user: demoUsers[2]!,
+        filename: `Packing_List_${data.exporter.replace(/\s+/g, "_")}_PL102.pdf`,
+        size: "186 KB",
+      },
+      "Purchase Order": {
+        user: demoUsers[4]!,
+        filename: `Purchase_Order_${data.exporter.replace(/\s+/g, "_")}_PO881.xlsx`,
+        size: "64 KB",
+      },
+      "Shipping Bill": {
+        user: demoUsers[3]!,
+        filename: `Shipping_Bill_SB4471.pdf`,
+        size: "312 KB",
+      },
+      "Quality Certificate": {
+        user: demoUsers[5]!,
+        filename: `MPEDA_Quality_Cert_QC992.pdf`,
+        size: "1.2 MB",
+      },
+      "Other": {
+        user: demoUsers[0]!,
+        filename: "Document.pdf",
+        size: "100 KB",
+      },
+    };
+
+    const targetTypes: DocType[] = [
+      "Commercial Invoice",
+      "Packing List",
+      "Shipping Bill",
+      "Purchase Order",
+      "Quality Certificate",
+    ];
+
+    const newSlots: DocumentSlot[] = targetTypes.map((type) => {
+      const isSelected = data.selectedDocTypes.includes(type);
+      const assign = defaultAssignments[type]!;
+      const slotId = `slot-${type.toLowerCase().slice(0, 2)}-${id}`;
+
+      if (isSelected) {
+        const ver = {
+          version: 1,
+          filename: assign.filename,
+          fileSize: assign.size,
+          uploadedBy: assign.user.name,
+          uploadedByRole: assign.user.roleLabel,
+          uploadedAt: "07 Oct 2026, 10:45 AM",
+          status: "APPROVED" as const,
+          provenance: {
+            source: type,
+            version: 1,
+            team: assign.user.team,
+            uploader: assign.user.name,
+            timestamp: "07 Oct 2026, 10:45 AM",
+            pageCount: 1,
+          },
+        };
+        return {
+          id: slotId,
+          shipmentId: id,
+          type,
+          required: true,
+          assignedToUser: assign.user,
+          status: "READY" as SlotStatus,
+          versions: [ver],
+          currentVersion: ver,
+        };
+      } else {
+        return {
+          id: slotId,
+          shipmentId: id,
+          type,
+          required: true,
+          assignedToUser: assign.user,
+          status: "WAITING" as SlotStatus,
+          versions: [],
+        };
+      }
+    });
+
+    const newShipment: Shipment = {
+      id,
+      commodity: data.commodity,
+      category,
+      from: "Cochin Port (INCOK)",
+      to: data.destination,
+      readiness: data.selectedDocTypes.length === 5 ? 100 : Math.round((data.selectedDocTypes.length / 5) * 80),
+      status: data.selectedDocTypes.length === 5 ? "ready" : "review",
+      issues: data.selectedDocTypes.length === 5 ? 0 : 2,
+      updated: "Just now",
+      exporter: data.exporter,
+      consignee: "Gulf Fresh Trading LLC, Dubai",
+      value: "USD 128,000",
+    };
+
+    const existingIdx = shipments.findIndex((s) => s.id === id);
+    if (existingIdx >= 0) {
+      shipments[existingIdx] = newShipment;
+    } else {
+      shipments.unshift(newShipment);
+    }
+
+    setDocumentSlots((prev) => ({
+      ...prev,
+      [id]: newSlots,
+    }));
+    setActiveShipmentId(id);
+    return id;
+  };
+
   const value: DemoState = {
     activeShipmentId,
     setActiveShipmentId,
@@ -475,6 +613,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     goldenOverrides,
     setGoldenOverride,
     ignoreDiscrepancy,
+    createConsignment,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

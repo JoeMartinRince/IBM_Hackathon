@@ -14,6 +14,7 @@ import { seo } from "@/lib/seo";
 import { useDemo } from "@/lib/demo-store";
 import { PageHeader, Reveal, StatusBadge, ProgressBar, CommodityThumb } from "@/components/verifex/primitives";
 import { shipments, type Shipment } from "@/lib/data";
+import { NewConsignmentModal } from "@/components/verifex/NewConsignmentModal";
 
 export const Route = createFileRoute("/_app/shipments")({
   head: () => seo("Shipments", "Manage and inspect export consignments and verification status."),
@@ -27,14 +28,6 @@ function ShipmentsPage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
-
-  // New Shipment Form State
-  const [newCommodity, setNewCommodity] = useState("Frozen Squid Rings");
-  const [newCategory, setNewCategory] = useState<Shipment["category"]>("Seafood");
-  const [newExporter, setNewExporter] = useState("Cochin Sea Foods Pvt Ltd");
-  const [newConsignee, setNewConsignee] = useState("Al Maya Trading LLC, Dubai");
-  const [newPort, setNewPort] = useState("Cochin (INCOK)");
-  const [newDestination, setNewDestination] = useState("Jebel Ali, UAE");
 
   const filtered = shipments.filter((s) => {
     const matchesSearch =
@@ -52,29 +45,6 @@ function ShipmentsPage() {
   const handleSelectShipment = (id: string) => {
     setActiveShipmentId(id);
     navigate({ to: "/results" });
-  };
-
-  const handleCreateShipment = (e: React.FormEvent) => {
-    e.preventDefault();
-    const id = `EXP-KL-2026-${Math.floor(1050 + Math.random() * 900)}`;
-    const created: Shipment = {
-      id,
-      commodity: newCommodity,
-      category: newCategory,
-      from: newPort.split(" ")[0] || newPort,
-      to: newDestination.split(",")[0] || newDestination,
-      readiness: 70,
-      status: "review",
-      issues: 2,
-      updated: "Just now",
-      exporter: newExporter,
-      consignee: newConsignee,
-      value: "USD 115,000",
-    };
-    shipments.unshift(created);
-    setActiveShipmentId(id);
-    setShowCreateModal(false);
-    navigate({ to: "/verify" });
   };
 
   return (
@@ -186,104 +156,15 @@ function ShipmentsPage() {
         })}
       </div>
 
-      {/* Create Shipment Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="surface max-w-lg w-full p-6 space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Ship className="size-5 text-primary" /> Create Export Shipment
-              </h3>
-              <button onClick={() => setShowCreateModal(false)} className="text-muted-foreground hover:text-foreground">
-                <X className="size-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateShipment} className="space-y-3 text-xs">
-              <div>
-                <label className="font-semibold text-muted-foreground">Commodity Name</label>
-                <input
-                  required
-                  value={newCommodity}
-                  onChange={(e) => setNewCommodity(e.target.value)}
-                  className="mt-1 h-10 w-full rounded-xl border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-semibold text-muted-foreground">Category</label>
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value as Shipment["category"])}
-                    className="mt-1 h-10 w-full rounded-xl border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <option value="Seafood">Seafood</option>
-                    <option value="Spices">Spices</option>
-                    <option value="Rubber">Rubber</option>
-                    <option value="Agriculture">Agriculture</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="font-semibold text-muted-foreground">Origin Port</label>
-                  <input
-                    required
-                    value={newPort}
-                    onChange={(e) => setNewPort(e.target.value)}
-                    className="mt-1 h-10 w-full rounded-xl border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-semibold text-muted-foreground">Exporter Company</label>
-                <input
-                  required
-                  value={newExporter}
-                  onChange={(e) => setNewExporter(e.target.value)}
-                  className="mt-1 h-10 w-full rounded-xl border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-
-              <div>
-                <label className="font-semibold text-muted-foreground">Consignee (Buyer)</label>
-                <input
-                  required
-                  value={newConsignee}
-                  onChange={(e) => setNewConsignee(e.target.value)}
-                  className="mt-1 h-10 w-full rounded-xl border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-
-              <div>
-                <label className="font-semibold text-muted-foreground">Destination Port / Country</label>
-                <input
-                  required
-                  value={newDestination}
-                  onChange={(e) => setNewDestination(e.target.value)}
-                  className="mt-1 h-10 w-full rounded-xl border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="rounded-full border bg-card px-4 py-2 font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="press rounded-full bg-primary px-5 py-2 font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
-                >
-                  Create & Upload Documents
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* New Export Consignment Modal */}
+      <NewConsignmentModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={() => {
+          setShowCreateModal(false);
+          navigate({ to: "/dashboard" });
+        }}
+      />
     </div>
   );
 }
