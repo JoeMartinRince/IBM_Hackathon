@@ -265,13 +265,13 @@ function Dashboard() {
                 <div>
                   <div className="font-bold text-sm">
                     {completion.canStart
-                      ? "ALL DOCUMENTS RECEIVED (5/5 READY)"
+                      ? `ALL REQUIRED DOCUMENTS RECEIVED (${completion.received}/${completion.total} READY)`
                       : `Waiting for Required Documents (${completion.total - completion.received} Missing)`}
                   </div>
                   <p className="mt-0.5 opacity-90 leading-relaxed">
                     {completion.canStart
-                      ? "All 5 export documents have been uploaded across Finance, Warehouse, Customs Broker, Buyer, and Quality teams. AI verification is unlocked."
-                      : `Still waiting for: ${completion.missing.join(", ")}. Admin cannot trigger verification until all 5 documents are available.`}
+                      ? `All ${completion.total} required export documents have been uploaded across assigned departments. AI verification is unlocked.`
+                      : `Still waiting for: ${completion.missing.join(", ")}. Admin cannot trigger verification until all ${completion.total} required documents are available.`}
                   </p>
                 </div>
               </div>
@@ -296,23 +296,28 @@ function Dashboard() {
               </button>
             </div>
 
-            {/* 5 Required Document Slots Grid */}
+            {/* Document Slots Grid */}
             <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
               {slots.map((slot) => {
                 const isReady = slot.status === "READY";
                 const isWaiting = slot.status === "WAITING";
                 const isCorrReq = slot.status === "CORRECTION_REQUESTED";
                 const isCorrSub = slot.status === "CORRECTION_SUBMITTED";
+                const isExempt = !slot.required;
 
                 return (
                   <div
                     key={slot.id}
-                    className="rounded-2xl border bg-card p-4 space-y-3 flex flex-col justify-between hover:border-primary/40 transition-colors shadow-xs"
+                    className={`rounded-2xl border bg-card p-4 space-y-3 flex flex-col justify-between hover:border-primary/40 transition-colors shadow-xs ${
+                      isExempt ? "opacity-75 bg-muted/20" : ""
+                    }`}
                   >
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h4 className="font-bold text-sm text-foreground">{slot.type}</h4>
+                          <h4 className={`font-bold text-sm ${isExempt ? "text-muted-foreground" : "text-foreground"}`}>
+                            {slot.type}
+                          </h4>
                           <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
                             <span>Assigned:</span>
                             <select
@@ -336,7 +341,9 @@ function Dashboard() {
 
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                            isReady
+                            isExempt
+                              ? "bg-muted text-muted-foreground border-border/50"
+                              : isReady
                               ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                               : isCorrReq
                               ? "bg-critical/10 text-critical border-critical/20 animate-pulse"
@@ -345,7 +352,9 @@ function Dashboard() {
                               : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                           }`}
                         >
-                          {isReady
+                          {isExempt
+                            ? "EXEMPT"
+                            : isReady
                             ? "READY"
                             : isCorrReq
                             ? "CORRECTION REQ"
@@ -356,7 +365,11 @@ function Dashboard() {
                       </div>
 
                       {/* Version & Metadata */}
-                      {slot.currentVersion ? (
+                      {isExempt ? (
+                        <div className="rounded-xl border border-dashed border-border/60 bg-muted/20 p-3 text-[11px] text-muted-foreground text-center italic">
+                          Exempt · Not needed for this consignment
+                        </div>
+                      ) : slot.currentVersion ? (
                         <div className="rounded-xl bg-muted/40 p-2.5 text-[11px] space-y-1">
                           <div className="flex items-center justify-between font-mono font-semibold text-foreground truncate">
                             <span className="truncate">{slot.currentVersion.filename}</span>
@@ -598,9 +611,10 @@ function Dashboard() {
                 const isWaiting = slot.status === "WAITING";
                 const isCorrReq = slot.status === "CORRECTION_REQUESTED";
                 const isCorrSub = slot.status === "CORRECTION_SUBMITTED";
+                const isExempt = !slot.required;
 
                 return (
-                  <Reveal key={slot.id} className="surface p-6 space-y-4 border-2">
+                  <Reveal key={slot.id} className={`surface p-6 space-y-4 border-2 ${isExempt ? "opacity-75" : ""}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="font-mono text-xs text-primary font-bold">
@@ -616,7 +630,9 @@ function Dashboard() {
 
                       <span
                         className={`text-xs font-bold px-3 py-1 rounded-full border ${
-                          isReady
+                          isExempt
+                            ? "bg-muted text-muted-foreground border-border/50"
+                            : isReady
                             ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                             : isCorrReq
                             ? "bg-critical/10 text-critical border-critical/30 animate-pulse"
@@ -625,7 +641,9 @@ function Dashboard() {
                             : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                         }`}
                       >
-                        {isReady
+                        {isExempt
+                          ? "EXEMPT"
+                          : isReady
                           ? "UPLOADED ✓"
                           : isCorrReq
                           ? "CORRECTION REQUESTED"
@@ -673,14 +691,20 @@ function Dashboard() {
                     {/* User Action Button */}
                     <div className="pt-2 flex items-center justify-between">
                       <div className="text-[11px] text-muted-foreground">
-                        {isReady
+                        {isExempt
+                          ? "Document is exempt for this consignment."
+                          : isReady
                           ? "Waiting for Admin verification."
                           : isCorrReq
                           ? "Action required to proceed."
                           : "Upload required export document."}
                       </div>
 
-                      {isCorrReq ? (
+                      {isExempt ? (
+                        <span className="text-[11px] text-muted-foreground italic bg-muted/40 px-3 py-1.5 rounded-full border border-border/40">
+                          No upload required
+                        </span>
+                      ) : isCorrReq ? (
                         <div className="flex items-center gap-2">
                           <button
                             type="button"

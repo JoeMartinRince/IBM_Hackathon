@@ -66,6 +66,7 @@ interface DemoState {
     commodity: string;
     category?: Shipment["category"] | undefined;
     selectedDocTypes: DocType[];
+    scannedDocs?: Record<string, { filename: string; fileSize: string }> | undefined;
   }) => string;
 }
 
@@ -451,6 +452,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     commodity: string;
     category?: Shipment["category"] | undefined;
     selectedDocTypes: DocType[];
+    scannedDocs?: Record<string, { filename: string; fileSize: string }> | undefined;
   }): string => {
     const id = data.id || `EXP-ABC-2026-${Math.floor(100 + Math.random() * 900)}`;
     const category: Shipment["category"] = data.category || "Seafood";
@@ -500,12 +502,13 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       const isSelected = data.selectedDocTypes.includes(type);
       const assign = defaultAssignments[type]!;
       const slotId = `slot-${type.toLowerCase().slice(0, 2)}-${id}`;
+      const scanned = data.scannedDocs?.[type];
 
       if (isSelected) {
         const ver = {
           version: 1,
-          filename: assign.filename,
-          fileSize: assign.size,
+          filename: scanned?.filename || assign.filename,
+          fileSize: scanned?.fileSize || assign.size,
           uploadedBy: assign.user.name,
           uploadedByRole: assign.user.roleLabel,
           uploadedAt: "07 Oct 2026, 10:45 AM",
@@ -534,7 +537,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           id: slotId,
           shipmentId: id,
           type,
-          required: true,
+          required: false, // NOT REQUIRED (EXEMPT from verification)
           assignedToUser: assign.user,
           status: "WAITING" as SlotStatus,
           versions: [],
@@ -548,9 +551,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       category,
       from: "Cochin Port (INCOK)",
       to: data.destination,
-      readiness: data.selectedDocTypes.length === 5 ? 100 : Math.round((data.selectedDocTypes.length / 5) * 80),
-      status: data.selectedDocTypes.length === 5 ? "ready" : "review",
-      issues: data.selectedDocTypes.length === 5 ? 0 : 2,
+      readiness: 100, // All required docs are configured and ready for AI verification
+      status: "ready",
+      issues: 0,
       updated: "Just now",
       exporter: data.exporter,
       consignee: "Gulf Fresh Trading LLC, Dubai",
