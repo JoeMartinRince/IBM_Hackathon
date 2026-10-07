@@ -1,9 +1,9 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import path from "node:path";
-import dotenv from "dotenv";
 import { db } from "./db";
 import { shipmentsRouter } from "./routes/shipments";
 import { documentsRouter } from "./routes/documents";
@@ -12,8 +12,6 @@ import { assistantRouter } from "./routes/assistant";
 import { insightsRouter } from "./routes/insights";
 import { publicVerifyRouter } from "./routes/publicVerify";
 import { authRouter } from "./routes/auth";
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
