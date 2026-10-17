@@ -120,7 +120,7 @@ VERIFAI PLATFORM
 ### 2. ISO 6346 Container Number Checksum Engine
 
 - Evaluates the mathematical validity of container serials (e.g. `CSQU3054383`, `MSKU4829150`) using the power-of-two modulus algorithm before the truck arrives at the terminal gate.
-
+                                      
 ### 3. Consensus Golden Record Engine
 
 - Ingests multiple contradictory documents and deterministically builds an authoritative single source of truth using a weighted hierarchical priority model ($SB > CI > PL > BL > PO$).
